@@ -24,11 +24,26 @@ const pool = new Pool({
 	connectionTimeoutMillis: 2000,
 });
 
+function updateVocabMasteredVal(vocabId, isMastered) {
+	pool.connect((err, client, release) => {
+		if(err) {
+			return console.error('Error acquiring client', err.stack)
+		}
+		client.query('UPDATE vocabulary SET mastered = $1 WHERE id = $2', [isMastered, vocabId], (err, result) => {
+			release();
+			if(err) {
+				return console.error('Error executing query', err.stack);
+			} else {
+				console.log('Mastered value set successfully.');
+			}
+		});
+	});
+}
+
 async function setupVocabMsgEventListeners(results) {
 	for(let i = 0; i < results.length; i++) {
 		app.action(results[i].id.toString(), function(e) {
-			console.log('button ' + results[i].id.toString() + ' clicked');
-			updateVocabMasteredVal(results[i].id.toString());
+			updateVocabMasteredVal(results[i].id.toString(), e.action.selected_options.length > 0);
 		});
 	}
 	sendDailyDutchVocabToSlack(results);
