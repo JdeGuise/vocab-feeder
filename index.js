@@ -66,20 +66,12 @@ async function getDailyDutchVocab() {
 }
 
 (async () => {
-	await getDailyDutchVocab();
-	// Start your app
 	await app.start();
-  
-	console.log('⚡️ Bolt app is running!');
 })();
 
 schedule.scheduleJob('30 07 * * *', function(){
 	(async () => {
 		await getDailyDutchVocab();
-		// Start your app
-		await app.start();
-	  
-		console.log('⚡️ Bolt app is running!');
 	})();
 });
 
