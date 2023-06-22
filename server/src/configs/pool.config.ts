@@ -11,4 +11,4 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-module.exports = pool;
+export { pool };

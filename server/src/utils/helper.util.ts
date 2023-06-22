@@ -1,4 +1,4 @@
-const buildKeyString = (resultRows) => {
+const buildKeyString = (resultRows: any) => {
   let keyString = "";
   for (const row in resultRows) {
     if (resultRows[row].id) {
@@ -9,7 +9,7 @@ const buildKeyString = (resultRows) => {
   return keyString;
 };
 
-const buildLoggingStr = (message, opts) => {
+const buildLoggingString = (message: any, opts: any) => {
   if (opts) {
     if (opts.payload) {
       return `${message} : ${opts.payload}`;
@@ -19,7 +19,7 @@ const buildLoggingStr = (message, opts) => {
   return `${message}`;
 };
 
-module.exports = {
+export {
   buildKeyString,
-  buildLoggingStr,
+  buildLoggingString,
 };

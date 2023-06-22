@@ -11,7 +11,7 @@ const slackApp = new App({
   port: process.env.PORT || 3000,
 });
 
-module.exports = {
+export {
   slackApp,
   storage,
   web,

@@ -4,12 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
+    "start": "NODE_ENV=production node index.tsx",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon index.js",
+    "dev": "NODE_ENV=development nodemon index.tsx",
     "lint": "eslint .  --ext .js",
     "lint-fix": "eslint --fix .  --ext .js",
-    "prepare": "husky install"
+    "prepare": "cd /home/pi/vocab-feeder; husky install /home/pi/vocab-feeder/.husky"
   },
   "repository": {
     "type": "git",
@@ -34,12 +34,17 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.2",
-    "nodemon": "^2.0.20",
-    "prettier": "2.8.8"
+    "nodemon": "^2.0.22",
+    "prettier": "2.8.8",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@slack/bolt": "^3.13.1",
     "@slack/web-api": "^6.7.2",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.3.1",
+    "@types/react": "^18.2.13",
+    "@types/react-dom": "^18.2.6",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "node-persist": "^3.1.3",
@@ -48,6 +53,7 @@
     "pg-format": "^1.0.4",
     "qs": "^6.11.0",
     "react": "^18.2.0",
+    "typescript": "^5.1.3",
     "winston": "^3.9.0"
   },
   "lint-staged": {

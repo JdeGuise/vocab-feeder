@@ -8,6 +8,6 @@ const initDailyDutchScheduler = () => {
   });
 };
 
-module.exports = {
+export {
   initDailyDutchScheduler,
 };

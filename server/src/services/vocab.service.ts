@@ -7,33 +7,34 @@ const {
 } = require("../../constants");
 
 const { buildLoggingStr } = require("../utils/helper.util");
-const logger = require("../../log"); // this retrieves default logger which was configured in log.js
+const { logger } = require("../../log"); // this retrieves default logger which was configured in log.js
 
-const getConnection = (callback) => {
-  pool.getConnection((err, connection, release) => {
+const getConnection = (callback: any) => {
+  pool.getConnection((err: any, connection: any, release: any) => {
     callback(err, connection, release);
   });
 };
 
-const getSlackInfo = async (req, res, next) => {
+const getSlackInfo = async (req: any, res: any, next: any) => {
   try {
     return { sendDailySlackBtnLabel: SEND_DAILY_SLACK_BTN_LABEL };
-  } catch (err) {
+  } catch (err: any) {
     logger.error(buildLoggingStr("Error: ", err.message));
     console.error("Error: ", err.message);
     next(err);
   }
 };
 
-const getReviewCategories = async (req, res, next) => {
-  await pool.connect(async (err, client, release) => {
+// const getReviewCategories = async (req: any, res: any, next: any) => {
+const getReviewCategories = async (req: any, res: { send: (arg0: any[]) => void; }, next: any) => {
+  await pool.connect(async (err: any, client: any, release: any) => {
     if (err) {
       logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
       return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
     }
     client.query(
       "SELECT name FROM category WHERE name != '' ORDER BY category_order ASC",
-      async (err, result) => {
+      async (err: any, result: any) => {
         release();
         if (err) {
           logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
@@ -50,7 +51,7 @@ const getReviewCategories = async (req, res, next) => {
   });
 };
 
-const buildInsertVocabRecordQuery = (newVocab) => {
+const buildInsertVocabRecordQuery = (newVocab: { [s: string]: unknown; } | ArrayLike<unknown>) => {
   return format(
     "INSERT INTO vocabulary (%I) VALUES (%L)",
     Object.keys(newVocab),
@@ -58,13 +59,13 @@ const buildInsertVocabRecordQuery = (newVocab) => {
   );
 };
 
-const buildUpdateVocabRecordByIdQuery = (id, cols) => {
+const buildUpdateVocabRecordByIdQuery = (id: string, cols: { [x: string]: any; }) => {
   const query = ["UPDATE vocabulary"];
   query.push("SET");
 
   // Create another array storing each set command
   // and assigning a number value for parameterized query
-  const set = [];
+  const set: string[] = [];
   Object.keys(cols).forEach((key, i) => {
     set.push(`${cols[key]} = ($${i + 1})`);
   });
@@ -77,11 +78,11 @@ const buildUpdateVocabRecordByIdQuery = (id, cols) => {
   return query.join(" ");
 };
 
-const buildDeleteVocabRecordByIdQuery = (id) => {
+const buildDeleteVocabRecordByIdQuery = (id: string) => {
   return format("DELETE FROM vocabulary WHERE id = %L", id);
 };
 
-module.exports = {
+export {
   getSlackInfo,
   getConnection,
   getReviewCategories,

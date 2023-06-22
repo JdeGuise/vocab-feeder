@@ -28,12 +28,12 @@ const { slackApp, storage, web } = require("../configs/slack.config");
 const { buildLoggingStr } = require("../utils/helper.util");
 const logger = require("../../log"); // this retrieves default logger which was configured in log.js
 
-const sendDailyDutchVocabToSlack = async (recordCount) => {
+const sendDailyDutchVocabToSlack = async (recordCount: number) => {
   await getVocabularyRecords(recordCount);
 };
 
-const getVocabularyRecords = async (recordCount) => {
-  pool.connect((err, client, release) => {
+const getVocabularyRecords = async (recordCount: number) => {
+  pool.connect((err: any, client: any, release: any) => {
     if (err) {
       logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
       return console.error(QUERY_EXECUTION_ERROR_MSG, err.stack);
@@ -42,7 +42,7 @@ const getVocabularyRecords = async (recordCount) => {
     client.query(
       "SELECT id, dutch, english, pronunciationLink FROM vocabulary WHERE mastered != TRUE ORDER BY random() LIMIT $1",
       [recordCount],
-      (err, result) => {
+      (err: any, result: any) => {
         release();
         if (err) {
           logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
@@ -54,10 +54,10 @@ const getVocabularyRecords = async (recordCount) => {
   });
 };
 
-const postSlackMessage = (data, keyString) => {
+const postSlackMessage = (data: any, keyString: string) => {
   (async () => {
     initLocalStorageDataGroups(data, keyString);
-    const blockStr = buildDutchBlockStr(data);
+    const blockStr: any = buildDutchBlockStr(data);
 
     const result = await web.chat.postMessage({
       blocks: JSON.stringify(blockStr),
@@ -80,7 +80,7 @@ const postSlackMessage = (data, keyString) => {
     const actions = await storage.getItem(REGISTERED_ACTIONS_STRING);
     const actionVals = Object.values(actions);
     for (const action in actionVals) {
-      slackApp.action(actionVals[action], async ({ body, ack, client }) => {
+      slackApp.action(actionVals[action], async ({ body, ack }: any) => {
         try {
           await ack();
         } catch (error) {
@@ -120,7 +120,7 @@ const postSlackMessage = (data, keyString) => {
   })();
 };
 
-const initLocalStorageDataGroups = async (data, keyString) => {
+const initLocalStorageDataGroups = async (data: any, keyString: string) => {
   let dataGroups = await storage.getItem(DATA_GROUP_KEYSTRING);
   if (!dataGroups) {
     dataGroups = {};
@@ -131,16 +131,16 @@ const initLocalStorageDataGroups = async (data, keyString) => {
 };
 
 const setLocalStorageRegisteredActions = async (
-  actionId,
-  keyString,
-  timestamp
+  actionId: string,
+  keyString: string,
+  timestamp: any
 ) => {
   await setStorageMap(actionId, actionId, REGISTERED_ACTIONS_STRING);
   await setStorageMap(actionId, keyString, KEYSTRING_BY_ACTION_ID);
   await setStorageMap(keyString, timestamp, TIMESTAMP_BY_KEYSTRING);
 };
 
-const setStorageMap = async (k, v, mapKey) => {
+const setStorageMap = async (k: string, v: any, mapKey: any) => {
   let existingItem = await storage.getItem(mapKey);
   if (!existingItem) {
     existingItem = {};
@@ -150,15 +150,15 @@ const setStorageMap = async (k, v, mapKey) => {
   await storage.setItem(mapKey, existingItem);
 };
 
-const removeLocalStorageRegisteredAction = async (actionId) => {
+const removeLocalStorageRegisteredAction = async (actionId: string) => {
   const updatedActions = await storage.getItem(REGISTERED_ACTIONS_STRING);
   delete updatedActions[actionId];
 
   await storage.setItem(REGISTERED_ACTIONS_STRING, updatedActions);
 };
 
-const buildDutchBlockStr = (data) => {
-  const blockStr = initBlockStrWithDailyMessageHeaderTitle();
+const buildDutchBlockStr = (data: any) => {
+  const blockStr: any[] = initBlockStrWithDailyMessageHeaderTitle();
 
   for (const entry in data) {
     blockStr.push({
@@ -206,7 +206,7 @@ const buildDutchBlockStr = (data) => {
   return blockStr;
 };
 
-const buildPronunciationString = (pronunciationlink) =>
+const buildPronunciationString = (pronunciationlink: string) =>
   pronunciationlink === EMPTY_PRONUNCIATION_LINK
     ? NO_URL_FOUND_STRING
     : `<${pronunciationlink}|(Pronunciation)>`;
@@ -224,7 +224,7 @@ const initBlockStrWithDailyMessageHeaderTitle = () => [
   },
 ];
 
-const updateIdActionList = (actionValue, rowIdOfAction) => {
+const updateIdActionList = (actionValue: string, rowIdOfAction: number) => {
   updateVocabRecordsAsSeen(actionValue, rowIdOfAction);
   if (actionValue === MASTERED_STRING) {
     slackVars.masteredIds.push(rowIdOfAction);
@@ -233,19 +233,19 @@ const updateIdActionList = (actionValue, rowIdOfAction) => {
   }
 };
 
-const getRowIdFromSlackAction = (payloadActionId) =>
+const getRowIdFromSlackAction = (payloadActionId: string) =>
   parseInt(payloadActionId.split("-")[1]);
 
 const buildUpdatedDutchBlockStr = (
-  actionId,
-  actionValue,
-  keyString,
-  keyStringData
+  actionId: string,
+  actionValue: string,
+  keyString: string,
+  keyStringData: any
 ) => {
   const rowIdOfAction = getRowIdFromSlackAction(actionId);
   updateIdActionList(actionValue, rowIdOfAction);
 
-  const blockStr = initBlockStrWithDailyMessageHeaderTitle();
+  const blockStr: any[] = initBlockStrWithDailyMessageHeaderTitle();
 
   for (const entryIndex in keyStringData) {
     if (
@@ -317,15 +317,15 @@ const buildUpdatedDutchBlockStr = (
   return JSON.stringify(blockStr);
 };
 
-const updateVocabRecordsAsSeen = async (field, vocabId) => {
-  pool.connect((err, client, release) => {
+const updateVocabRecordsAsSeen = async (field: string, vocabId: number) => {
+  pool.connect((err: any, client: any, release: any) => {
     if (err) {
       logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
       return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
     }
 
     const queryStr = `UPDATE vocabulary SET ${field} = TRUE WHERE id = ANY($1)`;
-    client.query(queryStr, [[vocabId]], (err, result) => {
+    client.query(queryStr, [[vocabId]], (err: any) => {
       release();
       if (err) {
         logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
@@ -353,6 +353,6 @@ const updateVocabRecordsAsSeen = async (field, vocabId) => {
 //   })
 // }
 
-module.exports = {
+export {
   sendDailyDutchVocabToSlack,
 };

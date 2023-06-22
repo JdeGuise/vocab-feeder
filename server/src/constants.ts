@@ -26,7 +26,7 @@ const DATA_GROUP_KEYSTRING = "dataGroups";
 const KEYSTRING_BY_ACTION_ID = "keyStringByActionId";
 const TIMESTAMP_BY_KEYSTRING = "timestampByKeystring";
 
-module.exports = {
+export {
   DEFAULT_VOCAB_BATCH_COUNT,
   SEND_DAILY_SLACK_BTN_LABEL,
   QUERY_EXECUTION_ERROR_MSG,

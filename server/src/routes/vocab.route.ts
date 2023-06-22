@@ -13,4 +13,7 @@ router.delete("/vocab", vocabController.deleteVocab);
 router.post("/slack-message", vocabController.postSlackMessage);
 router.post("/vocab-for-category", vocabController.getVocabForCategory);
 
-module.exports = router;
+export {
+    express,
+    router
+};
