@@ -2,11 +2,11 @@
   "name": "vocab-feeder",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "NODE_ENV=production node index.tsx",
+    "start": "NODE_ENV=production node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "NODE_ENV=development nodemon index.tsx",
+    "dev": "NODE_ENV=development npx nodemon src/index.ts",
     "lint": "eslint .  --ext .js",
     "lint-fix": "eslint --fix .  --ext .js",
     "prepare": "cd /home/pi/vocab-feeder; husky install /home/pi/vocab-feeder/.husky"

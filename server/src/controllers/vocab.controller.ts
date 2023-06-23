@@ -5,10 +5,10 @@ const pool = require("../configs/pool.config");
 const {
   QUERY_EXECUTION_ERROR_MSG,
   QUERY_CONNECTION_ERROR_MSG,
-} = require("../../constants");
+} = require("./../constants");
 
 const { buildLoggingStr } = require("../utils/helper.util");
-const { logger } = require("../../log"); // this retrieves default logger which was configured in log.js
+const { logger } = require("./../log"); // this retrieves default logger which was configured in log.js
 
 const getSlackInfo = async (req: any, res: { json: (arg0: any) => void; }, next: (arg0: unknown) => void) => {
   try {

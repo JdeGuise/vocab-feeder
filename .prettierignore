@@ -1,6 +1,9 @@
-node_modules
-package-lock.json
-.env
+server/node_modules
+server/package-lock.json
+*.env
 
 *.log
-localStorage/
+server/localStorage/
+
+client/node_modules
+client/package-lock.json

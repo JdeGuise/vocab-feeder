@@ -4,10 +4,10 @@ const {
   SEND_DAILY_SLACK_BTN_LABEL,
   QUERY_CONNECTION_ERROR_MSG,
   QUERY_EXECUTION_ERROR_MSG,
-} = require("../../constants");
+} = require("./../constants");
 
 const { buildLoggingStr } = require("../utils/helper.util");
-const { logger } = require("../../log"); // this retrieves default logger which was configured in log.js
+const { logger } = require("./../log"); // this retrieves default logger which was configured in log.js
 
 const getConnection = (callback: any) => {
   pool.getConnection((err: any, connection: any, release: any) => {

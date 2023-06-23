@@ -18,15 +18,15 @@ const {
   TIMESTAMP_BY_KEYSTRING,
   EMPTY_PRONUNCIATION_LINK,
   NO_URL_FOUND_STRING,
-} = require("../../constants");
+} = require("./../constants");
 
 const { buildKeyString } = require("../utils/helper.util");
 const pool = require("../configs/pool.config");
-const slackVars = require("../../slack-vars");
+const slackVars = require("./../slack-vars");
 const { slackApp, storage, web } = require("../configs/slack.config");
 
 const { buildLoggingStr } = require("../utils/helper.util");
-const logger = require("../../log"); // this retrieves default logger which was configured in log.js
+const logger = require("./../log"); // this retrieves default logger which was configured in log.js
 
 const sendDailyDutchVocabToSlack = async (recordCount: number) => {
   await getVocabularyRecords(recordCount);
