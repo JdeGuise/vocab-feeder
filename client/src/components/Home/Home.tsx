@@ -1,11 +1,11 @@
 import React from "react";
 import "./../../App.css";
-import WindmillSVG from "./../../windmill.svg";
+import Windmill from "./../Windmill/Windmill";
 
-const Home = (props) => {
+const Home = (props: any) => {
   return (
     <div className="Windmill-Icon">
-      <img src={WindmillSVG} alt="Windmill SVG" />
+      <Windmill/>
     </div>
   );
 };
