@@ -21,7 +21,7 @@ const {
 } = require("./../constants");
 
 const { buildKeyString } = require("../utils/helper.util");
-const pool = require("../configs/pool.config");
+const { pool } = require("../configs/pool.config");
 const slackVars = require("./../slack-vars");
 const { slackApp, storage, web } = require("../configs/slack.config");
 

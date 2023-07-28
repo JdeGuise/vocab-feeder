@@ -1,4 +1,4 @@
-const pool = require("../configs/pool.config");
+const { pool } = require("../configs/pool.config");
 const format = require("pg-format");
 const {
   SEND_DAILY_SLACK_BTN_LABEL,
