@@ -1,5 +1,5 @@
 require("dotenv").config();
-
+const path = require('node:path'); 
 const PORT = process.env.NODE_PORT || 3001;
 
 const { initDailyDutchScheduler } = require("./jobs/vocab.job");
@@ -23,6 +23,12 @@ slackApp.error((error: any) => {
 });
 
 app.use("/api", router);
+
+app.use(express.static(__dirname)); //here is important thing - no static directory, because all static :)
+
+app.get("/*", function(req: any, res: any) {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
 app.listen(PORT, () => {
   logger.info(buildLoggingString(`Server listening on ${PORT}`));
