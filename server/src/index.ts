@@ -12,7 +12,7 @@ const { buildLoggingString } = require("./utils/helper.util");
 const { logger } = require("./log"); // this retrieves default logger which was configured in log.js
 
 (async () => {
-  await storage.init({ dir: "/home/pi/vocab-feeder/server/src/localStorage" });
+  await storage.init({ dir: "./src/localStorage" });
   await slackApp.start();
 
   initDailyDutchScheduler();

@@ -9,7 +9,7 @@
     "dev": "NODE_ENV=development npx nodemon src/index.ts",
     "lint": "eslint .  --ext .js",
     "lint-fix": "eslint --fix .  --ext .js",
-    "prepare": "cd /home/pi/vocab-feeder; husky install /home/pi/vocab-feeder/.husky"
+    "prepare": "cd ../; husky install .husky"
   },
   "repository": {
     "type": "git",
