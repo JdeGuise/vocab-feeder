@@ -1,5 +1,5 @@
 import SlackDailyVocab from "../components/SlackDailyVocab/SlackDailyVocab";
-import ReviewVocab from "../components/ReviewVocab/ReviewVocab";
+import ReviewVocab from "../components/ReviewVocab/ReviewVocab.js";
 import Home from "../components/Home/Home";
 import ReviewLessonNotes from "../components/ReviewLessonNotes/ReviewLessonNotes";
 import ReviewVocabEntries from "../components/ReviewVocabEntries/ReviewVocabEntries";

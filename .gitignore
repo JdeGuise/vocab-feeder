@@ -1,6 +1,19 @@
+# packages / package metadata
 node_modules
 package-lock.json
+
+# credentials
 .env
 
+# log files
 *.log
+
+# local storage / cache
 localStorage/
+
+# app builds
+build/
+dist/
+
+# sample data
+*.sql
