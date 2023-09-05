@@ -1,5 +1,6 @@
-require("dotenv").config();
 const path = require('node:path'); 
+require('dotenv').config({ path: path.resolve(__dirname, './../.env') });
+
 const PORT = process.env.NODE_PORT || 3001;
 
 const { initDailyDutchScheduler } = require("./jobs/vocab.job");
