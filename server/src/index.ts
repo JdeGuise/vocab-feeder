@@ -28,7 +28,7 @@ app.use("/api", router);
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, './../../dist/client')));
 
-app.get("/", function(req: any, res: any) {
+app.get("/*", function(req: any, res: any) {
   res.sendFile(path.resolve(__dirname, './../client', 'index.html'));
 });
 
