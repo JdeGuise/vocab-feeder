@@ -10,8 +10,12 @@ const SlackDailyVocab = (props) => {
   const [data, setData] = useState("");
 
   useEffect(() => {
+    console.log('testing client');
     fetch(Constants.GET_SLACK_INFO_ENDPOINT)
-      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        return res.text();
+      })
       .then((resData) => {
         setData(resData);
       })
