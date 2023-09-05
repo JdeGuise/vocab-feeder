@@ -26,17 +26,10 @@ slackApp.error((error: any) => {
 app.use("/api", router);
 
 app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, './../../dist/client')));
 
-app.get("/*", function(req: any, res: any) {
-  console.log('testing server');
-  // res.sendFile(path.join(__dirname, "index.html"));
-  // res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+app.get("/", function(req: any, res: any) {
   res.sendFile(path.resolve(__dirname, './../client', 'index.html'));
-
-
-  // console.log(path.resolve(__dirname, './../client/index.html'));
-
 });
 
 app.listen(PORT, () => {
