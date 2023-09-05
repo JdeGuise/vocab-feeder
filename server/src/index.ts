@@ -8,7 +8,7 @@ const { slackApp, storage } = require("./configs/slack.config");
 const {express, router } = require("./routes/vocab.route");
 const app = express();
 
-const { buildLoggingString } = require("./utils/helper.util");
+const { buildLoggingStr } = require("./utils/helper.util");
 const { logger } = require("./log"); // this retrieves default logger which was configured in log.js
 
 (async () => {
@@ -19,7 +19,7 @@ const { logger } = require("./log"); // this retrieves default logger which was 
 })();
 
 slackApp.error((error: any) => {
-  logger.info(buildLoggingString(error));
+  logger.info(buildLoggingStr(error));
 });
 
 app.use("/api", router);
@@ -31,7 +31,7 @@ app.get("/*", function(req: any, res: any) {
 });
 
 app.listen(PORT, () => {
-  logger.info(buildLoggingString(`Server listening on ${PORT}`));
+  logger.info(buildLoggingStr(`Server listening on ${PORT}`));
   console.log(`Server listening on ${PORT}`);
 });
 

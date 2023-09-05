@@ -9,7 +9,7 @@ const buildKeyString = (resultRows: any) => {
   return keyString;
 };
 
-const buildLoggingString = (message: any, opts: any) => {
+const buildLoggingStr = (message: any, opts: any) => {
   if (opts) {
     if (opts.payload) {
       return `${message} : ${opts.payload}`;
@@ -21,5 +21,5 @@ const buildLoggingString = (message: any, opts: any) => {
 
 export {
   buildKeyString,
-  buildLoggingString,
+  buildLoggingStr,
 };
