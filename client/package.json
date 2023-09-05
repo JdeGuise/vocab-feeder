@@ -24,7 +24,7 @@
   "scripts": {
     "start": "react-scripts start",
     "start-app": "react-scripts start",
-    "build-app": "BUILD_PATH='./../build/client' react-scripts build",
+    "build-app": "BUILD_PATH='./../dist/client' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
