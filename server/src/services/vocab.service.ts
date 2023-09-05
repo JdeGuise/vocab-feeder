@@ -17,7 +17,6 @@ const getConnection = (callback: any) => {
 
 const getSlackInfo = async (req: any, res: any, next: any) => {
   try {
-    console.log('sending json');
     return { sendDailySlackBtnLabel: SEND_DAILY_SLACK_BTN_LABEL };
   } catch (err: any) {
     logger.error(buildLoggingStr("Error: ", err.message));
