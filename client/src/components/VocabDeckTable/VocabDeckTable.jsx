@@ -13,7 +13,7 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { usePagination } from "@table-library/react-table-library/pagination";
 import TableSearch from "./TableSearch/TableSearch";
 import TableFooter from "./TableFooter/TableFooter";
-import Vocab from "./../Vocab/Vocab";
+import VocabDeckEntry from "../VocabDeckEntry/VocabDeckEntry";
 import Modal from "../VocabDeckDeleteRecordModal/VocabDeckDeleteRecordModal";
 
 const VocabTable = ({
@@ -162,7 +162,7 @@ const VocabTable = ({
 
               <Body>
                 {tableList.map((vocab) => (
-                  <Vocab
+                  <VocabDeckEntry
                     key={vocab.id}
                     vocab={vocab}
                     captureEdit={captureEdit}

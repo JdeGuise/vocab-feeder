@@ -1,7 +1,7 @@
-import SlackDailyVocab from "../components/SlackDailyVocab/SlackDailyVocab";
-import ReviewVocab from "../components/ReviewVocab/ReviewVocab.js";
+import SlackDailyVocabWrapper from "../components/SlackDailyVocabWrapper/SlackDailyVocabWrapper";
+import ReviewVocabWrapper from "../components/ReviewVocabWrapper/ReviewVocabWrapper.js";
 import Home from "../components/Home/Home";
-import ReviewLessonNotes from "../components/ReviewLessonNotes/ReviewLessonNotes";
+import LessonNotesWrapper from "../components/LessonNotesWrapper/LessonNotesWrapper";
 import VocabDeckWrapper from "../components/VocabDeckWrapper/VocabDeckWrapper";
 
 // ReviewVocab.js
@@ -23,7 +23,7 @@ export const REVIEW_ENDPOINT_REVIEW_TYPE_PARAM =
 export const CHOOSE_CATEGORY_LABEL = "Choose a category";
 export const REVIEW_ALL_CATEGORY_LABEL = "Review All";
 
-// SlackDailyVocab.js
+// SlackDailyVocabWrapper.js
 export const GET_SLACK_INFO_ENDPOINT = "/api/slack-info";
 export const SEND_SLACK_MSG_ENDPOINT = "/api/slack-message";
 export const SLACK_ENDPOINT = "/slack";
@@ -32,7 +32,7 @@ export const SLACK_SENT_CONFIRMATION = "Your vocab has been sent to Slack!";
 export const SLACK_RECORD_MIN = 1;
 export const SLACK_RECORD_MAX = 25;
 
-// VocabCard.js
+// ReviewVocabCardSession.js
 export const VOCAB_CARD_PREV_BUTTON_STR = "❮ Prev";
 export const VOCAB_CARD_NEXT_BUTTON_STR = "Next ❯";
 export const VOCAB_CARD_FLIP_BUTTON_STR = "Flip";
@@ -89,17 +89,17 @@ export const ROUTES = [
   {
     route: SLACK_ENDPOINT,
     linkLabel: "Slack",
-    element: <SlackDailyVocab />,
+    element: <SlackDailyVocabWrapper />,
   },
   {
     route: REVIEW_ENDPOINT,
     linkLabel: "Review",
-    element: <ReviewVocab />,
+    element: <ReviewVocabWrapper />,
   },
   {
     route: LESSONS_ENDPOINT,
     linkLabel: "Notes",
-    element: <ReviewLessonNotes />,
+    element: <LessonNotesWrapper />,
   },
   {
     route: DECK_ENDPOINT,
