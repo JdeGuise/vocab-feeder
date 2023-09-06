@@ -53,6 +53,14 @@ export const VOCAB_CARD_REVIEWTYPE_TEST_LABEL = "Test";
 export const VOCAB_CARD_REVIEWTYPE_TEST_STR =
   VOCAB_CARD_REVIEWTYPE_TEST_LABEL.toLowerCase();
 
+export const VOCAB_CARD_CORRECT_ANSWER_MSG = "That's Right!";
+export const VOCAB_CARD_INCORRECT_ANSWER_MSG = "Incorrect.";
+export const VOCAB_CARD_CORRECT_CSS = "showCorrect";
+export const VOCAB_CARD_INCORRECT_CSS = "showIncorrect";
+export const VOCAB_CARD_IMAGE_NEEDED_NAME = "image-needed.png";
+
+
+
 // ReviewVocabCardSessionTest.js
 export const DONE_LABEL = 'Done';
 
@@ -69,6 +77,26 @@ export const LESSON_ENDPOINT_PERSON_PARAM =
 export const DECK_TITLE = "Vocab Entries";
 export const DECK_ENDPOINT = "/deck";
 export const VOCAB_RECORDS_ENDPOINT = "/api/vocab";
+export const VOCAB_DECK_PAGE_LIMIT = "10";
+
+// VocabDeckTable.jsx
+export const ADD_VOCAB_ENTRY_LABEL = "Add Vocab Entry";
+
+// VocabDeckEntry.js
+export const EDIT_BTN_LABEL = "Edit";
+
+// VocabDeckWrapperAddVocab.js
+export const SAVE_BTN_LABEL = "Save";
+export const CANCEL_BTN_LABEL = "Cancel";
+
+// VocabDeckWrapperDeleteRecordModal.js
+export const CANCEL_BTN_X = "X";
+export const DELETE_BTN_LABEL = "Delete";
+export const CONFIRM_DELETE_MSG = "Confirm Deletion";
+export const RECORD_DELETE_CONFIRM = "Are you sure you want to delete the vocab record?";
+
+// TableSearch.jsx
+export const TABLE_SEARCH_PLACEHOLDER = "Enter a search term";
 
 // AWS
 export const S3_BUCKET_URL =

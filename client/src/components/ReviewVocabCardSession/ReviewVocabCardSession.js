@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import * as Constants from "../../constants/constants";
@@ -43,10 +43,12 @@ const ReviewVocabCardSession = (props) => {
     let snackBar = document.getElementById("snackbar");
     setCSS((css) => ({
       ...css,
-      snackbarCSS: (isCorrect ? "showCorrect" : "showIncorrect")
+      snackbarCSS: (isCorrect ? Constants.VOCAB_CARD_CORRECT_CSS : Constants.VOCAB_CARD_INCORRECT_CSS)
     }));
 
-    snackBar.innerText = isCorrect ? "That's right!" : "Incorrect.";
+    snackBar.innerText = isCorrect ? 
+      Constants.VOCAB_CARD_CORRECT_ANSWER_MSG : 
+      Constants.VOCAB_CARD_INCORRECT_ANSWER_MSG;
 
     setTimeout(function () {
       ResetSnackbar();

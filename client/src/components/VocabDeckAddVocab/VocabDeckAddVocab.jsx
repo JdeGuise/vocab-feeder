@@ -1,5 +1,3 @@
-import React from "react";
-
 import * as Constants from "../../constants/constants";
 
 const VocabDeckWrapperAddVocab = ({
@@ -66,10 +64,10 @@ const VocabDeckWrapperAddVocab = ({
 
         <div className={styles.formBtnRow}>
           <div className={styles.formBtns}>
-            <button type="submit">Save</button>
+            <button type="submit">{Constants.SAVE_BTN_LABEL}</button>
           </div>
           <div className={styles.formBtns}>
-            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCancel}>{Constants.CANCEL_BTN_LABEL}</button>
           </div>
         </div>
       </form>

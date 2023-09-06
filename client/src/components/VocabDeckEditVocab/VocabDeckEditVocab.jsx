@@ -1,5 +1,3 @@
-import React from "react";
-
 import * as Constants from "../../constants/constants";
 
 const VocabDeckWrapperEditVocab = ({
@@ -36,11 +34,11 @@ const VocabDeckWrapperEditVocab = ({
   };
 
   const labels = {
-    Dutch: dutch,
-    English: english,
+    "Dutch": dutch,
+    "English": english,
     "Pronunciation URL": pronunciationlink,
-    Notes: notes,
-    Category: set_name,
+    "Notes": notes,
+    "Category": set_name,
   };
 
   return (
@@ -66,10 +64,10 @@ const VocabDeckWrapperEditVocab = ({
 
         <div className={styles.formBtnRow}>
           <div className={styles.formBtns}>
-            <button type="submit">Save</button>
+            <button type="submit">{Constants.SAVE_BTN_LABEL}</button>
           </div>
           <div className={styles.formBtns}>
-            <button onClick={handleCancel}>Cancel</button>
+            <button onClick={handleCancel}>{Constants.CANCEL_BTN_LABEL}</button>
           </div>
         </div>
       </form>

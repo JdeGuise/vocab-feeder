@@ -31,7 +31,7 @@ const ReviewVocabCardSessionTest = (props) => {
               className="vocab-card-img"
               src={Constants.S3_BUCKET_URL + props.card.id + ".png"}
               alt=""
-              onError={(event) => (event.target.src = "image-needed.png")}
+              onError={(event) => (event.target.src = Constants.VOCAB_CARD_IMAGE_NEEDED_NAME)}
               onLoad={(event) => (event.target.style.visibility = "visible")}
             />
             <div className={props.css.frontCSS}>

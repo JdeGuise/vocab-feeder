@@ -1,3 +1,5 @@
+import * as Constants from "../../../constants/constants";
+
 const TableSearch = ({ styles, handleSearch, searchValue }) => {
     return (
       <>
@@ -6,7 +8,7 @@ const TableSearch = ({ styles, handleSearch, searchValue }) => {
             <input
               id="search"
               type="text"
-              placeholder="Enter a search term"
+              placeholder={Constants.TABLE_SEARCH_PLACEHOLDER}
               onChange={handleSearch}
               value={searchValue}
             />

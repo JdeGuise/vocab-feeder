@@ -1,5 +1,5 @@
 // @/src/components/VocabDeck/VocabDeck.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import styles from "./VocabDeck.module.css";
 
 import VocabDeckEditVocab from "../VocabDeckEditVocab/VocabDeckEditVocab";

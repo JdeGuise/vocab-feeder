@@ -1,7 +1,6 @@
 // @src/components/VocabDeckWrapperDeleteRecordModal.jsx
-
-import React from "react";
 import styles from "./VocabDeckDeleteRecordModal.module.css";
+import * as Constants from "../../constants/constants.js";
 
 const VocabDeckWrapperDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
   return (
@@ -10,16 +9,16 @@ const VocabDeckWrapperDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord
       <div className={styles.centered}>
         <div className={styles.modal}>
           <div className={styles.modalHeader}>
-            <h5 className={styles.heading}>Dialog</h5>
+            <h5 className={styles.heading}>{Constants.CONFIRM_DELETE_MSG}</h5>
           </div>
           <button
             className={styles.closeBtn}
             onClick={() => setDeleteRecord(false)}
           >
-            X
+            {Constants.CANCEL_BTN_X}
           </button>
           <div className={styles.modalContent}>
-            Are you sure you want to delete the vocab record?
+            {Constants.RECORD_DELETE_CONFIRM}
           </div>
           <div className={styles.modalActions}>
             <div className={styles.actionsContainer}>
@@ -30,13 +29,13 @@ const VocabDeckWrapperDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord
                   handleDeleteRecord();
                 }}
               >
-                Delete
+                {Constants.DELETE_BTN_LABEL}
               </button>
               <button
                 className={styles.cancelBtn}
                 onClick={() => setDeleteRecord(false)}
               >
-                Cancel
+                {Constants.CANCEL_BTN_LABEL}
               </button>
             </div>
           </div>

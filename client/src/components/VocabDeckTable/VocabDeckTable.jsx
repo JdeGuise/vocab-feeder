@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import * as Constants from "../../constants/constants";
 
 import {
   Table,
@@ -144,7 +145,7 @@ const VocabTable = ({
             changeAddState();
           }}
         >
-          Add Vocab Entry
+          {Constants.ADD_VOCAB_ENTRY_LABEL}
         </button>
       </div>
 

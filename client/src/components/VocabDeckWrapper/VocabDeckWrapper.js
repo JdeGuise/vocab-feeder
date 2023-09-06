@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 import "./../../VocabFeederApp.css";
 import "./../../Snackbar.css";
@@ -45,7 +45,7 @@ const VocabDeckWrapper = (props) => {
   return (
     <VocabDeck
       data={vocabRecords}
-      LIMIT="10"
+      LIMIT={Constants.VOCAB_DECK_PAGE_LIMIT}
       onCreateVocab={onCreateVocab}
       onUpdateVocab={onUpdateVocab}
       setRefetch={setRefetch}

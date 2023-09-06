@@ -4,7 +4,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import * as Constants from "../../constants/constants";
 import LessonNotes from "../LessonNotes/LessonNotes";
 
-const ReviewLessonNotes = (props) => {
+const ReviewLessonNotes = () => {
   const [lessons, setLessons] = useState({});
   const [searchParams] = useSearchParams();
 

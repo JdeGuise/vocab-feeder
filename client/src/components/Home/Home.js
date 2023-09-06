@@ -1,4 +1,3 @@
-import React from "react";
 import "./../../VocabFeederApp.css";
 import WindmillSVG from "./../../windmill.svg";
 

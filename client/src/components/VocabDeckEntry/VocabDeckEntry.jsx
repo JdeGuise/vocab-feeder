@@ -1,5 +1,5 @@
-import React from "react";
 import { Row, Cell } from "@table-library/react-table-library/table";
+import * as Constants from "../../constants/constants";
 
 const Vocab = ({
   vocab,
@@ -23,7 +23,7 @@ const Vocab = ({
             changeEditState(vocab);
           }}
         >
-          Edit
+          {Constants.EDIT_BTN_LABEL}
         </button>
         <button
           onClick={() => {
@@ -31,7 +31,7 @@ const Vocab = ({
             changeDeleteState(vocab);
           }}
         >
-          Delete
+          {Constants.DELETE_BTN_LABEL}
         </button>
       </Cell>
     </Row>
