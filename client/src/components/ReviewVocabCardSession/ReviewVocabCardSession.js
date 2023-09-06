@@ -61,14 +61,10 @@ const ReviewVocabCardSession = (props) => {
   };
 
   const GetNextCard = (e) => {
-    console.log(props.totalAttempted);
-    console.log(props.cards.length);
-
     e.preventDefault();
 
     if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
       if(props.totalAttempted === props.cards.length) {
-        console.log('you cant go any further');
         setShowSummary(true);
       } else {
         // don't reset prevCSS button styles for testing use case (because we never want the button)
