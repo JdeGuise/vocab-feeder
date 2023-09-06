@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import styles from "./Table.module.css";
 
-import EditVocab from "./../EditVocab/EditVocab";
-import AddVocab from "./../AddVocab/AddVocab";
+import VocabDeckEditVocab from "../VocabDeckVocabDeckEditVocab/VocabDeckVocabDeckEditVocab";
+import VocabDeckAddVocab from "./../VocabDeckAddVocab/VocabDeckAddVocab";
 import VocabTable from "../VocabTable/VocabTable";
 import * as Constants from "./../../constants";
 
@@ -86,7 +86,7 @@ const DataTable = ({
   let datatableMarkup;
   if (editRecord) {
     datatableMarkup = (
-      <EditVocab
+      <VocabDeckEditVocab
         editForm={editForm}
         handleEditChange={handleEditChange}
         handleCancel={handleCancel}
@@ -97,7 +97,7 @@ const DataTable = ({
     );
   } else if (addRecord) {
     datatableMarkup = (
-      <AddVocab
+      <VocabDeckAddVocab
         addForm={addForm}
         handleAddChange={handleAddChange}
         handleCancel={handleCancel}

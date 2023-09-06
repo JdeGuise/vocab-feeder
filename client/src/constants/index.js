@@ -2,7 +2,7 @@ import SlackDailyVocab from "../components/SlackDailyVocab/SlackDailyVocab";
 import ReviewVocab from "../components/ReviewVocab/ReviewVocab.js";
 import Home from "../components/Home/Home";
 import ReviewLessonNotes from "../components/ReviewLessonNotes/ReviewLessonNotes";
-import ReviewVocabEntries from "../components/ReviewVocabEntries/ReviewVocabEntries";
+import VocabDeck from "../components/VocabDeck/VocabDeck";
 
 // ReviewVocab.js
 export const SETNAME_QUERY_PARAM = "set_name";
@@ -59,7 +59,7 @@ export const LESSONS_ENDPOINT = "/lessons";
 export const LESSON_ENDPOINT_PERSON_PARAM =
   LESSONS_ENDPOINT + "?" + PERSON_QUERY_PARAM + "=";
 
-// ReviewVocabEntries.js
+// VocabDeck.js
 export const DECK_TITLE = "Vocab Entries";
 export const DECK_ENDPOINT = "/deck";
 export const VOCAB_RECORDS_ENDPOINT = "/api/vocab";
@@ -104,6 +104,6 @@ export const ROUTES = [
   {
     route: DECK_ENDPOINT,
     linkLabel: "Deck",
-    element: <ReviewVocabEntries />,
+    element: <VocabDeck />,
   },
 ];
