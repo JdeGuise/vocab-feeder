@@ -4,7 +4,7 @@ import Home from "../components/Home/Home";
 import LessonNotesWrapper from "../components/LessonNotesWrapper/LessonNotesWrapper";
 import VocabDeckWrapper from "../components/VocabDeckWrapper/VocabDeckWrapper";
 
-// ReviewVocab.js
+// ReviewVocabWrapper.js
 export const SETNAME_QUERY_PARAM = "set_name";
 export const REVIEWTYPE_QUERY_PARAM = "review_type";
 export const GET_REVIEW_CATEGORIES_ENDPOINT = "/api/review-categories";

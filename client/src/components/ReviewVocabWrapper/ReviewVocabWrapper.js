@@ -9,7 +9,7 @@ import ReviewCategoryList from "../ReviewCategoryList/ReviewCategoryList.js";
 import ReviewVocabCardSession from "../ReviewVocabCardSession/ReviewVocabCardSession.js";
 import ReviewTypes from "../ReviewTypes/ReviewTypes.js";
 
-const ReviewVocab = (props) => {
+const ReviewVocabWrapper = (props) => {
   const [searchParams] = useSearchParams();
   const [categories, setCategories] = useState([]);
   const [records, setRecords] = useState([]);
@@ -206,4 +206,4 @@ const ReviewVocab = (props) => {
   }
 };
 
-export default ReviewVocab;
+export default ReviewVocabWrapper;
