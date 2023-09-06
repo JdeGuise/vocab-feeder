@@ -12,9 +12,9 @@ const ReviewVocabCardSessionTest = (props) => {
         <div className="review-type-options">
           <Link
             className="review-type-item"
-            to={Constants.BACK_LINK}
+            to={Constants.REVIEW_ENDPOINT}
           >
-            Done
+            {Constants.DONE_LABEL}
           </Link>
         </div>
       </div>

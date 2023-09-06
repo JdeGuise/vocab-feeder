@@ -53,7 +53,7 @@ export const VOCAB_CARD_REVIEWTYPE_TEST_STR =
   VOCAB_CARD_REVIEWTYPE_TEST_LABEL.toLowerCase();
 
 // ReviewVocabCardSessionTest.js
-export const BACK_LINK = '/review';
+export const DONE_LABEL = 'Done';
 
 // ReviewLessonNotes.js
 export const LESSON_NOTES_TITLE = "Lesson Notes";
