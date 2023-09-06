@@ -14,7 +14,7 @@ export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
 export const HIDE_NEXT_BTN_CSS = "vocab-card-hide-next-btn";
 export const HIDE_PREV_BTN_CSS = "vocab-card-hide-prev-btn";
 
-// CategoryList.js
+// ReviewCategoryList.js
 export const REVIEW_ENDPOINT = "/review";
 export const REVIEW_ENDPOINT_SETNAME_PARAM =
   REVIEW_ENDPOINT + "?" + SETNAME_QUERY_PARAM + "=";

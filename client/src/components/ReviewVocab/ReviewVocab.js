@@ -5,7 +5,7 @@ import { shuffleArray } from "./../../utils.js";
 import "./../../App.css";
 import * as Constants from "./../../constants";
 
-import CategoryList from "../CategoryList/CategoryList";
+import ReviewCategoryList from "../ReviewCategoryList/ReviewCategoryList.js";
 import VocabCard from "../VocabCard/VocabCard";
 import ReviewType from "../ReviewType/ReviewType";
 
@@ -197,7 +197,7 @@ const ReviewVocab = (props) => {
       }
     } else {
       return (
-        <CategoryList
+        <ReviewCategoryList
           categories={categories}
           GetRecordsForCategory={GetRecordsForCategory}
         />
