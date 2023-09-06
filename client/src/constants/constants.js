@@ -9,10 +9,6 @@ export const SETNAME_QUERY_PARAM = "set_name";
 export const REVIEWTYPE_QUERY_PARAM = "review_type";
 export const GET_REVIEW_CATEGORIES_ENDPOINT = "/api/review-categories";
 export const GET_VOCAB_FOR_CATEGORY_ENDPOINT = "/api/vocab-for-category";
-export const SHOW_CARD_SIDE_CSS = "vocab-card-show-side";
-export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
-export const HIDE_NEXT_BTN_CSS = "vocab-card-hide-next-btn";
-export const HIDE_PREV_BTN_CSS = "vocab-card-hide-prev-btn";
 
 // ReviewCategoryList.js
 export const REVIEW_ENDPOINT = "/review";
@@ -43,6 +39,12 @@ export const VOCAB_CARD_ORIGINAL_BUTTON_CSS =
   "vocab-card-controls-btn vocab-card-controls-flip-btn";
 export const VOCAB_CARD_DISABLED_BUTTON_CSS =
   "vocab-card-controls-btn vocab-card-controls-disable-btn";
+
+export const SHOW_CARD_SIDE_CSS = "vocab-card-show-side";
+export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
+export const HIDE_NEXT_BTN_CSS = "vocab-card-hide-next-btn";
+export const HIDE_PREV_BTN_CSS = "vocab-card-hide-prev-btn";
+
 export const VOCAB_CARD_REVIEWTYPE_PRACTICE_LABEL = "Practice";
 export const VOCAB_CARD_REVIEWTYPE_PRACTICE_STR =
   VOCAB_CARD_REVIEWTYPE_PRACTICE_LABEL.toLowerCase();
