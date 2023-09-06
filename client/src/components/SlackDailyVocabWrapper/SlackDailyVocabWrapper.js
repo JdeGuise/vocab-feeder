@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import "./../../VocabFeederApp.css";
 import "./../../Snackbar.css";
 import "./SlackDailyVocabWrapper.css";
@@ -53,7 +53,7 @@ const SlackDailyVocabWrapper = (props) => {
 
   return (
     <div className="SlackApp">
-      <h1>Slack App</h1>
+      <h1>{Constants.SLACK_APP_HEADER}</h1>
       <form onSubmit={HandleSubmit} className="slack-form">
         <div className="slack-form-inputs">
           <label>

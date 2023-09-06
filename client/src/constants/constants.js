@@ -23,6 +23,7 @@ export const REVIEW_ALL_CATEGORY_LABEL = "Review All";
 export const GET_SLACK_INFO_ENDPOINT = "/api/slack-info";
 export const SEND_SLACK_MSG_ENDPOINT = "/api/slack-message";
 export const SLACK_ENDPOINT = "/slack";
+export const SLACK_APP_HEADER = "Slack App";
 export const SLACK_INPUT_PLACEHOLDER = "# of Records to Send";
 export const SLACK_SENT_CONFIRMATION = "Your vocab has been sent to Slack!";
 export const SLACK_RECORD_MIN = 1;
