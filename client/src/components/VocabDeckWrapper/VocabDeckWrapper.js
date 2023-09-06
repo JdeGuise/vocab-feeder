@@ -4,9 +4,9 @@ import "./../../App.css";
 import "./../../Snackbar.css";
 
 import * as Constants from "../../constants";
-import DataTable from "../DataTable/DataTable";
+import VocabDeck from "../VocabDeck/VocabDeck";
 
-const VocabDeck = (props) => {
+const VocabDeckWrapper = (props) => {
   const [vocabRecords, setVocabRecords] = useState([]);
   const [refetch, setRefetch] = useState(false);
 
@@ -43,7 +43,7 @@ const VocabDeck = (props) => {
   };
 
   return (
-    <DataTable
+    <VocabDeck
       data={vocabRecords}
       LIMIT="10"
       onCreateVocab={onCreateVocab}
@@ -53,4 +53,4 @@ const VocabDeck = (props) => {
   );
 };
 
-export default VocabDeck;
+export default VocabDeckWrapper;

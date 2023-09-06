@@ -2,7 +2,7 @@ import React from "react";
 
 import * as Constants from "../../constants";
 
-const VocabDeckEditVocab = ({
+const VocabDeckWrapperEditVocab = ({
   editForm,
   handleEditChange,
   handleCancel,
@@ -77,4 +77,4 @@ const VocabDeckEditVocab = ({
   );
 };
 
-export default VocabDeckEditVocab;
+export default VocabDeckWrapperEditVocab;

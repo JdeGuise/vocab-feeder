@@ -1,9 +1,9 @@
-// @src/components/VocabDeckDeleteRecordModal.jsx
+// @src/components/VocabDeckWrapperDeleteRecordModal.jsx
 
 import React from "react";
 import styles from "./VocabDeckDeleteRecordModal.module.css";
 
-const VocabDeckDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
+const VocabDeckWrapperDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
   return (
     <>
       <div className={styles.darkBG} onClick={() => setDeleteRecord(false)} />
@@ -46,4 +46,4 @@ const VocabDeckDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => 
   );
 };
 
-export default VocabDeckDeleteRecordModal;
+export default VocabDeckWrapperDeleteRecordModal;

@@ -7,14 +7,14 @@ import {
   HeaderCell,
   Body,
 } from "@table-library/react-table-library/table";
-import styles from "./VocabTable.module.css";
+import styles from "./VocabDeckTable.module.css";
 import { useTheme } from "@table-library/react-table-library/theme";
 
 import { usePagination } from "@table-library/react-table-library/pagination";
 import TableSearch from "./TableSearch/TableSearch";
 import TableFooter from "./TableFooter/TableFooter";
 import Vocab from "./../Vocab/Vocab";
-import Modal from "../ConfirmDeleteRecordModal/ConfirmDeleteRecordModal";
+import Modal from "../VocabDeckDeleteRecordModal/VocabDeckDeleteRecordModal";
 
 const VocabTable = ({
   data,
