@@ -14,7 +14,7 @@ import { usePagination } from "@table-library/react-table-library/pagination";
 import TableSearch from "./TableSearch/TableSearch";
 import TableFooter from "./TableFooter/TableFooter";
 import Vocab from "./../Vocab/Vocab";
-import Modal from "./../Modal/Modal";
+import Modal from "../ConfirmDeleteRecordModal/ConfirmDeleteRecordModal";
 
 const DisplayVocab = ({
   data,
