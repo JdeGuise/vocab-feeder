@@ -52,6 +52,9 @@ export const VOCAB_CARD_REVIEWTYPE_TEST_LABEL = "Test";
 export const VOCAB_CARD_REVIEWTYPE_TEST_STR =
   VOCAB_CARD_REVIEWTYPE_TEST_LABEL.toLowerCase();
 
+// ReviewVocabCardSessionTest.js
+export const BACK_LINK = '/review';
+
 // ReviewLessonNotes.js
 export const LESSON_NOTES_TITLE = "Lesson Notes";
 export const GET_LESSON_PEOPLE_NAMES_ENDPOINT = "/api/lesson-people-names";

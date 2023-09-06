@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 
 const ReviewVocabCardSessionTest = (props) => {
   if(props.showSummary) {
-    const BACK_LINK = '/review';
-
     return(
       <div className="vocab-card-wrapper">
         <h4 key={props.correctCount}>
@@ -14,7 +12,7 @@ const ReviewVocabCardSessionTest = (props) => {
         <div className="review-type-options">
           <Link
             className="review-type-item"
-            to={BACK_LINK}
+            to={Constants.BACK_LINK}
           >
             Done
           </Link>
