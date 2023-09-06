@@ -14,6 +14,7 @@ const ReviewVocabCardSession = (props) => {
   let [i, setI] = useState(0);
   const [isDisabled, setIsDisabled] = useState(false);
   const [answer, setAnswer] = useState("");
+  const [showSummary, setShowSummary] = useState(false);
 
   const REVIEW_TYPE = searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM);
 
@@ -60,21 +61,29 @@ const ReviewVocabCardSession = (props) => {
   };
 
   const GetNextCard = (e) => {
+    console.log(props.totalAttempted);
+    console.log(props.cards.length);
+
     e.preventDefault();
 
     if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
-      // don't reset prevCSS button styles for testing use case (because we never want the button)
-      setCSS((css) => ({
-        ...css,
-        frontCSS: Constants.SHOW_CARD_SIDE_CSS,
-        backCSS: Constants.HIDE_CARD_SIDE_CSS,
-        nextCSS: Constants.HIDE_NEXT_BTN_CSS,
-        buttonCSS: Constants.VOCAB_CARD_ORIGINAL_BUTTON_CSS,
-      }));
+      if(props.totalAttempted === props.cards.length) {
+        console.log('you cant go any further');
+        setShowSummary(true);
+      } else {
+        // don't reset prevCSS button styles for testing use case (because we never want the button)
+        setCSS((css) => ({
+          ...css,
+          frontCSS: Constants.SHOW_CARD_SIDE_CSS,
+          backCSS: Constants.HIDE_CARD_SIDE_CSS,
+          nextCSS: Constants.HIDE_NEXT_BTN_CSS,
+          buttonCSS: Constants.VOCAB_CARD_ORIGINAL_BUTTON_CSS,
+        }));
 
-      ResetSnackbar();
-      setAnswer("");
-      setIsDisabled(false);
+        ResetSnackbar();
+        setAnswer("");
+        setIsDisabled(false);
+      }
     } else {
       const nextStyle =
         i === props.cards.length - 2 ? Constants.HIDE_NEXT_BTN_CSS : null;
@@ -166,6 +175,7 @@ const ReviewVocabCardSession = (props) => {
         css={css}
         isDisabled={isDisabled}
         answer={answer}
+        showSummary={showSummary}
         GetPrevCard={GetPrevCard} 
         GetNextCard={GetNextCard} 
         HandleSubmit={HandleSubmit} 

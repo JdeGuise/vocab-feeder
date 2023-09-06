@@ -86,10 +86,11 @@ h2 {
 
 .review-type-item {
   border: 1px solid #bcb6ae;
-  margin: 12px;
+  margin: 12px auto;
   padding: 12px;
   flex-grow: 1;
   text-align: center;
+  max-width: 750px;
 }
 
 .review-type-item:hover {
