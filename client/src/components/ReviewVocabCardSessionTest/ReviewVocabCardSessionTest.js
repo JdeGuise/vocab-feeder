@@ -60,7 +60,7 @@ const ReviewVocabCardSessionTest = (props) => {
           </div>
         </div>
       </form>
-      <div id="snackbar"></div>
+      <div id="snackbar" className={props.css.snackbarCSS}></div>
     </div>
   );
 }

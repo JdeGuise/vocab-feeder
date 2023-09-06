@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import "./../../Snackbar.css";
 
-import "./ReviewVocabCardSession.css";
 import * as Constants from "../../constants/constants";
+import "./../../Snackbar.css";
+import "./ReviewVocabCardSession.css";
 
 import ReviewVocabCardSessionPractice from "../ReviewVocabCardSessionPractice/ReviewVocabCardSessionPractice.js";
 import ReviewVocabCardSessionTest from "../ReviewVocabCardSessionTest/ReviewVocabCardSessionTest.js";
@@ -11,14 +11,109 @@ import ReviewVocabCardSessionTest from "../ReviewVocabCardSessionTest/ReviewVoca
 const ReviewVocabCardSession = (props) => {
   const [searchParams] = useSearchParams();
   const [isLoaded, setIsLoaded] = useState(false);
+  let [i, setI] = useState(0);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [answer, setAnswer] = useState("");
 
-  if (
-    !isLoaded &&
-    searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM) ===
-      Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR
-  ) {
-    props.setCSS({
-      ...props.css,
+  const REVIEW_TYPE = searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM);
+
+  const [css, setCSS] = useState({
+    frontCSS: Constants.SHOW_CARD_SIDE_CSS,
+    backCSS: Constants.HIDE_CARD_SIDE_CSS,
+    prevCSS: Constants.HIDE_PREV_BTN_CSS,
+    buttonCSS: Constants.VOCAB_CARD_ORIGINAL_BUTTON_CSS,
+  });
+
+  const FlipCard = () => {
+    setCSS((css) => ({
+      ...css,
+      frontCSS:
+        css.frontCSS === Constants.HIDE_CARD_SIDE_CSS
+          ? Constants.SHOW_CARD_SIDE_CSS
+          : Constants.HIDE_CARD_SIDE_CSS,
+      backCSS:
+        css.backCSS === Constants.HIDE_CARD_SIDE_CSS
+          ? Constants.SHOW_CARD_SIDE_CSS
+          : Constants.HIDE_CARD_SIDE_CSS,
+    }));
+  };
+
+  const ShowSnackbar = (isCorrect) => {
+    let snackBar = document.getElementById("snackbar");
+    setCSS((css) => ({
+      ...css,
+      snackbarCSS: (isCorrect ? "showCorrect" : "showIncorrect")
+    }));
+
+    snackBar.innerText = isCorrect ? "That's right!" : "Incorrect.";
+
+    setTimeout(function () {
+      ResetSnackbar();
+    }, 5000);
+  };
+
+  const ResetSnackbar = () => {
+    setCSS((css) => ({
+      ...css,
+      snackbarCSS: null
+    }));
+  };
+
+  const GetNextCard = (e) => {
+    e.preventDefault();
+
+    if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
+      // don't reset prevCSS button styles for testing use case (because we never want the button)
+      setCSS((css) => ({
+        ...css,
+        frontCSS: Constants.SHOW_CARD_SIDE_CSS,
+        backCSS: Constants.HIDE_CARD_SIDE_CSS,
+        nextCSS: Constants.HIDE_NEXT_BTN_CSS,
+        buttonCSS: Constants.VOCAB_CARD_ORIGINAL_BUTTON_CSS,
+      }));
+
+      ResetSnackbar();
+      setAnswer("");
+      setIsDisabled(false);
+    } else {
+      const nextStyle =
+        i === props.cards.length - 2 ? Constants.HIDE_NEXT_BTN_CSS : null;
+
+      setCSS((css) => ({
+        ...css,
+        frontCSS: Constants.SHOW_CARD_SIDE_CSS,
+        backCSS: Constants.HIDE_CARD_SIDE_CSS,
+        nextCSS: nextStyle,
+        prevCSS: null,
+      }));
+    }
+
+    // check if we still have a next card to go to
+    if (i < props.cards.length - 1) {
+      setI(++i);
+    }
+  };
+
+  const GetPrevCard = () => {
+    const prevStyle = i === 1 ? Constants.HIDE_PREV_BTN_CSS : null;
+
+    setCSS((css) => ({
+      ...css,
+      frontCSS: Constants.SHOW_CARD_SIDE_CSS,
+      backCSS: Constants.HIDE_CARD_SIDE_CSS,
+      nextCSS: null,
+      prevCSS: prevStyle,
+    }));
+
+    // check if we still have a previous card to go to
+    if (i > 0) {
+      setI(--i);
+    }
+  };
+
+  if(!isLoaded && REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
+    setCSS({
+      ...css,
       nextCSS: Constants.HIDE_NEXT_BTN_CSS,
     });
 
@@ -28,9 +123,9 @@ const ReviewVocabCardSession = (props) => {
   const HandleSubmit = (e) => {
     e.preventDefault();
 
-    props.setIsDisabled(true);
-    props.setCSS({
-      ...props.css,
+    setIsDisabled(true);
+    setCSS({
+      ...css,
       buttonCSS: Constants.VOCAB_CARD_DISABLED_BUTTON_CSS,
       frontCSS: Constants.HIDE_CARD_SIDE_CSS,
       backCSS: Constants.SHOW_CARD_SIDE_CSS,
@@ -38,29 +133,28 @@ const ReviewVocabCardSession = (props) => {
     });
     props.setTotalAttempted(props.totalAttempted + 1);
 
-    if (props.card.english.toLowerCase().includes(props.answer.toLowerCase())) {
+    // TODO: make better check
+    if(props.cards[i].english.toLowerCase().includes(answer.toLowerCase())) {
       props.setCorrectCount(props.correctCount + 1);
-      props.showSnackbar(true);
+      ShowSnackbar(true);
     } else {
-      props.showSnackbar(false);
+      ShowSnackbar(false);
     }
   };
 
   const HandleAnswerChange = (e) => {
     e.preventDefault();
-    props.setAnswer(e.target.value);
+    setAnswer(e.target.value);
   };
-
-  const REVIEW_TYPE = searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM);
 
   if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_PRACTICE_STR) {
     return (
       <ReviewVocabCardSessionPractice 
-        card={props.card} 
-        css={props.css} 
-        FlipCard={props.FlipCard} 
-        GetNextCard={props.GetNextCard} 
-        GetPrevCard={props.GetPrevCard} 
+        card={props.cards[i]} 
+        css={css} 
+        FlipCard={FlipCard} 
+        GetNextCard={GetNextCard} 
+        GetPrevCard={GetPrevCard} 
       />
     );
   } else if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
@@ -68,12 +162,12 @@ const ReviewVocabCardSession = (props) => {
       <ReviewVocabCardSessionTest
         correctCount={props.correctCount}
         totalAttempted={props.totalAttempted}
-        card={props.card}
-        css={props.css}
-        isDisabled={props.isDisabled}
-        answer={props.answer}
-        GetPrevCard={props.GetPrevCard} 
-        GetNextCard={props.GetNextCard} 
+        card={props.cards[i]}
+        css={css}
+        isDisabled={isDisabled}
+        answer={answer}
+        GetPrevCard={GetPrevCard} 
+        GetNextCard={GetNextCard} 
         HandleSubmit={HandleSubmit} 
         HandleAnswerChange={HandleAnswerChange}
       />
