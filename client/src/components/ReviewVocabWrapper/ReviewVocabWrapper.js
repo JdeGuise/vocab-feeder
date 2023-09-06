@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { shuffleArray } from "../../utils.js";
-import "./../../App.css";
+import "./../../VocabFeederApp.css";
 import * as Constants from "../../constants/constants.js";
 
 import ReviewCategoryList from "../ReviewCategoryList/ReviewCategoryList.js";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import "./../../App.css";
+import "./../../VocabFeederApp.css";
 import "./../../Snackbar.css";
 
 import * as Constants from "../../constants/constants";

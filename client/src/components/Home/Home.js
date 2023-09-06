@@ -1,5 +1,5 @@
 import React from "react";
-import "./../../App.css";
+import "./../../VocabFeederApp.css";
 import WindmillSVG from "./../../windmill.svg";
 
 const Home = (props) => {
