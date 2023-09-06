@@ -1,9 +1,9 @@
-// @src/components/ConfirmDeleteRecordModal.jsx
+// @src/components/VocabDeckDeleteRecordModal.jsx
 
 import React from "react";
-import styles from "./ConfirmDeleteRecordModal.module.css";
+import styles from "./VocabDeckDeleteRecordModal.module.css";
 
-const ConfirmDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
+const VocabDeckDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
   return (
     <>
       <div className={styles.darkBG} onClick={() => setDeleteRecord(false)} />
@@ -46,4 +46,4 @@ const ConfirmDeleteRecordModal = ({ setDeleteRecord, handleDeleteRecord }) => {
   );
 };
 
-export default ConfirmDeleteRecordModal;
+export default VocabDeckDeleteRecordModal;
