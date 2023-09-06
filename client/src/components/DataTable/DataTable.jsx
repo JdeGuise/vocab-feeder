@@ -4,7 +4,7 @@ import styles from "./Table.module.css";
 
 import EditVocab from "./../EditVocab/EditVocab";
 import AddVocab from "./../AddVocab/AddVocab";
-import DisplayVocab from "../DisplayVocab/DisplayVocab";
+import VocabTable from "../VocabTable/VocabTable";
 import * as Constants from "./../../constants";
 
 const DataTable = ({
@@ -108,7 +108,7 @@ const DataTable = ({
     );
   } else {
     datatableMarkup = (
-      <DisplayVocab
+      <VocabTable
         data={data}
         LIMIT={LIMIT}
         editForm={editForm}
