@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import "./../../App.css";
 import "./../../Snackbar.css";
 
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 import VocabDeck from "../VocabDeck/VocabDeck";
 
 const VocabDeckWrapper = (props) => {

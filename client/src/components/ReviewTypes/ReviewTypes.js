@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 const ReviewTypes = (props) => {
   const PRACTICE_LINK = `?${Constants.SETNAME_QUERY_PARAM}=${props.setName}&${Constants.REVIEWTYPE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEWTYPE_PRACTICE_STR}`;

@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { shuffleArray } from "../../utils.js";
 import "./../../App.css";
-import * as Constants from "../../constants/index.js";
+import * as Constants from "../../constants/constants.js";
 
 import ReviewCategoryList from "../ReviewCategoryList/ReviewCategoryList.js";
 import ReviewVocabCardSession from "../ReviewVocabCardSession/ReviewVocabCardSession.js";

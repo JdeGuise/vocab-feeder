@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 import LessonNotes from "../LessonNotes/LessonNotes";
 
 const ReviewLessonNotes = (props) => {

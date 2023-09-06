@@ -1,6 +1,6 @@
 import React from "react";
 
-import * as Constants from "./../../constants";
+import * as Constants from "../../constants/constants";
 
 const VocabDeckWrapperAddVocab = ({
   addForm,

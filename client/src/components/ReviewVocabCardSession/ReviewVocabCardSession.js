@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import "./../../Snackbar.css";
 
 import "./VocabCard.css";
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 const VocabCard = (props) => {
   const [searchParams] = useSearchParams();

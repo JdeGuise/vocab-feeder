@@ -3,7 +3,7 @@ import "./../../App.css";
 import "./../../Snackbar.css";
 import "./SlackDailyVocabWrapper.css";
 
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 const SlackDailyVocabWrapper = (props) => {
   const [recordCount, setRecordCount] = useState(0);

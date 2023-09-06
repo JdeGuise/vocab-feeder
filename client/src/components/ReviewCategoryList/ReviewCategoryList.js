@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import "./../../App.css";
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 const ReviewCategoryList = (props) => {
   return (

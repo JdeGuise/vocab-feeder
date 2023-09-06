@@ -5,7 +5,7 @@ import styles from "./VocabDeck.module.css";
 import VocabDeckEditVocab from "../VocabDeckEditVocab/VocabDeckEditVocab";
 import VocabDeckAddVocab from "./../VocabDeckAddVocab/VocabDeckAddVocab";
 import VocabDeckTable from "../VocabDeckTable/VocabDeckTable";
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 const VocabDeck = ({
   data,
