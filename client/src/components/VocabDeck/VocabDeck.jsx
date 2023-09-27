@@ -14,19 +14,17 @@ const VocabDeck = ({
   onUpdateVocab,
   setRefetch,
 }) => {
-  // state for conditional render of edit form
-  const [showEditRecordForm, setShowEditRecordForm] = useState(false);
-  const [showAddRecordForm, setShowAddRecordForm] = useState(false);
-  const [showDeleteRecordForm, setShowDeleteRecordForm] = useState(false);
-
   // state for edit form inputs
   const [editForm, setEditForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showEditRecordForm, setShowEditRecordForm] = useState(false);
 
   // state for add form inputs
   const [addForm, setAddForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showAddRecordForm, setShowAddRecordForm] = useState(false);
 
   // state for delete form inputs
   const [deleteForm, setDeleteForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showDeleteRecordForm, setShowDeleteRecordForm] = useState(false);
 
   // capture user input in edit form inputs
   const handleEditChange = (e) => {
