@@ -81,7 +81,6 @@ const Toast = ({ message, type, id }) => {
       <button className="dismiss-btn" onClick={handleDismiss}>
         <IconX size={18} color="#aeb0d7" />
       </button>
-      {/* Toast Progress Bar */}
       <div className="toast-progress">
         <div
           ref={progressRef}
