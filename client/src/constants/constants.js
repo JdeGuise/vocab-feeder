@@ -111,6 +111,14 @@ export const DELETE_METHOD = "DELETE";
 export const CONTENT_TYPE_JSON_UTF8 = "application/json; charset=UTF-8";
 export const LOADING_STR = "Loading...";
 export const ROOT_ENDPOINT = "/";
+export const EMPTY_VOCAB_FORM = {
+  id: "",
+  dutch: "",
+  english: "",
+  pronunciationlink: "",
+  notes: "",
+  category: "",
+};
 
 // App.js
 export const APP_HEADER_TITLE = "De Nederlandse App";

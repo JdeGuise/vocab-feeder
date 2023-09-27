@@ -4,7 +4,7 @@ const VocabDeckWrapperEditVocab = ({
   editForm,
   handleEditChange,
   handleCancel,
-  setEditRecord,
+  setShowEditRecordForm,
   onUpdateVocab,
   styles,
 }) => {
@@ -29,7 +29,7 @@ const VocabDeckWrapperEditVocab = ({
 
   // when PATCH request happens; auto-hides the form, pushes changes to display
   const handleVocabUpdate = (updatedVocab) => {
-    setEditRecord(false);
+    setShowEditRecordForm(false);
     onUpdateVocab(updatedVocab);
   };
 
