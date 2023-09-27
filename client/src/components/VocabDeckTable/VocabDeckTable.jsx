@@ -21,13 +21,13 @@ const VocabTable = ({
   data,
   LIMIT,
   editForm,
-  editRecord,
-  deleteRecord,
-  setAddRecord,
+  showEditRecordForm,
+  showDeleteRecordForm,
+  setShowAddRecordForm,
   setEditForm,
-  setEditRecord,
+  setShowEditRecordForm,
   setDeleteForm,
-  setDeleteRecord,
+  setShowDeleteRecordForm,
   handleDeleteRecord,
 }) => {
   const theme = useTheme({
@@ -103,7 +103,7 @@ const VocabTable = ({
 
   const currentData = {
     nodes: data.filter((vocabRecord) =>
-      vocabRecord.dutch.toLowerCase().includes(search.toLowerCase())
+      vocabRecord.dutch?.toLowerCase().includes(search.toLowerCase())
     ),
   };
 
@@ -116,19 +116,19 @@ const VocabTable = ({
   });
 
   const changeAddState = () => {
-    setAddRecord((addRecord) => !addRecord); // shows the form
+    setShowAddRecordForm((addRecord) => !addRecord); // shows the form
   };
 
   // needed logic for conditional rendering of the form - shows the vocab you want when you want them, and hides it when you don't
   const changeEditState = (vocab) => {
-    if (vocab.id === editForm.id || !editRecord) {
-      setEditRecord((editRecord) => !editRecord); // hides the form
+    if (vocab.id === editForm.id || !showEditRecordForm) {
+      setShowEditRecordForm((showEditRecordForm) => !showEditRecordForm); // hides the form
     }
   };
 
   // needed logic for conditional rendering of the form - shows the vocab you want when you want them, and hides it when you don't
   const changeDeleteState = (vocab) => {
-    setDeleteRecord((deleteRecord) => !deleteRecord);
+    setShowDeleteRecordForm((showDeleteRecordForm) => !showDeleteRecordForm);
   };
 
   return (
@@ -179,9 +179,9 @@ const VocabTable = ({
 
         <TableFooter pagination={pagination} pageCount={pageCount} />
       </div>
-      {deleteRecord && (
+      {showDeleteRecordForm && (
         <Modal
-          setDeleteRecord={setDeleteRecord}
+          setDeleteRecord={setShowDeleteRecordForm}
           handleDeleteRecord={handleDeleteRecord}
         />
       )}

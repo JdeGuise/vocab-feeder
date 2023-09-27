@@ -2,9 +2,10 @@ import * as Constants from "../../constants/constants";
 
 const VocabDeckWrapperAddVocab = ({
   addForm,
+  setAddForm,
   handleAddChange,
   handleCancel,
-  setAddRecord,
+  setShowAddRecordForm,
   onCreateVocab,
   styles,
 }) => {
@@ -13,6 +14,7 @@ const VocabDeckWrapperAddVocab = ({
   // POST request; calls handleVocabCreate to push changes to the page
   const handleAddForm = (e) => {
     e.preventDefault();
+    delete addForm.id;
 
     fetch(Constants.VOCAB_RECORDS_ENDPOINT, {
       method: Constants.POST_METHOD,
@@ -29,8 +31,9 @@ const VocabDeckWrapperAddVocab = ({
 
   // when PATCH request happens; auto-hides the form, pushes changes to display
   const handleVocabCreate = (updatedVocab) => {
-    setAddRecord(false);
     onCreateVocab(updatedVocab);
+    setShowAddRecordForm(false);
+    setAddForm(Constants.EMPTY_VOCAB_FORM);
   };
 
   const labels = {

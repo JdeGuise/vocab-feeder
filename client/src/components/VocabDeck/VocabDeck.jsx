@@ -14,38 +14,17 @@ const VocabDeck = ({
   onUpdateVocab,
   setRefetch,
 }) => {
-  // state for conditional render of edit form
-  const [editRecord, setEditRecord] = useState(false);
-  const [addRecord, setAddRecord] = useState(false);
-  const [deleteRecord, setDeleteRecord] = useState(false);
-
   // state for edit form inputs
-  const [editForm, setEditForm] = useState({
-    id: "",
-    dutch: "",
-    english: "",
-    pronunciationlink: "",
-    notes: "",
-    set_name: "",
-  });
+  const [editForm, setEditForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showEditRecordForm, setShowEditRecordForm] = useState(false);
 
-  // state for edit form inputs
-  const [addForm, setAddForm] = useState({
-    dutch: "",
-    english: "",
-    pronunciationlink: "",
-    notes: "",
-    category: "",
-  });
+  // state for add form inputs
+  const [addForm, setAddForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showAddRecordForm, setShowAddRecordForm] = useState(false);
 
-  // state for edit form inputs
-  const [deleteForm, setDeleteForm] = useState({
-    dutch: "",
-    english: "",
-    pronunciationlink: "",
-    notes: "",
-    category: "",
-  });
+  // state for delete form inputs
+  const [deleteForm, setDeleteForm] = useState(Constants.EMPTY_VOCAB_FORM);
+  const [showDeleteRecordForm, setShowDeleteRecordForm] = useState(false);
 
   // capture user input in edit form inputs
   const handleEditChange = (e) => {
@@ -55,7 +34,7 @@ const VocabDeck = ({
     });
   };
 
-  // capture user input in edit form inputs
+  // capture user input in add form inputs
   const handleAddChange = (e) => {
     setAddForm({
       ...addForm,
@@ -64,8 +43,10 @@ const VocabDeck = ({
   };
 
   const handleCancel = () => {
-    setAddRecord(false);
-    setEditRecord(false);
+    setShowAddRecordForm(false);
+    setAddForm(Constants.EMPTY_VOCAB_FORM);
+    setShowEditRecordForm(false);
+    setEditForm(Constants.EMPTY_VOCAB_FORM);
   };
 
   // POST request; calls handleVocabCreate to push changes to the page
@@ -84,24 +65,25 @@ const VocabDeck = ({
   };
 
   let datatableMarkup;
-  if (editRecord) {
+  if (showEditRecordForm) {
     datatableMarkup = (
       <VocabDeckEditVocab
         editForm={editForm}
         handleEditChange={handleEditChange}
         handleCancel={handleCancel}
-        setEditRecord={setEditRecord}
+        setShowEditRecordForm={setShowEditRecordForm}
         onUpdateVocab={onUpdateVocab}
         styles={styles}
       />
     );
-  } else if (addRecord) {
+  } else if (showAddRecordForm) {
     datatableMarkup = (
       <VocabDeckAddVocab
         addForm={addForm}
+        setAddForm={setAddForm}
         handleAddChange={handleAddChange}
         handleCancel={handleCancel}
-        setAddRecord={setAddRecord}
+        setShowAddRecordForm={setShowAddRecordForm}
         onCreateVocab={onCreateVocab}
         styles={styles}
       />
@@ -112,13 +94,13 @@ const VocabDeck = ({
         data={data}
         LIMIT={LIMIT}
         editForm={editForm}
-        editRecord={editRecord}
-        deleteRecord={deleteRecord}
-        setAddRecord={setAddRecord}
+        showEditRecordForm={showEditRecordForm}
+        showDeleteRecordForm={showDeleteRecordForm}
+        setShowAddRecordForm={setShowAddRecordForm}
         setEditForm={setEditForm}
-        setEditRecord={setEditRecord}
+        setShowEditRecordForm={setShowEditRecordForm}
         setDeleteForm={setDeleteForm}
-        setDeleteRecord={setDeleteRecord}
+        setShowDeleteRecordForm={setShowDeleteRecordForm}
         handleDeleteRecord={handleDeleteRecord}
       />
     );
