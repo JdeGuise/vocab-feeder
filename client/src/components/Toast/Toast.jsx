@@ -5,7 +5,7 @@ import {
   IconInfoCircleFilled,
   IconX,
 } from "@tabler/icons-react";
-import { useEffect, useRef } from "react"; // import useEffect & useRef
+import { useEffect, useRef, useState } from "react"; // import useEffect & useRef
 
 import { useToast } from "../../hooks/useToast";
 
@@ -37,9 +37,13 @@ const Toast = ({ message, type, id }) => {
   const toast = useToast(); // call useToast
   const timerID = useRef(null); // create a Reference
   const progressRef = useRef(null);
+  const [dismissed, setDismissed] = useState(false);
 
   const handleDismiss = () => {
-    toast.remove(id);
+    setDismissed(true);
+    setTimeout(() => {
+      toast.remove(id);
+    }, 400);
   };
 
   const handleMouseEnter = () => {
@@ -72,7 +76,7 @@ const Toast = ({ message, type, id }) => {
 
   return (
     <div
-      className="toast"
+      className={`toast ${dismissed ? "toast-dismissed" : ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
