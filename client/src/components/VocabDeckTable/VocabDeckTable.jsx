@@ -103,7 +103,7 @@ const VocabTable = ({
 
   const currentData = {
     nodes: data.filter((vocabRecord) =>
-      vocabRecord.dutch.toLowerCase().includes(search.toLowerCase())
+      vocabRecord.dutch?.toLowerCase().includes(search.toLowerCase())
     ),
   };
 
