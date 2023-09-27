@@ -31,7 +31,7 @@ const VocabDeckWrapper = (props) => {
   // update vocabRecords on page after add
   const onCreateVocab = () => {
     setRefetch((prevState) => !prevState);
-    toast.success("Success!");
+    toast.success("Vocab successfully added.");
   };
 
   // update vocabRecords on page after edit
