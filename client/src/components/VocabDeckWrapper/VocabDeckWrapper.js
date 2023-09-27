@@ -6,7 +6,10 @@ import "./../../Snackbar.css";
 import * as Constants from "../../constants/constants";
 import VocabDeck from "../VocabDeck/VocabDeck";
 
+import { useToast } from "../../hooks/useToast";
+
 const VocabDeckWrapper = (props) => {
+  const toast = useToast();
   const [vocabRecords, setVocabRecords] = useState([]);
   const [refetch, setRefetch] = useState(false);
 
@@ -28,6 +31,7 @@ const VocabDeckWrapper = (props) => {
   // update vocabRecords on page after add
   const onCreateVocab = () => {
     setRefetch((prevState) => !prevState);
+    toast.success("Success!");
   };
 
   // update vocabRecords on page after edit

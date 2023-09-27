@@ -3,6 +3,7 @@ import ReviewVocabWrapper from "../components/ReviewVocabWrapper/ReviewVocabWrap
 import Home from "../components/Home/Home";
 import LessonNotesWrapper from "../components/LessonNotesWrapper/LessonNotesWrapper";
 import VocabDeckWrapper from "../components/VocabDeckWrapper/VocabDeckWrapper";
+import { ToastContextProvider } from "../contexts/ToastContext";
 
 // ReviewVocabWrapper.js
 export const SETNAME_QUERY_PARAM = "set_name";
@@ -146,6 +147,6 @@ export const ROUTES = [
   {
     route: DECK_ENDPOINT,
     linkLabel: "Deck",
-    element: <VocabDeckWrapper />,
+    element: <ToastContextProvider><VocabDeckWrapper/></ToastContextProvider>,
   },
 ];
