@@ -8,7 +8,7 @@ import {
   HeaderCell,
   Body,
 } from "@table-library/react-table-library/table";
-import styles from "./VocabDeckTable.module.css";
+import vocabDeckTableStyles from "./VocabDeckTable.module.css";
 import { useTheme } from "@table-library/react-table-library/theme";
 
 import { usePagination } from "@table-library/react-table-library/pagination";
@@ -134,12 +134,12 @@ const VocabTable = ({
   return (
     <>
       <TableSearch
-        styles={styles}
+        styles={vocabDeckTableStyles}
         handleSearch={handleSearch}
         searchValue={search}
       />
 
-      <div className={styles.vocabEntryBtn}>
+      <div className={vocabDeckTableStyles.vocabEntryBtn}>
         <button
           onClick={() => {
             changeAddState();
@@ -149,7 +149,7 @@ const VocabTable = ({
         </button>
       </div>
 
-      <div className={styles.wrapper}>
+      <div className={vocabDeckTableStyles.wrapper}>
         <Table data={currentData} theme={theme} pagination={pagination}>
           {(tableList) => (
             <>

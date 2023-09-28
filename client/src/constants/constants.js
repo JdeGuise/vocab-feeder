@@ -3,6 +3,7 @@ import ReviewVocabWrapper from "../components/ReviewVocabWrapper/ReviewVocabWrap
 import Home from "../components/Home/Home";
 import LessonNotesWrapper from "../components/LessonNotesWrapper/LessonNotesWrapper";
 import VocabDeckWrapper from "../components/VocabDeckWrapper/VocabDeckWrapper";
+import { ToastContextProvider } from "../contexts/ToastContext";
 
 // ReviewVocabWrapper.js
 export const SETNAME_QUERY_PARAM = "set_name";
@@ -110,6 +111,9 @@ export const PATCH_METHOD = "PATCH";
 export const DELETE_METHOD = "DELETE";
 export const CONTENT_TYPE_JSON_UTF8 = "application/json; charset=UTF-8";
 export const LOADING_STR = "Loading...";
+export const TOAST_UPDATE_MSG = "Vocab successfully updated.";
+export const TOAST_CREATE_MSG = "Vocab successfully created.";
+export const TOAST_DELETE_MSG = "Vocab successfully deleted.";
 export const ROOT_ENDPOINT = "/";
 export const EMPTY_VOCAB_FORM = {
   id: "",
@@ -146,6 +150,6 @@ export const ROUTES = [
   {
     route: DECK_ENDPOINT,
     linkLabel: "Deck",
-    element: <VocabDeckWrapper />,
+    element: <ToastContextProvider><VocabDeckWrapper/></ToastContextProvider>,
   },
 ];

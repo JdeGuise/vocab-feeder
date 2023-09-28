@@ -6,7 +6,10 @@ import "./../../Snackbar.css";
 import * as Constants from "../../constants/constants";
 import VocabDeck from "../VocabDeck/VocabDeck";
 
+import { useToast } from "../../hooks/useToast";
+
 const VocabDeckWrapper = (props) => {
+  const toast = useToast();
   const [vocabRecords, setVocabRecords] = useState([]);
   const [refetch, setRefetch] = useState(false);
 
@@ -28,6 +31,7 @@ const VocabDeckWrapper = (props) => {
   // update vocabRecords on page after add
   const onCreateVocab = () => {
     setRefetch((prevState) => !prevState);
+    toast.success(Constants.TOAST_CREATE_MSG);
   };
 
   // update vocabRecords on page after edit
@@ -40,6 +44,11 @@ const VocabDeckWrapper = (props) => {
       }
     });
     setVocabRecords(updatedVocabs);
+    toast.success(Constants.TOAST_UPDATE_MSG);
+  };
+
+  const onDeleteVocab = () => {
+    toast.success(Constants.TOAST_DELETE_MSG);
   };
 
   return (
@@ -48,6 +57,7 @@ const VocabDeckWrapper = (props) => {
       LIMIT={Constants.VOCAB_DECK_PAGE_LIMIT}
       onCreateVocab={onCreateVocab}
       onUpdateVocab={onUpdateVocab}
+      onDeleteVocab={onDeleteVocab}
       setRefetch={setRefetch}
     />
   );

@@ -12,6 +12,7 @@ const VocabDeck = ({
   LIMIT,
   onCreateVocab,
   onUpdateVocab,
+  onDeleteVocab,
   setRefetch,
 }) => {
   // state for edit form inputs
@@ -58,6 +59,7 @@ const VocabDeck = ({
       .then((res) => res.json())
       .then(() => {
         setRefetch((prevState) => !prevState);
+        onDeleteVocab();
       })
       .catch((err) => {
         console.error(Constants.ERROR_STR, err);
