@@ -60,7 +60,7 @@ const ReviewVocabWrapper = (props) => {
 
   if (isLoaded) {
     if (searchParams.get(Constants.SETNAME_QUERY_PARAM) && records.length > 0) {
-      if (!searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM)) {
+      if (!searchParams.get(Constants.REVIEWMODE_QUERY_PARAM)) {
         return (
           <ReviewTypes
             setName={searchParams.get(Constants.SETNAME_QUERY_PARAM)}

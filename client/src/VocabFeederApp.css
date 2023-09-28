@@ -86,10 +86,29 @@ h2 {
   text-decoration: none;
 }
 
-.review-type-options {
-  padding: 12px;
+.flex-grid-halves {
   display: flex;
+  justify-content: space-between;
 }
+.flex-grid-halves .col {
+  width: 49%;
+}
+
+.col {
+  padding: 20px;
+}
+
+@media (max-width: 400px) {
+  .flex-grid,
+  .flex-grid-thirds {
+    display: block;
+    .col {
+      width: 100%;
+      margin: 0 0 10px 0;
+    }
+  }
+}
+
 
 .review-type-item {
   border: 1px solid #bcb6ae;

@@ -16,7 +16,7 @@ const ReviewVocabCardSession = (props) => {
   const [answer, setAnswer] = useState("");
   const [showSummary, setShowSummary] = useState(false);
 
-  const REVIEW_TYPE = searchParams.get(Constants.REVIEWTYPE_QUERY_PARAM);
+  const REVIEW_TYPE = searchParams.get(Constants.REVIEWMODE_QUERY_PARAM);
 
   const [css, setCSS] = useState({
     frontCSS: Constants.SHOW_CARD_SIDE_CSS,
@@ -65,7 +65,7 @@ const ReviewVocabCardSession = (props) => {
   const GetNextCard = (e) => {
     e.preventDefault();
 
-    if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
+    if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEW_TEST_STR) {
       if(props.totalAttempted === props.cards.length) {
         setShowSummary(true);
       } else {
@@ -118,7 +118,7 @@ const ReviewVocabCardSession = (props) => {
     }
   };
 
-  if(!isLoaded && REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
+  if(!isLoaded && REVIEW_TYPE === Constants.VOCAB_CARD_REVIEW_TEST_STR) {
     setCSS({
       ...css,
       nextCSS: Constants.HIDE_NEXT_BTN_CSS,
@@ -154,7 +154,7 @@ const ReviewVocabCardSession = (props) => {
     setAnswer(e.target.value);
   };
 
-  if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_PRACTICE_STR) {
+  if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEW_PRACTICE_STR) {
     return (
       <ReviewVocabCardSessionPractice 
         card={props.cards[i]} 
@@ -164,7 +164,7 @@ const ReviewVocabCardSession = (props) => {
         GetPrevCard={GetPrevCard} 
       />
     );
-  } else if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEWTYPE_TEST_STR) {
+  } else if(REVIEW_TYPE === Constants.VOCAB_CARD_REVIEW_TEST_STR) {
     return (
       <ReviewVocabCardSessionTest
         correctCount={props.correctCount}

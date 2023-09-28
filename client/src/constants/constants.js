@@ -8,6 +8,7 @@ import { ToastContextProvider } from "../contexts/ToastContext";
 // ReviewVocabWrapper.js
 export const SETNAME_QUERY_PARAM = "set_name";
 export const REVIEWTYPE_QUERY_PARAM = "review_type";
+export const REVIEWMODE_QUERY_PARAM = "review_mode";
 export const GET_REVIEW_CATEGORIES_ENDPOINT = "/api/review-categories";
 export const GET_VOCAB_FOR_CATEGORY_ENDPOINT = "/api/vocab-for-category";
 
@@ -17,6 +18,8 @@ export const REVIEW_ENDPOINT_SETNAME_PARAM =
   REVIEW_ENDPOINT + "?" + SETNAME_QUERY_PARAM + "=";
 export const REVIEW_ENDPOINT_REVIEW_TYPE_PARAM =
   REVIEW_ENDPOINT + "?" + REVIEWTYPE_QUERY_PARAM + "=";
+export const REVIEW_ENDPOINT_REVIEW_MODE_PARAM =
+  REVIEW_ENDPOINT + "?" + REVIEWMODE_QUERY_PARAM + "=";
 export const CHOOSE_CATEGORY_LABEL = "Choose a category";
 export const REVIEW_ALL_CATEGORY_LABEL = "Review All";
 
@@ -47,12 +50,12 @@ export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
 export const HIDE_NEXT_BTN_CSS = "vocab-card-hide-next-btn";
 export const HIDE_PREV_BTN_CSS = "vocab-card-hide-prev-btn";
 
-export const VOCAB_CARD_REVIEWTYPE_PRACTICE_LABEL = "Practice";
-export const VOCAB_CARD_REVIEWTYPE_PRACTICE_STR =
-  VOCAB_CARD_REVIEWTYPE_PRACTICE_LABEL.toLowerCase();
-export const VOCAB_CARD_REVIEWTYPE_TEST_LABEL = "Test";
-export const VOCAB_CARD_REVIEWTYPE_TEST_STR =
-  VOCAB_CARD_REVIEWTYPE_TEST_LABEL.toLowerCase();
+export const VOCAB_CARD_REVIEW_PRACTICE_LABEL = "Practice";
+export const VOCAB_CARD_REVIEW_PRACTICE_STR =
+  VOCAB_CARD_REVIEW_PRACTICE_LABEL.toLowerCase();
+export const VOCAB_CARD_REVIEW_TEST_LABEL = "Test";
+export const VOCAB_CARD_REVIEW_TEST_STR =
+VOCAB_CARD_REVIEW_TEST_LABEL.toLowerCase();
 
 export const VOCAB_CARD_CORRECT_ANSWER_MSG = "That's Right!";
 export const VOCAB_CARD_INCORRECT_ANSWER_MSG = "Incorrect.";
