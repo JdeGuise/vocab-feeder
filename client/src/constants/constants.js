@@ -79,9 +79,13 @@ export const DECK_TITLE = "Vocab Entries";
 export const DECK_ENDPOINT = "/deck";
 export const VOCAB_RECORDS_ENDPOINT = "/api/vocab";
 export const VOCAB_DECK_PAGE_LIMIT = "10";
+export const TOAST_UPDATE_MSG = "Vocab successfully updated.";
+export const TOAST_CREATE_MSG = "Vocab successfully created.";
+export const TOAST_DELETE_MSG = "Vocab successfully deleted.";
 
 // VocabDeckTable.jsx
 export const ADD_VOCAB_ENTRY_LABEL = "Add Vocab Entry";
+export const SEARCH_FIELDS = ["dutch", "english", "notes", "pronunciationlink", "set_name"];
 
 // VocabDeckEntry.js
 export const EDIT_BTN_LABEL = "Edit";
@@ -111,9 +115,6 @@ export const PATCH_METHOD = "PATCH";
 export const DELETE_METHOD = "DELETE";
 export const CONTENT_TYPE_JSON_UTF8 = "application/json; charset=UTF-8";
 export const LOADING_STR = "Loading...";
-export const TOAST_UPDATE_MSG = "Vocab successfully updated.";
-export const TOAST_CREATE_MSG = "Vocab successfully created.";
-export const TOAST_DELETE_MSG = "Vocab successfully deleted.";
 export const ROOT_ENDPOINT = "/";
 export const EMPTY_VOCAB_FORM = {
   id: "",

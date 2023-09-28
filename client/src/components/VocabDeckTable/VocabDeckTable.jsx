@@ -101,10 +101,18 @@ const VocabTable = ({
     setDeleteForm(filtered[0]);
   };
 
+  const checkFieldsForSearchTerm = (vocabRecord, lowercaseSearch) => {
+    const possibleSearchParams = Constants.SEARCH_FIELDS.map((field) => vocabRecord[field]?.toLowerCase());
+
+    return possibleSearchParams.some(
+      field => field?.includes(lowercaseSearch)
+    );
+  };
+
   const currentData = {
-    nodes: data.filter((vocabRecord) =>
-      vocabRecord.dutch?.toLowerCase().includes(search.toLowerCase())
-    ),
+    nodes: data.filter(
+      (vocabRecord) => checkFieldsForSearchTerm(vocabRecord, search.toLowerCase())
+    )
   };
 
   const pageCount = parseInt(data.length / LIMIT) + 1;
