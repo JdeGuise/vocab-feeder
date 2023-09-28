@@ -104,9 +104,9 @@ const VocabTable = ({
   const checkFieldsForSearchTerm = (vocabRecord, lowercaseSearch) => {
     const possibleSearchParams = Constants.SEARCH_FIELDS.map((field) => vocabRecord[field]?.toLowerCase());
 
-    return possibleSearchParams.some(field => {
-      return field?.includes(lowercaseSearch);
-    });
+    return possibleSearchParams.some(
+      field => field?.includes(lowercaseSearch)
+    );
   };
 
   const currentData = {
