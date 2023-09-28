@@ -110,9 +110,9 @@ const VocabTable = ({
   };
 
   const currentData = {
-    nodes: data.filter((vocabRecord) => {
-      return checkFieldsForSearchTerm(vocabRecord, search.toLowerCase());
-    }),
+    nodes: data.filter(
+      (vocabRecord) => checkFieldsForSearchTerm(vocabRecord, search.toLowerCase())
+    )
   };
 
   const pageCount = parseInt(data.length / LIMIT) + 1;
