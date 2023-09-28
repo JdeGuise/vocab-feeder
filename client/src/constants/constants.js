@@ -50,6 +50,13 @@ export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
 export const HIDE_NEXT_BTN_CSS = "vocab-card-hide-next-btn";
 export const HIDE_PREV_BTN_CSS = "vocab-card-hide-prev-btn";
 
+export const VOCAB_CARD_CORRECT_ANSWER_MSG = "That's Right!";
+export const VOCAB_CARD_INCORRECT_ANSWER_MSG = "Incorrect.";
+export const VOCAB_CARD_CORRECT_CSS = "showCorrect";
+export const VOCAB_CARD_INCORRECT_CSS = "showIncorrect";
+export const VOCAB_CARD_IMAGE_NEEDED_NAME = "image-needed.png";
+
+// ReviewTypes.js
 export const VOCAB_CARD_REVIEW_PRACTICE_LABEL = "Practice";
 export const VOCAB_CARD_REVIEW_PRACTICE_STR =
   VOCAB_CARD_REVIEW_PRACTICE_LABEL.toLowerCase();
@@ -63,12 +70,8 @@ export const VOCAB_CARD_REVIEW_DEHET_LABEL = "DeHet";
 export const VOCAB_CARD_REVIEW_DEHET_STR =
 VOCAB_CARD_REVIEW_DEHET_LABEL.toLowerCase();
 
-
-export const VOCAB_CARD_CORRECT_ANSWER_MSG = "That's Right!";
-export const VOCAB_CARD_INCORRECT_ANSWER_MSG = "Incorrect.";
-export const VOCAB_CARD_CORRECT_CSS = "showCorrect";
-export const VOCAB_CARD_INCORRECT_CSS = "showIncorrect";
-export const VOCAB_CARD_IMAGE_NEEDED_NAME = "image-needed.png";
+export const VOCAB_DRILLING_LABEL = "Vocab Drilling";
+export const DEHET_DRILLING_LABEL = "De / Het Drilling";
 
 
 

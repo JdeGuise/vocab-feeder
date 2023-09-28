@@ -2,17 +2,17 @@ import { Link } from "react-router-dom";
 import * as Constants from "../../constants/constants";
 
 const ReviewTypes = (props) => {
-  const BASE_LINK = `?${Constants.SETNAME_QUERY_PARAM}=${props.setName}&${Constants.REVIEWMODE_QUERY_PARAM}=`;
+  const BASE_LINK = `?${Constants.SETNAME_QUERY_PARAM}=${props.setName}&${Constants.REVIEWTYPE_QUERY_PARAM}=`;
 
-  const PRACTICE_LINK_VOCAB = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_PRACTICE_STR}&${Constants.REVIEWTYPE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_VOCAB_STR}`;
-  const TEST_LINK_VOCAB = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_TEST_STR}&${Constants.REVIEWTYPE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_VOCAB_STR}`;
+  const PRACTICE_LINK_VOCAB = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_VOCAB_STR}&${Constants.REVIEWMODE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_PRACTICE_STR}`;
+  const TEST_LINK_VOCAB = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_VOCAB_STR}&${Constants.REVIEWMODE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_TEST_STR}`;
 
-  const PRACTICE_LINK_DEHET = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_PRACTICE_STR}&${Constants.REVIEWTYPE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_DEHET_STR}`;
-  const TEST_LINK_VOCAB_DEHET = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_TEST_STR}&${Constants.REVIEWTYPE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_DEHET_STR}`;
+  const PRACTICE_LINK_DEHET = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_DEHET_STR}&${Constants.REVIEWMODE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_PRACTICE_STR}`;
+  const TEST_LINK_VOCAB_DEHET = BASE_LINK + `${Constants.VOCAB_CARD_REVIEW_DEHET_STR}&${Constants.REVIEWMODE_QUERY_PARAM}=${Constants.VOCAB_CARD_REVIEW_TEST_STR}`;
 
   return (
     <div className="review-type-options">
-      <h1>Vocab Drilling</h1>
+      <h1>{Constants.VOCAB_DRILLING_LABEL}</h1>
       <div className="review-type flex-grid-halves">
         <Link
           className="review-type-item col"
@@ -28,7 +28,7 @@ const ReviewTypes = (props) => {
         </Link>
       </div>
 
-      <h1>De / Het Drilling</h1>
+      <h1>{Constants.DEHET_DRILLING_LABEL}</h1>
       <div className="review-type flex-grid-halves">
         <Link
           className="review-type-item col"
