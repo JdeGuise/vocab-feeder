@@ -69,6 +69,49 @@ const ReviewVocab = (props) => {
     [setRecords]
   );
 
+  const HandleMarkAsStudied = (event) => {
+    let recordId;
+    let isStudied = false;
+
+    const updatedCategories = categories.map((category) => {
+      if (String(category.id) === event.target.dataset.key) {
+        recordId = category.id;
+        isStudied = !category.fully_studied;
+
+        return {
+          ...category,
+          fully_studied: !category.fully_studied,
+        };
+      } else {
+        return category;
+      }
+    });
+
+    setCategories(updatedCategories);
+    updateCategoryStudiedStatus(recordId, isStudied);
+  };
+
+  const updateCategoryStudiedStatus = useCallback(
+    (recordId, isStudied) => {
+      fetch(Constants.REVIEW_CATEGORIES_ENDPOINT, {
+        method: Constants.PATCH_METHOD,
+        body: JSON.stringify({
+          recordId: recordId,
+          isStudied: isStudied,
+        }),
+        headers: {
+          "Content-type": Constants.CONTENT_TYPE_JSON_UTF8,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          resetState();
+          setIsLoaded(true);
+        });
+    },
+    [setRecords]
+  );
+
   let [i, setI] = useState(0);
   const GetNextCard = (e) => {
     e.preventDefault();
@@ -156,7 +199,7 @@ const ReviewVocab = (props) => {
   };
 
   useEffect(() => {
-    fetch(Constants.GET_REVIEW_CATEGORIES_ENDPOINT)
+    fetch(Constants.REVIEW_CATEGORIES_ENDPOINT)
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);
@@ -209,6 +252,7 @@ const ReviewVocab = (props) => {
         <CategoryList
           categories={categories}
           GetRecordsForCategory={GetRecordsForCategory}
+          HandleMarkAsStudied={HandleMarkAsStudied}
         />
       );
     }

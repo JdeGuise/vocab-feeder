@@ -1,4 +1,4 @@
-import * as Constants from "../../constants";
+import * as Constants from "../../constants/constants";
 
 import "./LessonNotes.css";
 const LessonNotes = (props) => {

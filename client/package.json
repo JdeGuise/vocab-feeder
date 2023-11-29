@@ -2,24 +2,35 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001",
+  "proxy": "http://localhost:6002",
+  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.11.0",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
     "@table-library/react-table-library": "^4.1.4",
+    "@tabler/icons-react": "^2.35.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.36",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.3",
     "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "npm-run-all clean build-app",
+    "start-app": "PORT=12000 react-scripts start",
+    "dev": "PORT=12000 react-scripts start",
+    "clean": "rimraf ./../dist/client",
+    "build-app": "BUILD_PATH='./../dist/client' react-scripts build",
+    "test": "PORT=12000 react-scripts test",
+    "eject": "PORT=12000 react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
@@ -38,5 +49,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "typescript-plugin-css-modules": "^5.0.1",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4"
   }
 }
