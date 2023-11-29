@@ -159,6 +159,7 @@ const ReviewVocab = (props) => {
     fetch(Constants.GET_REVIEW_CATEGORIES_ENDPOINT)
       .then((res) => res.json())
       .then((data) => {
+        console.log(data);
         setCategories(data);
         setIsLoaded(true);
       })

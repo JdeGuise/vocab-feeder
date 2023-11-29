@@ -5,6 +5,8 @@ import "./../../App.css";
 import * as Constants from "./../../constants";
 
 const CategoryList = (props) => {
+  console.log(props);
+
   return (
     <div className="ReviewApp">
       <h1>{Constants.CHOOSE_CATEGORY_LABEL}</h1>
@@ -19,7 +21,7 @@ const CategoryList = (props) => {
           </Link>
         </li>
         <hr />
-        {props.categories.map((category) => (
+        {/* {props.categories.map((category) => (
           <li key={category}>
             <Link
               className="category-list-item"
@@ -29,7 +31,46 @@ const CategoryList = (props) => {
               {category}
             </Link>
           </li>
-        ))}
+        ))} */}
+        {props.categories.map((category) => {
+          let element = "";
+
+          if (!category.fully_studied) {
+            element = (
+              <li key={category}>
+                <Link
+                  className="category-list-item"
+                  to={Constants.REVIEW_ENDPOINT_SETNAME_PARAM + category}
+                  onClick={props.GetRecordsForCategory}
+                >
+                  {category}
+                </Link>
+              </li>
+            );
+          }
+
+          return element;
+        })}
+        <hr />
+        {props.categories.map((category) => {
+          let element = "";
+
+          if (category.fully_studied) {
+            element = (
+              <li key={category}>
+                <Link
+                  className="category-list-item"
+                  to={Constants.REVIEW_ENDPOINT_SETNAME_PARAM + category}
+                  onClick={props.GetRecordsForCategory}
+                >
+                  {category}
+                </Link>
+              </li>
+            );
+          }
+
+          return element;
+        })}
       </ul>
     </div>
   );

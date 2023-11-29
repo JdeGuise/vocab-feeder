@@ -27,19 +27,21 @@ const getReviewCategories = async (req, res, next) => {
       return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
     }
     client.query(
-      "SELECT name FROM category WHERE name != '' ORDER BY category_order ASC",
+      "SELECT name, fully_studied FROM category WHERE name != '' ORDER BY category_order ASC",
       async (err, result) => {
         release();
         if (err) {
           logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
           return console.error(QUERY_EXECUTION_ERROR_MSG, err.stack);
         }
-        const setNames = [];
-        for (const row in result.rows) {
-          setNames.push(result.rows[row].name);
-        }
+        // const setNames = [];
+        // for (const row in result.rows) {
+        //   // setNames.push(result.rows[row].name);
+        //   setNames.push(result.rows[row]);
+        // }
 
-        res.send(setNames);
+        // res.send(setNames);
+        res.send(result.rows);
       }
     );
   });
