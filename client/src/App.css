@@ -79,6 +79,39 @@ h2 {
   text-decoration: none;
 }
 
+.category-list-item-specific {
+  border: "2px solid white";
+  width: 440px;
+  margin: auto;
+}
+
+.category-option-list-item-contents {
+  margin: auto;
+  min-height: 45px;
+}
+
+.category-option-list-item-checkbox {
+  display: "inline-block";
+  text-align: left;
+  width: 40px;
+}
+
+.category-option-list-item-value {
+  display: "inline-block";
+  vertical-align: middle;
+  text-align: left;
+  width: 340px;
+  margin: 4px 0 4px 0;
+}
+
+.category-option-list-item {
+  margin: 0 auto;
+}
+
+.no-margin {
+  margin: 0;
+}
+
 .review-type-options {
   padding: 12px;
   display: flex;

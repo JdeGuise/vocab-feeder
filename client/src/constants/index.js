@@ -7,7 +7,7 @@ import ReviewVocabEntries from "../components/ReviewVocabEntries/ReviewVocabEntr
 // ReviewVocab.js
 export const SETNAME_QUERY_PARAM = "set_name";
 export const REVIEWTYPE_QUERY_PARAM = "review_type";
-export const GET_REVIEW_CATEGORIES_ENDPOINT = "/api/review-categories";
+export const REVIEW_CATEGORIES_ENDPOINT = "/api/review-categories";
 export const GET_VOCAB_FOR_CATEGORY_ENDPOINT = "/api/vocab-for-category";
 export const SHOW_CARD_SIDE_CSS = "vocab-card-show-side";
 export const HIDE_CARD_SIDE_CSS = "vocab-card-hide-side";
@@ -21,6 +21,8 @@ export const REVIEW_ENDPOINT_SETNAME_PARAM =
 export const REVIEW_ENDPOINT_REVIEW_TYPE_PARAM =
   REVIEW_ENDPOINT + "?" + REVIEWTYPE_QUERY_PARAM + "=";
 export const CHOOSE_CATEGORY_LABEL = "Choose a category";
+export const ACTIVE_CATEGORY_LABEL = "Active";
+export const ARCHIVED_CATEGORY_LABEL = "Archived";
 export const REVIEW_ALL_CATEGORY_LABEL = "Review All";
 
 // SlackDailyVocab.js
