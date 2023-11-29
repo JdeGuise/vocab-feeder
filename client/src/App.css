@@ -80,7 +80,7 @@ h2 {
 }
 
 .category-list-item-specific {
-  border: "2px solid white";
+  border: 2px solid white;
   width: 440px;
   margin: auto;
 }
@@ -91,13 +91,13 @@ h2 {
 }
 
 .category-option-list-item-checkbox {
-  display: "inline-block";
+  display: inline-block;
   text-align: left;
   width: 40px;
 }
 
 .category-option-list-item-value {
-  display: "inline-block";
+  display: inline-block;
   vertical-align: middle;
   text-align: left;
   width: 340px;
