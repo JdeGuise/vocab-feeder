@@ -20,28 +20,54 @@ const getSlackInfo = async (req: any, res: { json: (arg0: any) => void; }, next:
   }
 };
 
-const getReviewCategories = async (req: any, res: { send: (arg0: any[]) => void; }, next: any) => {
-  await pool.connect(async (err: { stack: any; }, client: { query: (arg0: string, arg1: (err: any, result: any) => Promise<void>) => void; }, release: () => void) => {
+const getReviewCategories = async (req, res, next) => {
+  await pool.connect(async (err, client, release) => {
     if (err) {
       logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
       return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
     }
     client.query(
-      "SELECT name FROM category WHERE name != '' ORDER BY category_order ASC",
-      async (err: { stack: any; }, result: { rows: { [x: string]: { name: any; }; }; }) => {
+      "SELECT id, name, fully_studied FROM category WHERE name != '' ORDER BY category_order ASC",
+      async (err, result) => {
         release();
         if (err) {
           logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
           return console.error(QUERY_EXECUTION_ERROR_MSG, err.stack);
         }
-        const setNames = [];
-        for (const row in result.rows) {
-          setNames.push(result.rows[row].name);
-        }
 
-        res.send(setNames);
+        res.send(result.rows);
       }
     );
+  });
+};
+
+const updateReviewCategory = async (req, res, next) => {
+  let body = "";
+  req.on("data", (chunk) => {
+    body += chunk.toString();
+  });
+
+  req.on("end", () => {
+    const newCategory = JSON.parse(decodeURIComponent(body));
+
+    pool.connect(async (err, client, release) => {
+      if (err) {
+        logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
+        return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
+      }
+      client.query(
+        "UPDATE category SET fully_studied = $1 WHERE id = $2",
+        [newCategory.isStudied, newCategory.recordId],
+        (err, result) => {
+          release();
+          if (err) {
+            logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
+            return console.error(QUERY_EXECUTION_ERROR_MSG, err.stack);
+          }
+          res.send(newCategory);
+        }
+      );
+    });
   });
 };
 
@@ -238,9 +264,10 @@ const deleteVocab = (req: { on: (arg0: string, arg1: { (chunk: { toString: () =>
   });
 };
 
-export {
+export = {
   getSlackInfo,
   getReviewCategories,
+  updateReviewCategory,
   getLessonPeopleNames,
   getVocabForCategory,
   getVocab,

@@ -5,6 +5,7 @@ const vocabController = require("../controllers/vocab.controller");
 
 router.get("/slack-info", vocabController.getSlackInfo);
 router.get("/review-categories", vocabController.getReviewCategories);
+router.patch("/review-categories", vocabController.updateReviewCategory);
 router.get("/lesson-people-names", vocabController.getLessonPeopleNames);
 router.get("/vocab", vocabController.getVocab);
 router.patch("/vocab", vocabController.updateVocab);
