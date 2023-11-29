@@ -20,15 +20,17 @@ const getSlackInfo = async (req: any, res: { json: (arg0: any) => void; }, next:
   }
 };
 
-const getReviewCategories = async (req, res, next) => {
-  await pool.connect(async (err, client, release) => {
+const getReviewCategories = async (req: any, res: {
+  send(rows: { [x: string]: any; }): unknown; json: (arg0: any) => void; 
+}, next: (arg0: unknown) => void) => {
+  await pool.connect(async (err: { stack: any; }, client: { query: (arg0: string, arg1: (err: any, result: any) => Promise<void>) => void; }, release: () => void) => {
     if (err) {
       logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
       return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
     }
     client.query(
       "SELECT id, name, fully_studied FROM category WHERE name != '' ORDER BY category_order ASC",
-      async (err, result) => {
+      async (err: any, result: {send: any; rows: { [x: string]: any; }; }) => {
         release();
         if (err) {
           logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));
@@ -41,24 +43,25 @@ const getReviewCategories = async (req, res, next) => {
   });
 };
 
-const updateReviewCategory = async (req, res, next) => {
+const updateReviewCategory = async (req: any, res: {
+  send(newCategory: any): unknown; json: (arg0: any) => void; 
+}, next: (arg0: unknown) => void) => {
   let body = "";
-  req.on("data", (chunk) => {
+  req.on("data", (chunk: { toString: () => string; }) => {
     body += chunk.toString();
   });
 
   req.on("end", () => {
     const newCategory = JSON.parse(decodeURIComponent(body));
 
-    pool.connect(async (err, client, release) => {
+    pool.connect(async (err: { stack: any; }, client: { query: (arg0: string, arg1: (err: any, result: any) => Promise<void>) => void; }, release: () => void) => {
       if (err) {
         logger.error(buildLoggingStr(QUERY_CONNECTION_ERROR_MSG, err.stack));
         return console.error(QUERY_CONNECTION_ERROR_MSG, err.stack);
       }
       client.query(
-        "UPDATE category SET fully_studied = $1 WHERE id = $2",
-        [newCategory.isStudied, newCategory.recordId],
-        (err, result) => {
+        "UPDATE category SET fully_studied = " + newCategory.isStudied + " WHERE id = " + newCategory.recordId,
+        async (err: { stack: any; }, result: { rows: { [x: string]: any; }; }) => {
           release();
           if (err) {
             logger.error(buildLoggingStr(QUERY_EXECUTION_ERROR_MSG, err.stack));

@@ -5,7 +5,7 @@ import { shuffleArray } from "../../utils.js";
 import "./../../VocabFeederApp.css";
 import * as Constants from "../../constants/constants.js";
 
-import ReviewCategoryList from "../ReviewCategoryList/ReviewCategoryList.js";
+import CategoryList from "../CategoryList/CategoryList.js";
 import ReviewVocabCardSession from "../ReviewVocabCardSession/ReviewVocabCardSession.js";
 import ReviewTypes from "../ReviewTypes/ReviewTypes.js";
 
@@ -46,8 +46,51 @@ const ReviewVocabWrapper = (props) => {
     [setRecords]
   );
 
+  const HandleMarkAsStudied = (event) => {
+    let recordId;
+    let isStudied = false;
+
+    const updatedCategories = categories.map((category) => {
+      if (String(category.id) === event.target.dataset.key) {
+        recordId = category.id;
+        isStudied = !category.fully_studied;
+
+        return {
+          ...category,
+          fully_studied: !category.fully_studied,
+        };
+      } else {
+        return category;
+      }
+    });
+
+    setCategories(updatedCategories);
+    updateCategoryStudiedStatus(recordId, isStudied);
+  };
+
+  const updateCategoryStudiedStatus = useCallback(
+    (recordId, isStudied) => {
+      fetch(Constants.REVIEW_CATEGORIES_ENDPOINT, {
+        method: Constants.PATCH_METHOD,
+        body: JSON.stringify({
+          recordId: recordId,
+          isStudied: isStudied,
+        }),
+        headers: {
+          "Content-type": Constants.CONTENT_TYPE_JSON_UTF8,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          resetState();
+          setIsLoaded(true);
+        });
+    },
+    []
+  );
+
   useEffect(() => {
-    fetch(Constants.GET_REVIEW_CATEGORIES_ENDPOINT)
+    fetch(Constants.REVIEW_CATEGORIES_ENDPOINT)
       .then((res) => res.json())
       .then((data) => {
         setCategories(data);
@@ -83,9 +126,10 @@ const ReviewVocabWrapper = (props) => {
       }
     } else {
       return (
-        <ReviewCategoryList
+        <CategoryList
           categories={categories}
           GetRecordsForCategory={GetRecordsForCategory}
+          HandleMarkAsStudied={HandleMarkAsStudied}
         />
       );
     }

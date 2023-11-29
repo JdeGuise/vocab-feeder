@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3002",
+  "proxy": "http://localhost:6002",
   "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.11.0",
@@ -25,12 +25,12 @@
   },
   "scripts": {
     "start": "npm-run-all clean build-app",
-    "start-app": "react-scripts start",
-    "dev": "react-scripts start",
+    "start-app": "PORT=12000 react-scripts start",
+    "dev": "PORT=12000 react-scripts start",
     "clean": "rimraf ./../dist/client",
     "build-app": "BUILD_PATH='./../dist/client' react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "PORT=12000 react-scripts test",
+    "eject": "PORT=12000 react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

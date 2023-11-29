@@ -16,13 +16,14 @@ then
 fi
 
 echo "Installing PostgresSQL"
-sudo apt install postgresql -y
+sudo dnf install postgresql -y
 
 echo "Setting password of postgres user"
 echo "=== $BASH_SOURCE on $(hostname -f) at $(date)" >&2
 sudo passwd postgres
 
 echo "Creating postgres user root"
+sudo -u postgres createuser goose -P --interactive
 sudo -u postgres createuser pi -P --interactive
 
 echo "Starting Postgres"
@@ -34,6 +35,7 @@ sudo su - postgres -c \
 "psql <<__END__
 
 CREATE DATABASE pi;
+CREATE DATABASE goose;
 CREATE DATABASE vocabdb;
 \connect vocabdb;
 

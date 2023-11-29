@@ -1,9 +1,10 @@
+import React from "react";
 import { Link } from "react-router-dom";
 
-import "./../../VocabFeederApp.css";
-import * as Constants from "../../constants/constants";
+import "./../../App.css";
+import * as Constants from "../../constants/constants.js";
 
-const ReviewCategoryList = (props) => {
+const CategoryList = (props) => {
   return (
     <div className="ReviewApp">
       <h1>{Constants.CHOOSE_CATEGORY_LABEL}</h1>
@@ -75,4 +76,4 @@ const CategoryOption = (props) => {
   );
 };
 
-export default ReviewCategoryList;
+export default CategoryList;

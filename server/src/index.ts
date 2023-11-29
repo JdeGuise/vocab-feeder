@@ -1,7 +1,7 @@
 const path = require('node:path'); 
 require('dotenv').config({ path: path.resolve(__dirname, './.env') });
 
-const PORT = process.env.NODE_ENV==='development' ? (process.env.NODE_PORT_DEV || 3002) : (process.env.NODE_PORT_PROD || 3001);
+const PORT = process.env.NODE_ENV==='development' ? (process.env.NODE_PORT_DEV || 6002) : (process.env.NODE_PORT_PROD || 6001);
 
 const { initDailyDutchScheduler } = require("./jobs/vocab.job");
 const { slackApp, storage } = require("./configs/slack.config");
