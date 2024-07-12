@@ -36,9 +36,9 @@ const VocabDeckWrapperEditVocab = ({
   const labels = {
     "Dutch": dutch,
     "English": english,
-    "Pronunciation URL": pronunciationlink,
+    "pronunciationlink": pronunciationlink,
     "Notes": notes,
-    "Category": set_name,
+    "set_name": set_name,
   };
 
   return (
