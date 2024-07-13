@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.11 (Raspbian 13.11-0+deb11u1)
--- Dumped by pg_dump version 13.11 (Raspbian 13.11-0+deb11u1)
+-- Dumped from database version 13.14 (Raspbian 13.14-0+deb11u1)
+-- Dumped by pg_dump version 13.14 (Raspbian 13.14-0+deb11u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,11 +26,35 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.category (
     name character varying(80) NOT NULL,
-    category_order integer NOT NULL
+    category_order integer NOT NULL,
+    fully_studied boolean,
+    id integer NOT NULL
 );
 
 
 ALTER TABLE public.category OWNER TO postgres;
+
+--
+-- Name: category_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.category_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.category_id_seq OWNER TO postgres;
+
+--
+-- Name: category_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.category_id_seq OWNED BY public.category.id;
+
 
 --
 -- Name: lesson; Type: TABLE; Schema: public; Owner: postgres
@@ -81,7 +105,9 @@ CREATE TABLE public.vocabulary (
     seen boolean DEFAULT false,
     mastered boolean DEFAULT false,
     id integer NOT NULL,
-    set_name character varying(80)
+    set_name character varying(80),
+    created_date timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    de_het character varying(3)
 );
 
 
@@ -110,6 +136,13 @@ ALTER SEQUENCE public.vocabulary_id_seq OWNED BY public.vocabulary.id;
 
 
 --
+-- Name: category id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.category ALTER COLUMN id SET DEFAULT nextval('public.category_id_seq'::regclass);
+
+
+--
 -- Name: lesson id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -127,1849 +160,2177 @@ ALTER TABLE ONLY public.vocabulary ALTER COLUMN id SET DEFAULT nextval('public.v
 -- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO public.category VALUES ('introductory', 1);
-INSERT INTO public.category VALUES ('pronouns/thanking', 2);
-INSERT INTO public.category VALUES ('professions', 3);
-INSERT INTO public.category VALUES ('food/drink', 4);
-INSERT INTO public.category VALUES ('question words', 5);
-INSERT INTO public.category VALUES ('traffic/buildings', 6);
-INSERT INTO public.category VALUES ('numbers/counting', 7);
-INSERT INTO public.category VALUES ('common verbs (1)', 8);
-INSERT INTO public.category VALUES ('common adjectives (1)', 9);
-INSERT INTO public.category VALUES ('weekdays/months/seasons', 10);
-INSERT INTO public.category VALUES ('prepositions', 11);
-INSERT INTO public.category VALUES ('hobbies', 12);
-INSERT INTO public.category VALUES ('Amsterdam', 13);
-INSERT INTO public.category VALUES ('household', 14);
-INSERT INTO public.category VALUES ('body', 15);
-INSERT INTO public.category VALUES ('clothes', 16);
-INSERT INTO public.category VALUES ('common verbs (2)', 17);
-INSERT INTO public.category VALUES ('job hunting/business', 18);
-INSERT INTO public.category VALUES ('family', 19);
-INSERT INTO public.category VALUES ('animals (1)', 20);
-INSERT INTO public.category VALUES ('football', 21);
-INSERT INTO public.category VALUES ('common verbs (3)', 22);
-INSERT INTO public.category VALUES ('weather', 23);
-INSERT INTO public.category VALUES ('common adjectives (2)', 24);
-INSERT INTO public.category VALUES ('doctor', 25);
-INSERT INTO public.category VALUES ('geography', 26);
-INSERT INTO public.category VALUES ('moving/immigration', 27);
-INSERT INTO public.category VALUES ('moods/emotions', 28);
-INSERT INTO public.category VALUES ('cooking', 29);
-INSERT INTO public.category VALUES ('fruits/veggies', 30);
-INSERT INTO public.category VALUES ('common verbs (4)', 31);
-INSERT INTO public.category VALUES ('tools/materials', 32);
-INSERT INTO public.category VALUES ('adverbs', 33);
-INSERT INTO public.category VALUES ('colors/shapes', 34);
-INSERT INTO public.category VALUES ('common adjectives (3)', 35);
-INSERT INTO public.category VALUES ('celebrations/holidays', 36);
-INSERT INTO public.category VALUES ('animals (2)', 37);
-INSERT INTO public.category VALUES ('common adjectives (4)', 38);
-INSERT INTO public.category VALUES ('misc. words (1)', 39);
-INSERT INTO public.category VALUES ('misc. words (2)', 40);
-INSERT INTO public.category VALUES ('dutch symbols', 41);
-INSERT INTO public.category VALUES ('grammar', 42);
-INSERT INTO public.category VALUES ('nature', 43);
-INSERT INTO public.category VALUES ('time', 44);
+COPY public.category (name, category_order, fully_studied, id) FROM stdin;
+traffic/buildings	6	f	5
+numbers/counting	7	f	6
+common verbs (1)	8	f	7
+common adjectives (1)	9	f	8
+weekdays/months/seasons	10	f	9
+prepositions	11	f	10
+hobbies	12	f	11
+Amsterdam	13	f	12
+household	14	f	13
+body	15	f	14
+clothes	16	f	15
+common verbs (2)	17	f	16
+job hunting/business	18	f	17
+family	19	f	18
+animals (1)	20	f	19
+football	21	f	20
+common verbs (3)	22	f	21
+weather	23	f	22
+common adjectives (2)	24	f	23
+doctor	25	f	24
+geography	26	f	25
+moving/immigration	27	f	26
+moods/emotions	28	f	27
+cooking	29	f	28
+fruits/veggies	30	f	29
+common verbs (4)	31	f	30
+tools/materials	32	f	31
+adverbs	33	f	32
+colors/shapes	34	f	33
+common adjectives (3)	35	f	34
+celebrations/holidays	36	f	35
+animals (2)	37	f	36
+common adjectives (4)	38	f	37
+misc. words (1)	39	f	38
+misc. words (2)	40	f	39
+dutch symbols	41	f	40
+grammar	42	f	41
+nature	43	f	42
+time	44	f	43
+introductory	1	t	44
+UvA A2 Course	45	f	45
+pronouns/thanking	2	t	1
+food/drink	4	t	3
+professions	3	t	2
+question words	5	t	4
+\.
+
+
+--
+-- Data for Name: lesson; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.lesson (id, person, lesson_date, notes, lesson_title) FROM stdin;
+2	rachel	2022-11-22	rachel nov 22 notes	\N
+3	john	2022-11-16	small words notes	Small Words/Concepts Review
+1	john	2022-11-24	Testing\nTesting\nTesting\nTesting Testing2\\n\nTesting	Pub Quiz
+4	john	2022-11-09	<p class="c4"><span class="c3">Test Sheet</span></p><ul class="c0 lst-kix_wy5eji99qfml-0 start"><li class="c4 c5 li-bullet-0"><span class="c2">Testing</span></li><li class="c4 c5 li-bullet-0"><span class="c2">Testing2</span></li></ul><p class="c1"><span class="c2"></span></p><p class="c1"><span class="c6"></span></p><ul class="c0 lst-kix_vsky5at4erd8-0 start"><li class="c4 c5 li-bullet-0"><span class="c8">Testing 3</span></li></ul>	\N
+\.
 
 
 --
 -- Data for Name: vocabulary; Type: TABLE DATA; Schema: public; Owner: pi
 --
 
-INSERT INTO public.vocabulary VALUES ('bang', 'afraid', NULL, 'https://forvo.com/word/bang/#nl', false, true, 1804, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('vroeg', 'early', NULL, 'https://forvo.com/word/vroeg/#nl', true, false, 1692, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('welke dag (van de week)?', 'which day of the week', NULL, '#', false, true, 1303, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de kampioen', 'the champion', NULL, 'https://forvo.com/word/kampioen/#nl', true, false, 1624, 'football');
-INSERT INTO public.vocabulary VALUES ('rit', 'ride', 'n/a', 'https://forvo.com/word/rit/#nl', true, false, 508, NULL);
-INSERT INTO public.vocabulary VALUES ('jullie', 'you (all)', NULL, 'https://forvo.com/word/jullie/#nl', false, true, 1125, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('markt', 'market', 'n/a', 'https://forvo.com/word/markt/#nl', false, true, 879, NULL);
-INSERT INTO public.vocabulary VALUES ('ontwikkelen', 'to develop', NULL, 'https://forvo.com/word/ontwikkelen/#nl', true, false, 1894, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('januari', 'January', NULL, 'https://forvo.com/word/januari/#nl', false, true, 1313, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('bodem', 'soil', 'n/a', 'https://forvo.com/word/bodem/#nl', true, false, 739, 'nature');
-INSERT INTO public.vocabulary VALUES ('serveren', 'to serve', 'verb', 'https://forvo.com/word/serveren/#nl', true, false, 1005, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('(het)zelfde', 'same', NULL, 'https://forvo.com/word/zelfde/#nl', true, false, 1993, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('de buren', 'the neighbours', NULL, 'https://forvo.com/word/buren/#nl', true, false, 1777, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de politieman/de agent', 'the police officer', NULL, 'https://forvo.com/word/politieman/#nl', true, false, 1141, 'professions');
-INSERT INTO public.vocabulary VALUES ('vies', 'dirty, disgusting', NULL, 'https://forvo.com/word/vies/#nl', false, true, 1277, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('dik', 'thick, fat', NULL, 'https://forvo.com/word/dik/#nl', false, false, 1985, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('hij', 'he', NULL, 'https://forvo.com/word/hij/#nl', false, false, 1120, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de trein', 'the train', NULL, 'https://forvo.com/word/trein/#nl', false, false, 1202, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('best', 'best', NULL, 'https://forvo.com/word/best/#nl', false, false, 1688, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de provincie', 'the province', NULL, 'https://forvo.com/word/provincie/#nl', false, false, 1741, 'geography');
-INSERT INTO public.vocabulary VALUES ('soldaat', 'soldier', 'n/a', 'https://forvo.com/word/soldaat/#nl', false, false, 759, NULL);
-INSERT INTO public.vocabulary VALUES ('coat', 'coat', 'n/a', 'https://forvo.com/word/coat/#nl', false, false, 932, 'clothes');
-INSERT INTO public.vocabulary VALUES ('het concert', 'the concert', NULL, 'https://forvo.com/word/concert/#nl', false, false, 1392, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het schaap', 'the sheep', NULL, 'https://forvo.com/word/schaap/#nl', false, false, 2031, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('noord', 'north', NULL, 'https://forvo.com/word/noord/#nl', false, false, 2076, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('hoed', 'hat', 'n/a', 'https://forvo.com/word/hoed/#nl', false, false, 954, NULL);
-INSERT INTO public.vocabulary VALUES ('papier', 'paper', 'n/a', 'https://forvo.com/word/papier/#nl', false, false, 286, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('naast', 'next to', NULL, 'https://forvo.com/word/naast/#nl', false, false, 1335, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('de boom', 'the tree', NULL, 'https://forvo.com/word/boom/#nl', false, false, 2111, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het park', 'the park', NULL, 'https://forvo.com/word/park/#nl', false, false, 1405, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('rood', 'red', NULL, 'https://forvo.com/word/rood/#nl', false, false, 1968, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('heel', 'whole, very, quite', NULL, 'https://forvo.com/word/heel/#nl', false, false, 1695, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('douchen', 'to share', 'n/a', 'https://forvo.com/word/douchen/#nl', false, false, 2155, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('stofzuigen', 'to vacuum', 'n/a', 'https://forvo.com/word/stofzuigen/#nl', false, false, 2156, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('spons', 'sponge', 'n/a', 'https://forvo.com/word/spons/#nl', false, false, 2157, 'household');
-INSERT INTO public.vocabulary VALUES ('nerveus', 'anxious', 'n/a', 'https://forvo.com/word/nerveus/#nl', false, false, 2158, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('vliegtuig', 'plane', 'n/a', 'https://forvo.com/word/vliegtuig/#nl', false, false, 376, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('diep', 'deep', 'n/a', 'https://forvo.com/word/diep/#nl', false, false, 2159, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('wachtkamer', 'waiting room', 'n/a', 'https://forvo.com/word/wachtkamer/#nl', false, false, 2160, 'doctor');
-INSERT INTO public.vocabulary VALUES ('baden', 'to bathe', 'n/a', 'https://forvo.com/word/baden/#nl', false, false, 2161, 'household');
-INSERT INTO public.vocabulary VALUES ('duizend', 'thousand', NULL, 'https://forvo.com/word/duizend/#nl', false, false, 1245, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('april', 'April', NULL, 'https://forvo.com/word/april/#nl', false, false, 1316, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('tapijt', 'carpet', 'n/a', 'https://forvo.com/word/tapijt/#nl', false, false, 2162, 'household');
-INSERT INTO public.vocabulary VALUES ('vuil', 'dirty', 'n/a', 'https://forvo.com/word/vuil/#nl', false, false, 2163, 'household');
-INSERT INTO public.vocabulary VALUES ('kok', 'cook', 'n/a', 'https://forvo.com/word/kok/#nl', false, false, 720, 'cooking');
-INSERT INTO public.vocabulary VALUES ('meer', 'more/lake', 'n/a', 'https://forvo.com/word/meer/#nl', false, false, 1963, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('grillen', 'to grill', 'n/a', 'https://forvo.com/word/grillen/#nl', false, false, 2165, 'cooking');
-INSERT INTO public.vocabulary VALUES ('voetpad', 'sidewalk', 'n/a', 'https://forvo.com/word/voetpad/#nl', false, false, 2166, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('enkel', 'ankle', 'n/a', 'https://forvo.com/word/enkel/#nl', false, false, 2167, 'body');
-INSERT INTO public.vocabulary VALUES ('haan', 'rooster', 'n/a', 'https://forvo.com/word/haan/#nl', false, false, 2168, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('afstandsbediening', 'remote control', 'n/a', 'https://forvo.com/word/afstandsbediening/#nl', false, false, 2169, 'household');
-INSERT INTO public.vocabulary VALUES ('benzene', 'gas/petrol', 'n/a', 'https://forvo.com/word/benzene/#nl', true, true, 2164, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('zien', 'to see', NULL, 'https://forvo.com/word/zien/#nl', true, false, 1261, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('hoog', 'high, tall', NULL, 'https://forvo.com/word/hoog/#nl', false, true, 1298, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de huisarts', 'the general practitioner', NULL, 'https://forvo.com/word/huisarts/#nl', true, false, 1723, 'doctor');
-INSERT INTO public.vocabulary VALUES ('deur', 'door', 'n/a', 'https://forvo.com/word/deur/#nl', true, false, 325, 'household');
-INSERT INTO public.vocabulary VALUES ('de ring', 'the ring, the ring road', NULL, 'https://forvo.com/word/ring/#nl', false, false, 1399, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('de komkommer', 'the cucumber', NULL, 'https://forvo.com/word/komkommer/#nl', true, false, 1859, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('groeien', 'to grow', NULL, 'https://forvo.com/word/groeien/#nl', false, false, 1649, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('zal niet', 'won’t', 'n/a', '#', false, false, 753, NULL);
-INSERT INTO public.vocabulary VALUES ('fijne', 'fine', 'n/a', 'https://forvo.com/word/fijne/#nl', true, false, 405, NULL);
-INSERT INTO public.vocabulary VALUES ('bewolkt', 'cloudy', NULL, 'https://forvo.com/word/bewolkt/#nl', false, true, 1680, 'weather');
-INSERT INTO public.vocabulary VALUES ('kwart over drie', 'quarter past three', '', '#', true, false, 1055, 'time');
-INSERT INTO public.vocabulary VALUES ('één', 'one', 'n/a', 'https://forvo.com/word/een/#nl', false, false, 15, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('zou', 'would/might', 'n/a', 'https://forvo.com/word/zou/#nl', false, false, 164, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('beneden', 'down, downstairs', NULL, 'https://forvo.com/word/beneden/#nl', false, false, 1336, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('de haan', 'the cockerel', NULL, 'https://forvo.com/word/haan/#nl', false, false, 1580, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('veranderen', 'to change', NULL, 'https://forvo.com/word/veranderen/#nl', false, false, 1519, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('het ontbijt', 'the breakfast', NULL, 'https://forvo.com/word/ontbijt/#nl', false, false, 1821, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de neef', 'the cousin, the nephew', NULL, 'https://forvo.com/word/neef/#nl', false, false, 1552, 'family');
-INSERT INTO public.vocabulary VALUES ('tolk', 'interpreter', 'noun', 'https://forvo.com/word/tolk/#nl', false, false, 1006, NULL);
-INSERT INTO public.vocabulary VALUES ('tegengesteld', 'opposite', 'n/a', 'https://forvo.com/word/tegengesteld/#nl', false, false, 964, NULL);
-INSERT INTO public.vocabulary VALUES ('zicht', 'sight', 'n/a', 'https://forvo.com/word/zicht/#nl', false, false, 825, NULL);
-INSERT INTO public.vocabulary VALUES ('houden van', 'to love', NULL, '#', false, false, 1505, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('laten vallen', 'drop', 'n/a', '#', false, false, 540, NULL);
-INSERT INTO public.vocabulary VALUES ('zeil', 'sail', 'n/a', 'https://forvo.com/word/zeil/#nl', false, false, 550, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('doet', 'does', 'n/a', 'https://forvo.com/word/doet/#nl', false, false, 52, NULL);
-INSERT INTO public.vocabulary VALUES ('kinderen', 'children', 'n/a', 'https://forvo.com/word/kinderen/#nl', false, false, 280, 'family');
-INSERT INTO public.vocabulary VALUES ('druk', 'busy/crowded', NULL, 'https://forvo.com/word/druk/#nl', false, false, 2062, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('pers', 'press', 'n/a', 'https://forvo.com/word/pers/#nl', false, false, 245, NULL);
-INSERT INTO public.vocabulary VALUES ('verhogen', 'raise', 'n/a', 'https://forvo.com/word/verhogen/#nl', false, false, 708, NULL);
-INSERT INTO public.vocabulary VALUES ('hopen', 'hope', 'n/a', 'https://forvo.com/word/hopen/#nl', false, false, 596, NULL);
-INSERT INTO public.vocabulary VALUES ('twee uur', 'two o’clock', '', '#', false, false, 1049, 'time');
-INSERT INTO public.vocabulary VALUES ('het bed', 'the bed', NULL, 'https://forvo.com/word/bed/#nl', true, false, 1424, 'household');
-INSERT INTO public.vocabulary VALUES ('zoutig', 'salty', NULL, 'https://forvo.com/word/zout/#nl', false, false, 1832, 'cooking');
-INSERT INTO public.vocabulary VALUES ('jullie / uw (plural)', 'your', NULL, 'https://forvo.com/word/jullie/#nl', false, false, 2118, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('winnen', 'to win', NULL, 'https://forvo.com/word/winnen/#nl', false, false, 1511, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('maken', 'to make', NULL, 'https://forvo.com/word/maken/#nl', false, false, 1512, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('tennissen', 'to play tennis', NULL, 'https://forvo.com/word/tennissen/#nl', false, false, 1368, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('de scheidsrechter', 'the referee', NULL, 'https://forvo.com/word/scheidsrechter/#nl', false, false, 1607, 'football');
-INSERT INTO public.vocabulary VALUES ('trompet', 'trumpet', NULL, 'https://forvo.com/word/trompet/#nl', false, false, 2154, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('wave', 'wave', 'n/a', 'https://forvo.com/word/wave/#nl', true, false, 539, NULL);
-INSERT INTO public.vocabulary VALUES ('de vogel', 'the bird', NULL, 'https://forvo.com/word/vogel/#nl', false, false, 1581, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('onderdeel', 'element', 'n/a', 'https://forvo.com/word/onderdeel/#nl', false, false, 771, NULL);
-INSERT INTO public.vocabulary VALUES ('ijsvrij', 'a day off for skating', NULL, 'https://forvo.com/word/ijsvrij/#nl', false, false, 2015, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('vier', 'four', NULL, 'https://forvo.com/word/vier/#nl', false, false, 1226, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('het bos', 'the forest', NULL, 'https://forvo.com/word/bos/#nl', false, false, 1406, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('uit eten gaan', 'to go out for dinner', NULL, '#', false, false, 1371, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('koud', 'cold', NULL, 'https://forvo.com/word/koud/#nl', false, false, 1294, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('warm', 'warm', NULL, 'https://forvo.com/word/warm/#nl', false, false, 1295, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('had', 'had', 'n/a', 'https://forvo.com/word/had/#nl', false, false, 29, NULL);
-INSERT INTO public.vocabulary VALUES ('haast', 'hurry', 'n/a', 'https://forvo.com/word/haast/#nl', false, false, 829, NULL);
-INSERT INTO public.vocabulary VALUES ('schilderen', 'paint', 'n/a', 'https://forvo.com/word/schilderen/#nl', false, false, 399, NULL);
-INSERT INTO public.vocabulary VALUES ('rol', 'roll', 'n/a', 'https://forvo.com/word/rol/#nl', false, false, 740, NULL);
-INSERT INTO public.vocabulary VALUES ('vrij', 'free, pretty', NULL, 'https://forvo.com/word/vrij/#nl', false, false, 1694, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de pruim', 'the plum', NULL, 'https://forvo.com/word/pruim/#nl', false, false, 1876, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de plaats', 'the place', NULL, 'https://forvo.com/word/plaats/#nl', false, false, 1746, 'geography');
-INSERT INTO public.vocabulary VALUES ('de kleren', 'the clothes', NULL, 'https://forvo.com/word/kleren/#nl', false, false, 1460, 'clothes');
-INSERT INTO public.vocabulary VALUES ('bespreken', 'discuss', 'n/a', 'https://forvo.com/word/bespreken/#nl', false, false, 922, NULL);
-INSERT INTO public.vocabulary VALUES ('de vork', 'the fork', NULL, 'https://forvo.com/word/vork/#nl', false, false, 1841, 'cooking');
-INSERT INTO public.vocabulary VALUES ('interessant', 'interesting', NULL, 'https://forvo.com/word/interessant/#nl', false, false, 1282, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('vriendelijk', 'friendly', NULL, 'https://forvo.com/word/vriendelijk/#nl', false, false, 1815, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('Oud en Nieuw', 'New year’s eve and New year’s day', NULL, '#', false, false, 2011, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('zij/ze', 'she/they', NULL, 'https://forvo.com/word/zij/#nl', false, false, 1121, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('depressief', 'depressive', NULL, 'https://forvo.com/word/depressief/#nl', false, false, 1802, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('kant', 'side', 'n/a', 'https://forvo.com/word/kant/#nl', false, false, 198, NULL);
-INSERT INTO public.vocabulary VALUES ('het bestek', 'the cutlery', NULL, 'https://forvo.com/word/bestek/#nl', false, false, 1840, 'cooking');
-INSERT INTO public.vocabulary VALUES ('net', 'just', NULL, 'https://forvo.com/word/net/#nl', false, false, 1945, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('saai', 'boring', NULL, 'https://forvo.com/word/saai/#nl', false, false, 1283, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('rijk', 'rich', NULL, 'https://forvo.com/word/rijk/#nl', false, false, 1285, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('november', 'November', NULL, 'https://forvo.com/word/november/#nl', false, false, 1323, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('vijftig', 'fifty', NULL, 'https://forvo.com/word/vijftig/#nl', false, false, 1242, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('augustus', 'august', NULL, 'https://forvo.com/word/augustus/#nl', false, false, 1320, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('klok', 'clock', 'n/a', 'https://forvo.com/word/klok/#nl', false, false, 832, 'time');
-INSERT INTO public.vocabulary VALUES ('feit', 'fact', 'n/a', 'https://forvo.com/word/feit/#nl', false, false, 450, NULL);
-INSERT INTO public.vocabulary VALUES ('graden', 'degrees', NULL, 'https://forvo.com/word/graden/#nl', false, false, 1665, 'weather');
-INSERT INTO public.vocabulary VALUES ('de tram', 'the tram', NULL, 'https://forvo.com/word/tram/#nl', false, false, 1203, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('wanneer', 'when', NULL, 'https://forvo.com/word/wanneer/#nl', false, false, 1184, 'question words');
-INSERT INTO public.vocabulary VALUES ('de, het snoep', 'the sweets', NULL, 'https://forvo.com/word/snoep/#nl', false, false, 1173, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('kamer', 'room', 'n/a', 'https://forvo.com/word/kamer/#nl', false, false, 257, 'household');
-INSERT INTO public.vocabulary VALUES ('‘s avonds', 'in the evening', '', '#', false, false, 1073, 'time');
-INSERT INTO public.vocabulary VALUES ('de gevoelens', 'the feelings', NULL, 'https://forvo.com/word/gevoelens/#nl', false, false, 1793, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('teleurgesteld', 'disappointed', NULL, 'https://forvo.com/word/teleurgesteld/#nl', false, false, 1796, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('vervelend', 'annoying', NULL, 'https://forvo.com/word/vervelend/#nl', false, false, 1797, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('het vakantiegeld', 'the vacation bonus', NULL, 'https://forvo.com/word/vakantiegeld/#nl', false, false, 1533, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('huren', 'to rent', NULL, 'https://forvo.com/word/huren/#nl', false, false, 1770, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('verkouden zijn', 'to have a cold', NULL, 'https://forvo.com/word/verkouden/#nl', false, false, 1714, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de koorts', 'the fever', NULL, 'https://forvo.com/word/koorts/#nl', false, false, 1715, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de garage', 'the garage', NULL, 'https://forvo.com/word/garage/#nl', false, false, 1429, 'household');
-INSERT INTO public.vocabulary VALUES ('de tuin', 'the garden', NULL, 'https://forvo.com/word/tuin/#nl', false, false, 1430, 'household');
-INSERT INTO public.vocabulary VALUES ('de zolder', 'the attic', NULL, 'https://forvo.com/word/zolder/#nl', false, false, 1431, 'household');
-INSERT INTO public.vocabulary VALUES ('meest', 'most', NULL, 'https://forvo.com/word/meest/#nl', false, false, 2075, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('de duin', 'the dune', NULL, 'https://forvo.com/word/duin/#nl', false, false, 1761, 'geography');
-INSERT INTO public.vocabulary VALUES ('de tunnel', 'the tunnel', NULL, 'https://forvo.com/word/tunnel/#nl', false, false, 1762, 'geography');
-INSERT INTO public.vocabulary VALUES ('lied', 'song', 'n/a', 'https://forvo.com/word/lied/#nl', false, false, 323, NULL);
-INSERT INTO public.vocabulary VALUES ('de das', 'the scarf', NULL, 'https://forvo.com/word/das/#nl', false, false, 1486, 'clothes');
-INSERT INTO public.vocabulary VALUES ('het kleinkind', 'the grandchild', NULL, 'https://forvo.com/word/kleinkind/#nl', false, false, 1555, 'family');
-INSERT INTO public.vocabulary VALUES ('kwaad', 'furious', NULL, 'https://forvo.com/word/kwaad/#nl', false, false, 1801, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('muziek', 'music', 'n/a', 'https://forvo.com/word/muziek/#nl', false, false, 289, NULL);
-INSERT INTO public.vocabulary VALUES ('inch', 'inch', 'n/a', 'https://forvo.com/word/inch/#nl', false, false, 352, NULL);
-INSERT INTO public.vocabulary VALUES ('alleen', 'alone', NULL, 'https://forvo.com/word/alleen/#nl', false, false, 1950, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('strijd', 'fight', 'n/a', 'https://forvo.com/word/strijd/#nl', true, false, 745, NULL);
-INSERT INTO public.vocabulary VALUES ('ook', 'also, too', NULL, 'https://forvo.com/word/ook/#nl', true, false, 1962, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('verzonden', 'sent', 'n/a', 'https://forvo.com/word/verzonden/#nl', false, false, 641, NULL);
-INSERT INTO public.vocabulary VALUES ('stem', 'voice', 'n/a', 'https://forvo.com/word/stem/#nl', false, false, 501, NULL);
-INSERT INTO public.vocabulary VALUES ('orgel', 'organ', 'n/a', 'https://forvo.com/word/orgel/#nl', false, false, 674, 'body');
-INSERT INTO public.vocabulary VALUES ('seizoen', 'season', 'n/a', 'https://forvo.com/word/seizoen/#nl', false, false, 908, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('tellen', 'count', 'n/a', 'https://forvo.com/word/tellen/#nl', false, false, 514, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de ober', 'the waiter', NULL, 'https://forvo.com/word/ober/#nl', false, false, 1140, 'professions');
-INSERT INTO public.vocabulary VALUES ('industrie', 'industry', 'n/a', 'https://forvo.com/word/industrie/#nl', false, false, 743, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('orde', 'order', 'n/a', 'https://forvo.com/word/orde/#nl', false, false, 339, NULL);
-INSERT INTO public.vocabulary VALUES ('nooit', 'never', NULL, 'https://forvo.com/word/nooit/#nl', false, false, 1958, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('door', 'through/by', NULL, 'https://forvo.com/word/door/#nl', false, false, 1952, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('uitnodigen', 'to invite', NULL, 'https://forvo.com/word/uitnodigen/#nl', false, false, 2016, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('het kanaal', 'the channel', NULL, 'https://forvo.com/word/kanaal/#nl', false, false, 1756, 'geography');
-INSERT INTO public.vocabulary VALUES ('square', 'square', 'n/a', 'https://forvo.com/word/square/#nl', false, false, 515, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('opgewekt, vrolijk', 'cheerful', NULL, 'https://forvo.com/word/opgewekt/#nl', false, false, 1808, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('besteden', 'spend', 'n/a', 'https://forvo.com/word/besteden/#nl', false, false, 862, NULL);
-INSERT INTO public.vocabulary VALUES ('de natuur', 'the nature', NULL, 'https://forvo.com/word/natuur/#nl', false, false, 1758, 'geography');
-INSERT INTO public.vocabulary VALUES ('ontvangen', 'to receive', NULL, 'https://forvo.com/word/ontvangen/#nl', false, false, 2019, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('de geboorte', 'the birth', NULL, 'https://forvo.com/word/geboorte/#nl', false, false, 2020, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('schreeuw', 'shout', 'n/a', 'https://forvo.com/word/schreeuw/#nl', false, false, 613, NULL);
-INSERT INTO public.vocabulary VALUES ('moderne', 'modern', 'n/a', 'https://forvo.com/word/moderne/#nl', false, false, 770, NULL);
-INSERT INTO public.vocabulary VALUES ('nu', 'now', NULL, 'https://forvo.com/word/nu/#nl', false, false, 1960, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('soms', 'sometimes', NULL, 'https://forvo.com/word/soms/#nl', false, false, 1961, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('acht', 'eight', NULL, 'https://forvo.com/word/acht/#nl', false, false, 1230, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('voeten', 'feet', 'n/a', 'https://forvo.com/word/voeten/#nl', false, false, 299, 'body');
-INSERT INTO public.vocabulary VALUES ('mooi weer', 'nice weather', NULL, '#', false, false, 1661, 'weather');
-INSERT INTO public.vocabulary VALUES ('de vrije trap', 'the free kick', NULL, '#', true, false, 1620, 'football');
-INSERT INTO public.vocabulary VALUES ('taal', 'language', 'n/a', 'https://forvo.com/word/taal/#nl', false, false, 400, 'grammar');
-INSERT INTO public.vocabulary VALUES ('en', 'and', NULL, 'https://forvo.com/word/en/#nl', false, false, 1117, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('het T-shirt', 'the T-shirt', NULL, '#', false, false, 1474, 'clothes');
-INSERT INTO public.vocabulary VALUES ('in de richting van', 'toward', 'n/a', '#', false, false, 481, NULL);
-INSERT INTO public.vocabulary VALUES ('hit', 'hit', 'n/a', 'https://forvo.com/word/hit/#nl', false, false, 772, NULL);
-INSERT INTO public.vocabulary VALUES ('de reiskosten', 'the travel expenses', NULL, 'https://forvo.com/word/reiskosten/#nl', false, false, 1536, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de gemeente', 'the municipality', NULL, 'https://forvo.com/word/gemeente/#nl', false, false, 1747, 'geography');
-INSERT INTO public.vocabulary VALUES ('het gemeentehuis', 'the town hall', NULL, 'https://forvo.com/word/gemeentehuis/#nl', false, false, 1748, 'geography');
-INSERT INTO public.vocabulary VALUES ('de kakkerlak', 'the cockroach', 'noun, insect', 'https://forvo.com/word/kakkerlak/#nl', false, false, 1002, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('mensen', 'people', 'n/a', 'https://forvo.com/word/mensen/#nl', false, false, 187, NULL);
-INSERT INTO public.vocabulary VALUES ('voorzitter', 'president (position)', 'noun', 'https://forvo.com/word/voorzitter/#nl', true, false, 1023, NULL);
-INSERT INTO public.vocabulary VALUES ('radio In', 'radio', 'n/a', '#', false, true, 785, NULL);
-INSERT INTO public.vocabulary VALUES ('wie', 'who', NULL, 'https://forvo.com/word/wie/#nl', false, false, 1174, 'question words');
-INSERT INTO public.vocabulary VALUES ('goedenavond', 'good evening', NULL, 'https://forvo.com/word/goedenavond/#nl', false, false, 1097, 'introductory');
-INSERT INTO public.vocabulary VALUES ('bank', 'bank', 'n/a', 'https://forvo.com/word/bank/#nl', false, false, 647, NULL);
-INSERT INTO public.vocabulary VALUES ('mei', 'may', NULL, 'https://forvo.com/word/mei/#nl', false, false, 1317, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('aanbod', 'offer', 'n/a', 'https://forvo.com/word/aanbod/#nl', false, false, 874, NULL);
-INSERT INTO public.vocabulary VALUES ('zelfstandig naamwoord', 'noun', 'n/a', 'https://forvo.com/word/zelfstandig/#nl', false, false, 419, 'grammar');
-INSERT INTO public.vocabulary VALUES ('klinker', 'vowel', 'n/a', 'https://forvo.com/word/klinker/#nl', false, false, 480, 'grammar');
-INSERT INTO public.vocabulary VALUES ('uit', 'out', 'n/a', 'https://forvo.com/word/uit/#nl', false, false, 38, NULL);
-INSERT INTO public.vocabulary VALUES ('waren', 'were', 'n/a', 'https://forvo.com/word/waren/#nl', false, false, 40, NULL);
-INSERT INTO public.vocabulary VALUES ('kunst', 'art', NULL, 'https://forvo.com/word/kunst/#nl', false, false, 1376, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('het mes', 'the knife', NULL, 'https://forvo.com/word/mes/#nl', false, false, 1842, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de lepel', 'the spoon', NULL, 'https://forvo.com/word/lepel/#nl', false, false, 1843, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de werkvergunning', 'the working permit', NULL, 'https://forvo.com/word/werkvergunning/#nl', false, false, 1786, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('werking', 'effect', 'n/a', 'https://forvo.com/word/werking/#nl', false, false, 790, NULL);
-INSERT INTO public.vocabulary VALUES ('noodzakelijk', 'necessary', 'n/a', 'https://forvo.com/word/noodzakelijk/#nl', false, false, 803, NULL);
-INSERT INTO public.vocabulary VALUES ('ontmoeten', 'to meet', NULL, 'https://forvo.com/word/ontmoeten/#nl', false, false, 1646, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('doorgaan', 'to continue', NULL, 'https://forvo.com/word/doorgaan/#nl', false, false, 1647, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('de pan', 'the pan', NULL, 'https://forvo.com/word/pan/#nl', false, false, 1837, 'cooking');
-INSERT INTO public.vocabulary VALUES ('verschijnen', 'appear', 'n/a', 'https://forvo.com/word/verschijnen/#nl', false, false, 492, NULL);
-INSERT INTO public.vocabulary VALUES ('gestegen', 'rose', 'n/a', 'https://forvo.com/word/gestegen/#nl', false, false, 850, NULL);
-INSERT INTO public.vocabulary VALUES ('gwe', 'utility bills', NULL, 'https://forvo.com/word/gwe/#nl', false, false, 1774, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de kont', 'the ass', NULL, 'https://forvo.com/word/kont/#nl', false, false, 1455, 'body');
-INSERT INTO public.vocabulary VALUES ('verschrikkelijk', 'terrible', NULL, 'https://forvo.com/word/verschrikkelijk/#nl', false, false, 2068, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('jij/je/u', 'you', NULL, 'https://forvo.com/word/jij/#nl', false, false, 1118, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('segmenten', 'segment', 'n/a', 'https://forvo.com/word/segmenten/#nl', false, false, 875, NULL);
-INSERT INTO public.vocabulary VALUES ('dal', 'valley', 'n/a', 'https://forvo.com/word/dal/#nl', false, false, 947, 'nature');
-INSERT INTO public.vocabulary VALUES ('paragraaf', 'paragraph', 'n/a', 'https://forvo.com/word/paragraaf/#nl', false, false, 714, 'grammar');
-INSERT INTO public.vocabulary VALUES ('avond', 'evening', NULL, 'https://forvo.com/word/avond/#nl', false, false, 1096, 'introductory');
-INSERT INTO public.vocabulary VALUES ('dag', 'day', NULL, 'https://forvo.com/word/dag/#nl', false, false, 1098, 'introductory');
-INSERT INTO public.vocabulary VALUES ('goedendag', 'good day !', NULL, 'https://forvo.com/word/goedendag/#nl', false, false, 1099, 'introductory');
-INSERT INTO public.vocabulary VALUES ('tot ziens', 'see you', NULL, 'https://forvo.com/word/ziens/#nl', false, false, 1100, 'introductory');
-INSERT INTO public.vocabulary VALUES ('tot', 'until', NULL, 'https://forvo.com/word/tot/#nl', false, false, 1101, 'introductory');
-INSERT INTO public.vocabulary VALUES ('het goud', 'the gold', NULL, 'https://forvo.com/word/goud/#nl', false, false, 1927, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('(twaalf uur ‘s) middags', 'noon', '', '#', false, false, 1076, 'time');
-INSERT INTO public.vocabulary VALUES ('de hond', 'the dog', NULL, 'https://forvo.com/word/hond/#nl', false, false, 1569, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('zeggen', 'to say', NULL, 'https://forvo.com/word/zeggen/#nl', false, false, 1270, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('oorlog', 'war', 'n/a', 'https://forvo.com/word/oorlog/#nl', false, false, 482, NULL);
-INSERT INTO public.vocabulary VALUES ('dienen', 'serve', 'n/a', 'https://forvo.com/word/dienen/#nl', false, false, 491, NULL);
-INSERT INTO public.vocabulary VALUES ('kwam', 'came', 'n/a', 'https://forvo.com/word/kwam/#nl', false, false, 119, NULL);
-INSERT INTO public.vocabulary VALUES ('het insect', 'the insect', NULL, 'https://forvo.com/word/insect/#nl', false, false, 1590, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('hart', 'heart', 'n/a', 'https://forvo.com/word/hart/#nl', false, false, 541, NULL);
-INSERT INTO public.vocabulary VALUES ('het duurt drie uur', 'it takes three hours', '', '#', false, false, 1064, 'time');
-INSERT INTO public.vocabulary VALUES ('dragen', 'to carry/bear/wear', 'n/a', 'https://forvo.com/word/dragen/#nl', false, false, 253, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('bevatten', 'contain', 'n/a', 'https://forvo.com/word/bevatten/#nl', false, false, 429, NULL);
-INSERT INTO public.vocabulary VALUES ('slapen', 'to sleep', NULL, 'https://forvo.com/word/slapen/#nl', false, false, 1265, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('reeks', 'range', 'n/a', 'https://forvo.com/word/reeks/#nl', false, false, 891, NULL);
-INSERT INTO public.vocabulary VALUES ('lucht', 'air', 'n/a', 'https://forvo.com/word/lucht/#nl', false, false, 56, 'nature');
-INSERT INTO public.vocabulary VALUES ('schip', 'ship', 'n/a', 'https://forvo.com/word/schip/#nl', false, false, 335, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('dank', 'thank', 'n/a', 'https://forvo.com/word/dank/#nl', false, false, 912, NULL);
-INSERT INTO public.vocabulary VALUES ('de vader', 'the father', NULL, 'https://forvo.com/word/vader/#nl', false, false, 1542, 'family');
-INSERT INTO public.vocabulary VALUES ('aangelegenheid', 'matter', 'n/a', 'https://forvo.com/word/aangelegenheid/#nl', false, false, 529, NULL);
-INSERT INTO public.vocabulary VALUES ('vreemde valuta', 'foreign exchange', '', 'https://forvo.com/word/valuta/#nl', false, false, 1003, NULL);
-INSERT INTO public.vocabulary VALUES ('vertellen', 'to tell', NULL, 'https://forvo.com/word/vertellen/#nl', false, false, 1638, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('de duif', 'the pigeon', NULL, 'https://forvo.com/word/duif/#nl', false, false, 1587, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de vis', 'the fish', NULL, 'https://forvo.com/word/vis/#nl', false, false, 1588, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('brak', 'broke', 'n/a', 'https://forvo.com/word/brak/#nl', false, false, 655, NULL);
-INSERT INTO public.vocabulary VALUES ('wakker', 'awake', NULL, 'https://forvo.com/word/wakker/#nl', false, false, 2074, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('zuurstof', 'oxygen', 'n/a', 'https://forvo.com/word/zuurstof/#nl', false, false, 902, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('experiment', 'experiment', 'n/a', 'https://forvo.com/word/experiment/#nl', false, false, 689, NULL);
-INSERT INTO public.vocabulary VALUES ('nieuwe', 'new', 'n/a', 'https://forvo.com/word/nieuwe/#nl', false, false, 103, NULL);
-INSERT INTO public.vocabulary VALUES ('zin', 'sentence', 'n/a', 'https://forvo.com/word/zin/#nl', false, false, 132, 'grammar');
-INSERT INTO public.vocabulary VALUES ('sneeuwen', 'to snow', NULL, 'https://forvo.com/word/sneeuwen/#nl', false, false, 1671, 'weather');
-INSERT INTO public.vocabulary VALUES ('doos', 'box', 'n/a', 'https://forvo.com/word/doos/#nl', false, false, 418, NULL);
-INSERT INTO public.vocabulary VALUES ('verhuizen', 'to move', NULL, 'https://forvo.com/word/verhuizen/#nl', false, false, 1769, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('dans', 'dance', 'n/a', 'https://forvo.com/word/dans/#nl', false, false, 545, NULL);
-INSERT INTO public.vocabulary VALUES ('netto', 'net', NULL, 'https://forvo.com/word/netto/#nl', false, false, 1531, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de belasting', 'the tax', NULL, 'https://forvo.com/word/belasting/#nl', false, false, 1532, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('vrijdag', 'Friday', NULL, 'https://forvo.com/word/vrijdag/#nl', false, false, 1308, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('bos', 'forest', 'n/a', 'https://forvo.com/word/bos/#nl', false, false, 553, 'nature');
-INSERT INTO public.vocabulary VALUES ('welkom', 'welcome', NULL, 'https://forvo.com/word/welkom/#nl', false, false, 2108, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('groen', 'green', NULL, 'https://forvo.com/word/groen/#nl', false, false, 1972, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('elke', 'every', 'n/a', 'https://forvo.com/word/elke/#nl', false, false, 121, NULL);
-INSERT INTO public.vocabulary VALUES ('normaal', 'usually', NULL, 'https://forvo.com/word/normaal/#nl', false, false, 1957, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('vader', 'father', 'n/a', 'https://forvo.com/word/vader/#nl', false, false, 101, 'family');
-INSERT INTO public.vocabulary VALUES ('station', 'station', 'n/a', 'https://forvo.com/word/station/#nl', false, false, 868, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de leerling', 'the scholar', NULL, 'https://forvo.com/word/leerling/#nl', false, false, 1132, 'professions');
-INSERT INTO public.vocabulary VALUES ('breed', 'wide', NULL, 'https://forvo.com/word/breed/#nl', false, false, 1987, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('de broek', 'the pants', NULL, 'https://forvo.com/word/broek/#nl', false, true, 1463, 'clothes');
-INSERT INTO public.vocabulary VALUES ('kantoor', 'office', 'n/a', 'https://forvo.com/word/kantoor/#nl', false, true, 604, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('vijftien', 'fifteen', NULL, 'https://forvo.com/word/vijftien/#nl', false, true, 1237, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de pindakaas', 'the peanut butter', NULL, 'https://forvo.com/word/pindakaas/#nl', false, false, 1155, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('het vierkant', 'the square', NULL, 'https://forvo.com/word/vierkant/#nl', false, false, 1969, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('materiaal', 'material', 'n/a', 'https://forvo.com/word/materiaal/#nl', false, false, 551, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('hoofd', 'head', 'n/a', 'https://forvo.com/word/hoofd/#nl', false, false, 202, NULL);
-INSERT INTO public.vocabulary VALUES ('maart', 'march', NULL, 'https://forvo.com/word/maart/#nl', false, false, 1315, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('idee', 'idea', 'n/a', 'https://forvo.com/word/idee/#nl', false, false, 260, NULL);
-INSERT INTO public.vocabulary VALUES ('berg', 'mountain', 'n/a', 'https://forvo.com/word/berg/#nl', false, false, 262, 'geography');
-INSERT INTO public.vocabulary VALUES ('omvatten', 'include', 'n/a', 'https://forvo.com/word/omvatten/#nl', false, false, 532, NULL);
-INSERT INTO public.vocabulary VALUES ('kloof', 'divide', 'n/a', 'https://forvo.com/word/kloof/#nl', false, false, 533, NULL);
-INSERT INTO public.vocabulary VALUES ('plaats', 'place/stead', 'n/a', 'https://forvo.com/word/plaats/#nl', false, false, 108, 'geography');
-INSERT INTO public.vocabulary VALUES ('beurt', 'turn', 'n/a', 'https://forvo.com/word/beurt/#nl', false, false, 140, NULL);
-INSERT INTO public.vocabulary VALUES ('het paard', 'the horse', NULL, 'https://forvo.com/word/paard/#nl', false, false, 1576, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de ambulance', 'the ambulance', NULL, 'https://forvo.com/word/ambulance/#nl', false, false, 1729, 'doctor');
-INSERT INTO public.vocabulary VALUES ('wortel', 'root', 'n/a', 'https://forvo.com/word/wortel/#nl', false, false, 706, 'nature');
-INSERT INTO public.vocabulary VALUES ('de stroopwafel', 'the syrup waffle', NULL, 'https://forvo.com/word/stroopwafel/#nl', false, false, 1171, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de hoofdstad', 'the capital', NULL, 'https://forvo.com/word/hoofdstad/#nl', false, false, 1744, 'geography');
-INSERT INTO public.vocabulary VALUES ('de elleboog', 'the elbow', NULL, 'https://forvo.com/word/elleboog/#nl', false, false, 1445, 'body');
-INSERT INTO public.vocabulary VALUES ('de sok', 'the sock (short)', NULL, 'https://forvo.com/word/sok/#nl', false, false, 1469, 'clothes');
-INSERT INTO public.vocabulary VALUES ('het haar', 'the hair', NULL, 'https://forvo.com/word/haar/#nl', false, false, 1443, 'body');
-INSERT INTO public.vocabulary VALUES ('de kous', 'the sock (long)', NULL, 'https://forvo.com/word/kous/#nl', false, false, 1470, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de dam', 'the dam', NULL, 'https://forvo.com/word/dam/#nl', false, false, 1759, 'geography');
-INSERT INTO public.vocabulary VALUES ('twee', 'two', NULL, 'https://forvo.com/word/twee/#nl', false, false, 1224, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de smaak', 'the taste', NULL, 'https://forvo.com/word/smaak/#nl', false, false, 1830, 'cooking');
-INSERT INTO public.vocabulary VALUES ('schoen', 'shoe', 'n/a', 'https://forvo.com/word/schoen/#nl', false, false, 966, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de verblijfsvergunning', 'the residence permit', NULL, 'https://forvo.com/word/verblijfsvergunning/#nl', false, false, 1785, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('spoedig', 'soon', 'n/a', 'https://forvo.com/word/spoedig/#nl', false, false, 316, NULL);
-INSERT INTO public.vocabulary VALUES ('verliefd', 'in love', NULL, 'https://forvo.com/word/verliefd/#nl', false, false, 1562, 'family');
-INSERT INTO public.vocabulary VALUES ('verstuiken', 'to sprain', 'verb', 'https://forvo.com/word/verstuiken/#nl', false, false, 1022, NULL);
-INSERT INTO public.vocabulary VALUES ('de metro', 'the metro', NULL, 'https://forvo.com/word/metro/#nl', false, false, 1205, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('motor', 'engine', 'n/a', 'https://forvo.com/word/motor/#nl', false, false, 546, NULL);
-INSERT INTO public.vocabulary VALUES ('huidig', 'current', NULL, 'https://forvo.com/word/huidig/#nl', false, false, 1705, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('vinden', 'to find, to think (have an opinion)', NULL, 'https://forvo.com/word/vinden/#nl', false, false, 1630, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('ronde', 'round', 'n/a', 'https://forvo.com/word/ronde/#nl', false, false, 116, NULL);
-INSERT INTO public.vocabulary VALUES ('serveerster', 'waitress', NULL, 'https://forvo.com/word/serveerster/#nl', false, false, 2149, 'professions');
-INSERT INTO public.vocabulary VALUES ('over', 'over/about', NULL, 'https://forvo.com/word/over/#nl', false, false, 1343, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('moeten', 'must / have to / should', NULL, 'https://forvo.com/word/moeten/#nl', false, false, 2096, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('venster', 'window', 'n/a', 'https://forvo.com/word/venster/#nl', false, false, 556, 'household');
-INSERT INTO public.vocabulary VALUES ('de arm', 'the arm', NULL, 'https://forvo.com/word/arm/#nl', false, false, 1444, 'body');
-INSERT INTO public.vocabulary VALUES ('oceaan', 'ocean', 'n/a', 'https://forvo.com/word/oceaan/#nl', false, false, 439, 'nature');
-INSERT INTO public.vocabulary VALUES ('proberen', 'to try', NULL, 'https://forvo.com/word/proberen/#nl', false, false, 1639, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('het visum', 'the visa', NULL, 'https://forvo.com/word/visum/#nl', false, false, 1782, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('lopen', 'to walk, to run', NULL, 'https://forvo.com/word/lopen/#nl', false, false, 1247, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('bruin', 'brown', NULL, 'https://forvo.com/word/bruin/#nl', false, false, 1982, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('het kwartier', 'the quarter', '', 'https://forvo.com/word/kwartier/#nl', false, false, 1054, 'time');
-INSERT INTO public.vocabulary VALUES ('glimlach', 'smile', 'n/a', 'https://forvo.com/word/glimlach/#nl', false, false, 698, NULL);
-INSERT INTO public.vocabulary VALUES ('de brug', 'the bridge', NULL, 'https://forvo.com/word/brug/#nl', false, false, 1397, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het papier', 'the paper', NULL, 'https://forvo.com/word/papier/#nl', false, false, 1923, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('dubbel', 'double', NULL, 'https://forvo.com/word/dubbel/#nl', false, false, 1691, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de hamster', 'the hamster', NULL, 'https://forvo.com/word/hamster/#nl', false, false, 2029, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de snor', 'the moustache', NULL, 'https://forvo.com/word/snor/#nl', false, false, 1458, 'body');
-INSERT INTO public.vocabulary VALUES ('ver', 'far', 'n/a', 'https://forvo.com/word/ver/#nl', false, false, 237, NULL);
-INSERT INTO public.vocabulary VALUES ('de paashaas', 'the Easter bunny', NULL, 'https://forvo.com/word/paashaas/#nl', false, false, 2013, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('het salaris', 'the salary', NULL, 'https://forvo.com/word/salaris/#nl', false, false, 1529, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de kok', 'the cook', NULL, 'https://forvo.com/word/kok/#nl', false, false, 1826, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de vesting', 'the fortress', NULL, 'https://forvo.com/word/vesting/#nl', false, false, 1751, 'geography');
-INSERT INTO public.vocabulary VALUES ('angst', 'fear', 'n/a', 'https://forvo.com/word/angst/#nl', false, false, 824, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('view', 'view', 'n/a', 'https://forvo.com/word/view/#nl', false, false, 750, NULL);
-INSERT INTO public.vocabulary VALUES ('wallen', 'fortified walls', NULL, 'https://forvo.com/word/wallen/#nl', false, false, 1752, 'geography');
-INSERT INTO public.vocabulary VALUES ('hear', 'hear', 'n/a', 'https://forvo.com/word/hear/#nl', false, false, 266, NULL);
-INSERT INTO public.vocabulary VALUES ('worden', 'to become', NULL, 'https://forvo.com/word/worden/#nl', false, false, 1249, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('indien', 'if', 'n/a', 'https://forvo.com/word/indien/#nl', false, false, 45, NULL);
-INSERT INTO public.vocabulary VALUES ('schijnen', 'to shine', NULL, 'https://forvo.com/word/schijnen/#nl', false, false, 1667, 'weather');
-INSERT INTO public.vocabulary VALUES ('de neerslag', 'the precipitation', NULL, 'https://forvo.com/word/neerslag/#nl', false, false, 1669, 'weather');
-INSERT INTO public.vocabulary VALUES ('de taal', 'the language', NULL, 'https://forvo.com/word/taal/#nl', false, false, 1363, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('verrast', 'surprised', NULL, 'https://forvo.com/word/verrast/#nl', false, false, 1811, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('de blouse', 'the blouse, the shirt', NULL, 'https://forvo.com/word/blouse/#nl', false, false, 1477, 'clothes');
-INSERT INTO public.vocabulary VALUES ('wel', '(confirmative)', NULL, 'https://forvo.com/word/wel/#nl', false, false, 1112, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('ouder', 'parent', 'n/a', 'https://forvo.com/word/ouder/#nl', false, false, 854, 'family');
-INSERT INTO public.vocabulary VALUES ('pak', 'suit', 'n/a', 'https://forvo.com/word/pak/#nl', false, false, 847, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de apotheek', 'the pharmacy', NULL, 'https://forvo.com/word/apotheek/#nl', false, false, 1215, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('het zwembad', 'the swimming pool', NULL, 'https://forvo.com/word/zwembad/#nl', false, false, 1216, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de mond', 'the mouth', NULL, 'https://forvo.com/word/mond/#nl', false, false, 1436, 'body');
-INSERT INTO public.vocabulary VALUES ('veld', 'field', 'n/a', 'https://forvo.com/word/veld/#nl', false, false, 420, NULL);
-INSERT INTO public.vocabulary VALUES ('eerlijk', 'fair', 'n/a', 'https://forvo.com/word/eerlijk/#nl', false, false, 646, NULL);
-INSERT INTO public.vocabulary VALUES ('stromen', 'flow', 'n/a', 'https://forvo.com/word/stromen/#nl', false, false, 645, NULL);
-INSERT INTO public.vocabulary VALUES ('de behandeling', 'the treatment', NULL, 'https://forvo.com/word/behandeling/#nl', false, false, 1722, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de klok', 'the clock', 'noun', 'https://forvo.com/word/klok/#nl', false, false, 1048, 'time');
-INSERT INTO public.vocabulary VALUES ('toen', 'at that time (past)', NULL, 'https://forvo.com/word/toen/#nl', false, false, 1186, 'question words');
-INSERT INTO public.vocabulary VALUES ('gedaan', 'done', 'n/a', 'https://forvo.com/word/gedaan/#nl', true, false, 425, NULL);
-INSERT INTO public.vocabulary VALUES ('terwijl', 'while', NULL, 'https://forvo.com/word/terwijl/#nl', false, false, 1187, 'question words');
-INSERT INTO public.vocabulary VALUES ('het feest', 'the party', NULL, 'https://forvo.com/word/feest/#nl', false, false, 1997, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('rond', 'around', NULL, 'https://forvo.com/word/rond/#nl', false, false, 1348, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('morgen', 'morning/tomorrow', NULL, 'https://forvo.com/word/morgen/#nl', false, false, 1093, 'introductory');
-INSERT INTO public.vocabulary VALUES ('gedachte', 'thought', 'n/a', 'https://forvo.com/word/gedachte/#nl', false, false, 227, NULL);
-INSERT INTO public.vocabulary VALUES ('de onderbroek', 'the undershorts', NULL, 'https://forvo.com/word/onderbroek/#nl', false, false, 1483, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de bh', 'the bra', NULL, 'https://forvo.com/word/bh/#nl', false, false, 1484, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de hoed', 'the hat', NULL, 'https://forvo.com/word/hoed/#nl', false, false, 1485, 'clothes');
-INSERT INTO public.vocabulary VALUES ('leven', 'life', 'n/a', 'https://forvo.com/word/leven/#nl', false, false, 249, NULL);
-INSERT INTO public.vocabulary VALUES ('zelf', 'self', 'n/a', 'https://forvo.com/word/zelf/#nl', false, false, 99, NULL);
-INSERT INTO public.vocabulary VALUES ('kijken', 'to look/to watch', NULL, 'https://forvo.com/word/kijken/#nl', false, false, 1262, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('de pyjama', 'the pyjamas', NULL, 'https://forvo.com/word/pyjama/#nl', false, false, 1482, 'clothes');
-INSERT INTO public.vocabulary VALUES ('beginnen', 'to begin', NULL, 'https://forvo.com/word/beginnen/#nl', false, false, 1488, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('spel', 'game', 'n/a', 'https://forvo.com/word/spel/#nl', false, false, 385, NULL);
-INSERT INTO public.vocabulary VALUES ('in staat', 'able', 'n/a', '#', false, false, 423, NULL);
-INSERT INTO public.vocabulary VALUES ('vordering', 'claim', 'n/a', 'https://forvo.com/word/vordering/#nl', false, false, 1000, NULL);
-INSERT INTO public.vocabulary VALUES ('was', 'was', 'n/a', 'https://forvo.com/word/was/#nl', false, false, 7, NULL);
-INSERT INTO public.vocabulary VALUES ('leeg', 'empty', NULL, 'https://forvo.com/word/leeg/#nl', false, false, 1698, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('totaal', 'total', 'n/a', 'https://forvo.com/word/totaal/#nl', false, false, 944, NULL);
-INSERT INTO public.vocabulary VALUES ('vergelijken', 'to compare', NULL, 'https://forvo.com/word/vergelijken/#nl', false, false, 1896, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de schoen', 'the shoe', NULL, 'https://forvo.com/word/schoen/#nl', false, false, 1471, 'clothes');
-INSERT INTO public.vocabulary VALUES ('half een', 'half past twelve', '', '#', false, false, 1053, 'time');
-INSERT INTO public.vocabulary VALUES ('geval', 'case', 'n/a', 'https://forvo.com/word/geval/#nl', false, false, 656, NULL);
-INSERT INTO public.vocabulary VALUES ('toetreden tot', 'join', 'n/a', 'https://forvo.com/word/toetreden/#nl', false, false, 618, NULL);
-INSERT INTO public.vocabulary VALUES ('buis', 'tube', 'n/a', 'https://forvo.com/word/buis/#nl', false, false, 820, NULL);
-INSERT INTO public.vocabulary VALUES ('gekocht', 'bought', 'n/a', 'https://forvo.com/word/gekocht/#nl', false, false, 929, NULL);
-INSERT INTO public.vocabulary VALUES ('de borst', 'the chest, the breast', NULL, 'https://forvo.com/word/borst/#nl', false, false, 1456, 'body');
-INSERT INTO public.vocabulary VALUES ('oude', 'old', 'n/a', 'https://forvo.com/word/oude/#nl', false, false, 148, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('donderdag', 'Thursday', NULL, 'https://forvo.com/word/donderdag/#nl', false, false, 1307, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de worst', 'the sausage', NULL, 'https://forvo.com/word/worst/#nl', false, false, 1856, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('klasse', 'class', 'n/a', 'https://forvo.com/word/klasse/#nl', false, false, 330, NULL);
-INSERT INTO public.vocabulary VALUES ('hier', 'here', NULL, 'https://forvo.com/word/hier/#nl', false, false, 1182, 'question words');
-INSERT INTO public.vocabulary VALUES ('schoppen', 'to kick', NULL, 'https://forvo.com/word/schoppen/#nl', false, false, 1613, 'football');
-INSERT INTO public.vocabulary VALUES ('het raam', 'the window', NULL, 'https://forvo.com/word/raam/#nl', false, false, 1409, 'household');
-INSERT INTO public.vocabulary VALUES ('duidelijk', 'clear', NULL, 'https://forvo.com/word/duidelijk/#nl', false, false, 1700, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('kon', 'could', 'n/a', 'https://forvo.com/word/kon/#nl', false, false, 179, NULL);
-INSERT INTO public.vocabulary VALUES ('set', 'set', 'n/a', 'https://forvo.com/word/set/#nl', false, false, 53, NULL);
-INSERT INTO public.vocabulary VALUES ('roep', 'call', 'n/a', 'https://forvo.com/word/roep/#nl', false, false, 193, NULL);
-INSERT INTO public.vocabulary VALUES ('boord', 'board', 'n/a', 'https://forvo.com/word/boord/#nl', false, false, 570, NULL);
-INSERT INTO public.vocabulary VALUES ('springen', 'jump', 'n/a', 'https://forvo.com/word/springen/#nl', false, false, 701, NULL);
-INSERT INTO public.vocabulary VALUES ('de kennis', 'the acquaintance', NULL, 'https://forvo.com/word/kennis/#nl', false, false, 1558, 'family');
-INSERT INTO public.vocabulary VALUES ('het hoofd', 'the head', NULL, 'https://forvo.com/word/hoofd/#nl', false, false, 1434, 'body');
-INSERT INTO public.vocabulary VALUES ('de ziektekostenverzekering', 'the health insurance', NULL, 'https://forvo.com/word/ziektekostenverzekering/#nl', false, false, 1736, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het medicijn', 'the medication', NULL, 'https://forvo.com/word/medicijn/#nl', false, false, 1737, 'doctor');
-INSERT INTO public.vocabulary VALUES ('sommige', 'some', 'n/a', 'https://forvo.com/word/sommige/#nl', false, false, 24, NULL);
-INSERT INTO public.vocabulary VALUES ('sterk', 'strong', NULL, 'https://forvo.com/word/sterk/#nl', false, false, 2070, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('het paleis', 'the palace', NULL, 'https://forvo.com/word/paleis/#nl', false, false, 1388, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('pont', 'the ferry', NULL, 'https://forvo.com/word/pont/#nl', false, false, 1389, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('reizen', 'to travel', NULL, 'https://forvo.com/word/reizen/#nl', false, false, 1356, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('dus', 'so/thus', NULL, 'https://forvo.com/word/dus/#nl', false, false, 1953, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('bijten', 'to bite', NULL, 'https://forvo.com/word/bijten/#nl', false, false, 1907, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('uitvinden', 'invent', 'n/a', 'https://forvo.com/word/uitvinden/#nl', false, false, 971, NULL);
-INSERT INTO public.vocabulary VALUES ('bepalen', 'determine', 'n/a', 'https://forvo.com/word/bepalen/#nl', false, false, 974, NULL);
-INSERT INTO public.vocabulary VALUES ('hij is jarig', 'it’s his birthday', NULL, 'https://forvo.com/word/jarig/#nl', false, false, 1379, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('eerste', 'first', 'n/a', 'https://forvo.com/word/eerste/#nl', false, false, 194, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('verwijzen', 'to refer', NULL, 'https://forvo.com/word/verwijzen/#nl', false, false, 1732, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het onderzoek', 'the check-up', NULL, 'https://forvo.com/word/onderzoek/#nl', false, false, 1733, 'doctor');
-INSERT INTO public.vocabulary VALUES ('doen', 'to do', NULL, 'https://forvo.com/word/doen/#nl', false, false, 1487, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('binnen', 'inside', NULL, 'https://forvo.com/word/binnen/#nl', false, false, 1345, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('sprak', 'spoke', 'n/a', 'https://forvo.com/word/sprak/#nl', false, false, 786, NULL);
-INSERT INTO public.vocabulary VALUES ('aanraken', 'touch', 'n/a', 'https://forvo.com/word/aanraken/#nl', false, false, 629, NULL);
-INSERT INTO public.vocabulary VALUES ('toonhoogte', 'pitch', 'n/a', 'https://forvo.com/word/toonhoogte/#nl', false, false, 931, NULL);
-INSERT INTO public.vocabulary VALUES ('bereiden', 'prepare', 'n/a', 'https://forvo.com/word/bereiden/#nl', false, false, 995, NULL);
-INSERT INTO public.vocabulary VALUES ('verleden', 'past', 'n/a', 'https://forvo.com/word/verleden/#nl', false, false, 585, NULL);
-INSERT INTO public.vocabulary VALUES ('de ezel', 'the donkey', NULL, 'https://forvo.com/word/ezel/#nl', false, false, 1578, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de feestdag', 'the public holiday', NULL, 'https://forvo.com/word/feestdag/#nl', false, false, 1999, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('glans', 'shine', 'n/a', 'https://forvo.com/word/glans/#nl', false, false, 985, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de soep', 'the soup', NULL, 'https://forvo.com/word/soep/#nl', false, false, 1863, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('Show', 'show', 'n/a', 'https://forvo.com/word/Show/#nl', false, false, 120, NULL);
-INSERT INTO public.vocabulary VALUES ('de verzekering', 'the insurance', NULL, 'https://forvo.com/word/verzekering/#nl', false, false, 1735, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de douche', 'the shower', NULL, 'https://forvo.com/word/douche/#nl', false, false, 1426, 'household');
-INSERT INTO public.vocabulary VALUES ('de kaars', 'the candle', NULL, 'https://forvo.com/word/kaars/#nl', false, false, 2024, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('straight/recht', 'straight', 'n/a', 'https://forvo.com/word/straight/#nl', false, false, 667, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('deal', 'deal', 'n/a', 'https://forvo.com/word/deal/#nl', false, false, 961, NULL);
-INSERT INTO public.vocabulary VALUES ('terug', 'back', NULL, 'https://forvo.com/word/terug/#nl', false, false, 1966, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('oor', 'ear', 'n/a', 'https://forvo.com/word/oor/#nl', true, false, 652, 'body');
-INSERT INTO public.vocabulary VALUES ('het middageten/de lunch', 'the lunch', NULL, 'https://forvo.com/word/middageten/#nl', false, true, 1823, 'cooking');
-INSERT INTO public.vocabulary VALUES ('bereiken', 'reach', 'n/a', 'https://forvo.com/word/bereiken/#nl', true, false, 467, NULL);
-INSERT INTO public.vocabulary VALUES ('de kip', 'the chicken', NULL, 'https://forvo.com/word/kip/#nl', false, true, 1579, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('selecteren', 'select', 'n/a', 'https://forvo.com/word/selecteren/#nl', true, false, 989, NULL);
-INSERT INTO public.vocabulary VALUES ('sympathiek', 'sympathetic', NULL, 'https://forvo.com/word/sympathiek/#nl', false, false, 1817, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('geleid', 'led', 'n/a', 'https://forvo.com/word/geleid/#nl', false, false, 930, NULL);
-INSERT INTO public.vocabulary VALUES ('de bes', 'the berry', NULL, 'https://forvo.com/word/bes/#nl', false, false, 1879, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('het bericht', 'the message', NULL, 'https://forvo.com/word/bericht/#nl', false, false, 1658, 'weather');
-INSERT INTO public.vocabulary VALUES ('de aardappeleter', 'the potato-eater', NULL, 'https://forvo.com/word/aardappeleter/#nl', false, false, 1160, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('Overleg', 'talk', 'n/a', 'https://forvo.com/word/Overleg/#nl', false, false, 314, NULL);
-INSERT INTO public.vocabulary VALUES ('honderd', 'hundred', NULL, 'https://forvo.com/word/honderd/#nl', false, false, 1243, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de tand', 'the tooth', NULL, 'https://forvo.com/word/tand/#nl', false, false, 1437, 'body');
-INSERT INTO public.vocabulary VALUES ('wonen', 'to live', NULL, 'https://forvo.com/word/wonen/#nl', false, false, 1387, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('bij', 'at, near', NULL, 'https://forvo.com/word/bij/#nl', false, false, 1344, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('droog', 'dry', NULL, 'https://forvo.com/word/droog/#nl', false, false, 2056, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('de rivier', 'the river', NULL, 'https://forvo.com/word/rivier/#nl', false, false, 1757, 'geography');
-INSERT INTO public.vocabulary VALUES ('volgende', 'next', NULL, 'https://forvo.com/word/volgende/#nl', false, false, 1973, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('blauw', 'blue', NULL, 'https://forvo.com/word/blauw/#nl', false, false, 1974, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('geel', 'yellow', NULL, 'https://forvo.com/word/geel/#nl', false, false, 1975, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('vertrekken', 'to leave', NULL, 'https://forvo.com/word/vertrekken/#nl', false, false, 1899, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('nam', 'took', 'n/a', 'https://forvo.com/word/nam/#nl', false, false, 254, NULL);
-INSERT INTO public.vocabulary VALUES ('natie', 'nation', 'n/a', 'https://forvo.com/word/natie/#nl', false, false, 669, NULL);
-INSERT INTO public.vocabulary VALUES ('het rijbewijs', 'the driving license', NULL, 'https://forvo.com/word/rijbewijs/#nl', false, false, 1784, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('Zwarte Piet', '(Black Pete)', NULL, '#', false, false, 2003, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('ik begrijp het niet', 'I don’t understand', NULL, '#', false, false, 1889, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('kans', 'chance', 'n/a', 'https://forvo.com/word/kans/#nl', false, false, 980, NULL);
-INSERT INTO public.vocabulary VALUES ('zijde', 'silk', 'noun', 'https://forvo.com/word/zijde/#nl', false, false, 1017, NULL);
-INSERT INTO public.vocabulary VALUES ('leugen', 'lie', 'n/a', 'https://forvo.com/word/leugen/#nl', false, false, 746, NULL);
-INSERT INTO public.vocabulary VALUES ('het slot', 'the lock', NULL, 'https://forvo.com/word/slot/#nl', false, false, 1917, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('miljoen', 'million', NULL, 'https://forvo.com/word/miljoen/#nl', false, false, 1246, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('geheel', 'whole', 'n/a', 'https://forvo.com/word/geheel/#nl', false, false, 349, NULL);
-INSERT INTO public.vocabulary VALUES ('snijden', 'to cut', NULL, 'https://forvo.com/word/snijden/#nl', false, false, 1496, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('vallen', 'to fall', NULL, 'https://forvo.com/word/vallen/#nl', false, false, 1498, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('bijzonder', 'special/particular', NULL, 'https://forvo.com/word/bijzonder/#nl', false, false, 2058, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('verdrietig', 'sad', NULL, 'https://forvo.com/word/verdrietig/#nl', false, false, 1799, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('het humeur', 'the mood', NULL, 'https://forvo.com/word/humeur/#nl', false, false, 1792, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('wat', 'what', NULL, 'https://forvo.com/word/wat/#nl', false, false, 1175, 'question words');
-INSERT INTO public.vocabulary VALUES ('werelddeel', 'continent', 'n/a', 'https://forvo.com/word/werelddeel/#nl', false, false, 1001, 'geography');
-INSERT INTO public.vocabulary VALUES ('het huisdier', 'the pet', NULL, 'https://forvo.com/word/huisdier/#nl', false, false, 1568, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('studie', 'study', 'n/a', 'https://forvo.com/word/studie/#nl', false, false, 212, NULL);
-INSERT INTO public.vocabulary VALUES ('de zonnebril', 'the sunglasses', NULL, 'https://forvo.com/word/zonnebril/#nl', false, false, 1441, 'body');
-INSERT INTO public.vocabulary VALUES ('belangrijkste', 'main', 'n/a', 'https://forvo.com/word/belangrijkste/#nl', false, false, 274, NULL);
-INSERT INTO public.vocabulary VALUES ('de ooievaar', 'the stork', NULL, 'https://forvo.com/word/ooievaar/#nl', false, false, 1585, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('sinds', 'since', NULL, 'https://forvo.com/word/sinds/#nl', false, false, 1349, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('de schaduw', 'the shadow / shade', NULL, 'https://forvo.com/word/schaduw/#nl', false, false, 2095, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('uitgeven', 'to spend', NULL, 'https://forvo.com/word/uitgeven/#nl', false, false, 1648, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('integreren', 'to integrate (in practice)', NULL, 'https://forvo.com/word/integreren/#nl', false, false, 1788, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('momenteel', 'moment', 'n/a', 'https://forvo.com/word/momenteel/#nl', false, false, 661, NULL);
-INSERT INTO public.vocabulary VALUES ('de boterham', 'the slice of bread', NULL, 'https://forvo.com/word/boterham/#nl', false, false, 1152, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('been', 'leg', 'n/a', 'https://forvo.com/word/been/#nl', false, false, 563, 'body');
-INSERT INTO public.vocabulary VALUES ('problemen', 'trouble', 'n/a', 'https://forvo.com/word/problemen/#nl', false, false, 612, NULL);
-INSERT INTO public.vocabulary VALUES ('voelen', 'to feel, to touch', NULL, 'https://forvo.com/word/voelen/#nl', false, false, 1499, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('hoe laat?', 'how late?', 'question', '#', false, false, 1046, 'time');
-INSERT INTO public.vocabulary VALUES ('luisteren', 'to listen', NULL, 'https://forvo.com/word/luisteren/#nl', false, false, 1260, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('uitgeschakeld', 'off', 'n/a', 'https://forvo.com/word/uitgeschakeld/#nl', false, false, 86, NULL);
-INSERT INTO public.vocabulary VALUES ('pick', 'pick', 'n/a', 'https://forvo.com/word/pick/#nl', false, false, 512, NULL);
-INSERT INTO public.vocabulary VALUES ('wiens', 'whose', 'n/a', 'https://forvo.com/word/wiens/#nl', false, false, 777, NULL);
-INSERT INTO public.vocabulary VALUES ('krijgen', 'to get, to receive', NULL, 'https://forvo.com/word/krijgen/#nl', false, false, 1254, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('eten', 'to eat', NULL, 'https://forvo.com/word/eten/#nl', false, false, 1255, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('break', 'break', 'n/a', 'https://forvo.com/word/break/#nl', false, false, 621, NULL);
-INSERT INTO public.vocabulary VALUES ('vergissen', 'to be mistaken', NULL, 'https://forvo.com/word/vergissen/#nl', false, false, 1897, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de rondvaart', 'the canal cruise', NULL, 'https://forvo.com/word/rondvaart/#nl', false, false, 1390, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('vangst', 'catch', 'n/a', 'https://forvo.com/word/vangst/#nl', false, false, 566, NULL);
-INSERT INTO public.vocabulary VALUES ('kiezen', 'to choose', NULL, 'https://forvo.com/word/kiezen/#nl', false, false, 1887, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('eet smakelijk / smakelijk eten', 'enjoy your meal', NULL, 'https://forvo.com/word/smakelijk/#nl', false, false, 1849, 'cooking');
-INSERT INTO public.vocabulary VALUES ('begrijpen', 'to understand', NULL, 'https://forvo.com/word/begrijpen/#nl', false, false, 1888, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('trouwen', 'to marry', NULL, 'https://forvo.com/word/trouwen/#nl', false, false, 1564, 'family');
-INSERT INTO public.vocabulary VALUES ('het paspoort', 'the passport', NULL, 'https://forvo.com/word/paspoort/#nl', false, false, 1779, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('molecuul', 'molecule', 'n/a', 'https://forvo.com/word/molecuul/#nl', false, false, 988, 'nature');
-INSERT INTO public.vocabulary VALUES ('rekken', 'stretch', 'n/a', 'https://forvo.com/word/rekken/#nl', false, false, 983, NULL);
-INSERT INTO public.vocabulary VALUES ('de supermarkt', 'the supermarket', NULL, 'https://forvo.com/word/supermarkt/#nl', false, false, 1213, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('geschreven', 'written', 'n/a', 'https://forvo.com/word/geschreven/#nl', false, false, 574, NULL);
-INSERT INTO public.vocabulary VALUES ('vandaag', 'today', NULL, 'https://forvo.com/word/vandaag/#nl', false, false, 1662, 'weather');
-INSERT INTO public.vocabulary VALUES ('drie', 'three', NULL, 'https://forvo.com/word/drie/#nl', false, false, 1225, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('onderwerp', 'subject', 'n/a', 'https://forvo.com/word/onderwerp/#nl', false, false, 520, 'grammar');
-INSERT INTO public.vocabulary VALUES ('het hout', 'the wood', NULL, 'https://forvo.com/word/hout/#nl', false, false, 1929, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('minuscuul', 'tiny', 'n/a', 'https://forvo.com/word/minuscuul/#nl', false, false, 683, NULL);
-INSERT INTO public.vocabulary VALUES ('moet', 'must', 'n/a', 'https://forvo.com/word/moet/#nl', false, true, 73, NULL);
-INSERT INTO public.vocabulary VALUES ('licht', 'light', NULL, 'https://forvo.com/word/licht/#nl', true, false, 1287, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de ui', 'the onion', NULL, 'https://forvo.com/word/ui/#nl', true, false, 1861, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('geloven', 'to believe', NULL, 'https://forvo.com/word/geloven/#nl', true, false, 1489, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('enthousiast', 'enthusiastic', NULL, 'https://forvo.com/word/enthousiast/#nl', true, false, 1812, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('aarde', 'earth', 'n/a', 'https://forvo.com/word/aarde/#nl', false, false, 100, 'nature');
-INSERT INTO public.vocabulary VALUES ('de leeftijd', 'the age', NULL, 'https://forvo.com/word/leeftijd/#nl', false, false, 2125, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('vergadering', 'meeting', NULL, 'https://forvo.com/word/vergadering/#nl', false, false, 2141, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('straat', 'street', 'n/a', 'https://forvo.com/word/straat/#nl', false, false, 351, NULL);
-INSERT INTO public.vocabulary VALUES ('het stadion', 'the stadium', NULL, 'https://forvo.com/word/stadion/#nl', false, false, 1401, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het dorp', 'the village', NULL, 'https://forvo.com/word/dorp/#nl', false, false, 1745, 'geography');
-INSERT INTO public.vocabulary VALUES ('het gerecht', 'the dish', NULL, 'https://forvo.com/word/gerecht/#nl', false, false, 1827, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de oom', 'the uncle', NULL, 'https://forvo.com/word/oom/#nl', false, false, 1551, 'family');
-INSERT INTO public.vocabulary VALUES ('het geld', 'the money', NULL, 'https://forvo.com/word/geld/#nl', false, false, 2105, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('katoen', 'cotton', 'n/a', 'https://forvo.com/word/katoen/#nl', false, false, 972, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('gelijkaardige', 'similar', 'n/a', 'https://forvo.com/word/gelijkaardige/#nl', false, false, 924, NULL);
-INSERT INTO public.vocabulary VALUES ('gezicht', 'face', 'n/a', 'https://forvo.com/word/gezicht/#nl', false, false, 272, 'body');
-INSERT INTO public.vocabulary VALUES ('figuur', 'figure', 'n/a', 'https://forvo.com/word/figuur/#nl', false, false, 416, NULL);
-INSERT INTO public.vocabulary VALUES ('wetenschap', 'science', 'n/a', 'https://forvo.com/word/wetenschap/#nl', false, false, 255, NULL);
-INSERT INTO public.vocabulary VALUES ('het hart', 'the heart', NULL, 'https://forvo.com/word/hart/#nl', false, false, 1459, 'body');
-INSERT INTO public.vocabulary VALUES ('de kleding', 'the clothing', NULL, 'https://forvo.com/word/kleding/#nl', false, false, 1461, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de kledingwinkel', 'the clothes shop', NULL, 'https://forvo.com/word/kledingwinkel/#nl', false, false, 1462, 'clothes');
-INSERT INTO public.vocabulary VALUES ('in', 'in', NULL, 'https://forvo.com/word/in/#nl', false, false, 1332, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('hill', 'hill', 'n/a', 'https://forvo.com/word/hill/#nl', false, false, 725, 'nature');
-INSERT INTO public.vocabulary VALUES ('het ei', 'the egg', NULL, 'https://forvo.com/word/ei/#nl', false, false, 1862, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('begin', 'start', 'n/a', 'https://forvo.com/word/begin/#nl', false, false, 233, NULL);
-INSERT INTO public.vocabulary VALUES ('ging', 'went', 'n/a', 'https://forvo.com/word/ging/#nl', false, false, 83, NULL);
-INSERT INTO public.vocabulary VALUES ('afbeelding', 'picture', 'n/a', 'https://forvo.com/word/afbeelding/#nl', false, false, 89, NULL);
-INSERT INTO public.vocabulary VALUES ('neus', 'nose', 'n/a', 'https://forvo.com/word/neus/#nl', false, false, 997, 'body');
-INSERT INTO public.vocabulary VALUES ('arm', 'arm', 'n/a', 'https://forvo.com/word/arm/#nl', false, false, 548, 'body');
-INSERT INTO public.vocabulary VALUES ('de koelkast', 'the fridge', NULL, 'https://forvo.com/word/koelkast/#nl', false, false, 1419, 'household');
-INSERT INTO public.vocabulary VALUES ('de kamer', 'the room', NULL, 'https://forvo.com/word/kamer/#nl', false, false, 1420, 'household');
-INSERT INTO public.vocabulary VALUES ('speciaal', 'special', NULL, 'https://forvo.com/word/speciaal/#nl', false, false, 1699, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('verrassing', 'surprise', 'noun', 'https://forvo.com/word/verrassing/#nl', false, false, 1029, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('luid', 'loud', 'n/a', 'https://forvo.com/word/luid/#nl', false, false, 663, NULL);
-INSERT INTO public.vocabulary VALUES ('zwart', 'black', NULL, 'https://forvo.com/word/zwart/#nl', false, false, 1979, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('grijs', 'grey', NULL, 'https://forvo.com/word/grijs/#nl', false, false, 1981, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('gemaakt', 'made', 'n/a', 'https://forvo.com/word/gemaakt/#nl', false, false, 109, NULL);
-INSERT INTO public.vocabulary VALUES ('arts', 'doctor', 'n/a', 'https://forvo.com/word/arts/#nl', false, false, 765, 'professions');
-INSERT INTO public.vocabulary VALUES ('wensen', 'wish', 'n/a', 'https://forvo.com/word/wensen/#nl', false, false, 568, NULL);
-INSERT INTO public.vocabulary VALUES ('roze', 'pink', NULL, 'https://forvo.com/word/roze/#nl', false, false, 1983, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('jongen', 'boy', 'n/a', 'https://forvo.com/word/jongen/#nl', false, false, 147, 'family');
-INSERT INTO public.vocabulary VALUES ('het kantoor', 'the office', NULL, 'https://forvo.com/word/kantoor/#nl', false, false, 1211, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('punaises', 'thumbtacks', 'noun', 'https://forvo.com/word/punaises/#nl', false, false, 1027, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('jonge', 'young', 'n/a', 'https://forvo.com/word/jonge/#nl', false, false, 306, NULL);
-INSERT INTO public.vocabulary VALUES ('stoom', 'steam', 'n/a', 'https://forvo.com/word/stoom/#nl', false, false, 892, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('voorkomen', 'occur', 'n/a', 'https://forvo.com/word/voorkomen/#nl', false, false, 887, NULL);
-INSERT INTO public.vocabulary VALUES ('diepe', 'deep', 'n/a', 'https://forvo.com/word/diepe/#nl', false, false, 364, NULL);
-INSERT INTO public.vocabulary VALUES ('het idee', 'the idea', NULL, 'https://forvo.com/word/idee/#nl', false, false, 2132, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('al, reeds', 'already', NULL, 'https://forvo.com/word/al/#nl', false, false, 1944, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('verloren', 'lost', 'n/a', 'https://forvo.com/word/verloren/#nl', false, false, 636, NULL);
-INSERT INTO public.vocabulary VALUES ('rustig', 'quiet', 'n/a', 'https://forvo.com/word/rustig/#nl', false, false, 681, NULL);
-INSERT INTO public.vocabulary VALUES ('zoals', 'like', 'n/a', 'https://forvo.com/word/zoals/#nl', false, false, 165, NULL);
-INSERT INTO public.vocabulary VALUES ('de identiteitskaart', 'the identity card', NULL, 'https://forvo.com/word/identiteitskaart/#nl', false, false, 1783, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('het bad', 'the bath tub', NULL, 'https://forvo.com/word/bad/#nl', false, false, 1427, 'household');
-INSERT INTO public.vocabulary VALUES ('levering', 'supply', 'n/a', 'https://forvo.com/word/levering/#nl', false, false, 776, NULL);
-INSERT INTO public.vocabulary VALUES ('mij', 'me', 'n/a', 'https://forvo.com/word/mij/#nl', false, false, 123, NULL);
-INSERT INTO public.vocabulary VALUES ('de kameel', 'the camel', NULL, 'https://forvo.com/word/kameel/#nl', false, false, 2052, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('graad', 'degree', 'n/a', 'https://forvo.com/word/graad/#nl', false, false, 880, NULL);
-INSERT INTO public.vocabulary VALUES ('geven', 'to give, indicate', NULL, 'https://forvo.com/word/geven/#nl', false, false, 1637, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('na', 'after', NULL, 'https://forvo.com/word/na/#nl', false, false, 1352, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('hoeveel', 'how much', NULL, 'https://forvo.com/word/hoeveel/#nl', false, false, 1190, 'question words');
-INSERT INTO public.vocabulary VALUES ('schilderij', '(a) painting', NULL, 'https://forvo.com/word/schilderij/#nl', false, false, 2151, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('het hert', 'the deer', NULL, 'https://forvo.com/word/hert/#nl', false, false, 1589, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de boot', 'the boat', NULL, 'https://forvo.com/word/boot/#nl', false, false, 1206, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('buiten', 'outside', NULL, 'https://forvo.com/word/buiten/#nl', false, false, 1346, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('zullen', 'will', NULL, 'https://forvo.com/word/zullen/#nl', false, false, 1906, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de zaak', 'the company', NULL, 'https://forvo.com/word/zaak/#nl', false, false, 1528, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('zachte', 'gentle/soft', 'n/a', 'https://forvo.com/word/zachte/#nl', false, false, 799, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('tafel', 'table', 'n/a', 'https://forvo.com/word/tafel/#nl', false, false, 473, 'household');
-INSERT INTO public.vocabulary VALUES ('afwerking', 'finish', 'n/a', 'https://forvo.com/word/afwerking/#nl', false, false, 594, NULL);
-INSERT INTO public.vocabulary VALUES ('band', 'tire, band', 'n/a', 'https://forvo.com/word/band/#nl', false, false, 393, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('vorm', 'shape/form', 'n/a', 'https://forvo.com/word/vorm/#nl', false, false, 386, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('regel', 'rule', 'n/a', 'https://forvo.com/word/regel/#nl', false, false, 496, NULL);
-INSERT INTO public.vocabulary VALUES ('genoeg', 'enough', NULL, 'https://forvo.com/word/genoeg/#nl', false, false, 1954, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('het paasei', 'the Easter egg', NULL, 'https://forvo.com/word/paasei/#nl', false, false, 2014, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('het weerbericht', 'the weather forecast', NULL, 'https://forvo.com/word/weerbericht/#nl', false, false, 1657, 'weather');
-INSERT INTO public.vocabulary VALUES ('lekker weer, hè', 'nice weather isn’t it?', NULL, '#', false, false, 1659, 'weather');
-INSERT INTO public.vocabulary VALUES ('zeker', '(for) sure', NULL, 'https://forvo.com/word/zeker/#nl', false, false, 1660, 'weather');
-INSERT INTO public.vocabulary VALUES ('exacte', 'exact', 'n/a', 'https://forvo.com/word/exacte/#nl', false, false, 608, NULL);
-INSERT INTO public.vocabulary VALUES ('tweehonderd', 'two hundred', NULL, 'https://forvo.com/word/tweehonderd/#nl', false, false, 1244, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('twaalf', 'twelve', NULL, 'https://forvo.com/word/twaalf/#nl', true, false, 1234, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('Amsterdam', 'Amsterdam', NULL, 'https://forvo.com/word/Amsterdam/#nl', false, true, 1383, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('blad', 'sheet', 'n/a', 'https://forvo.com/word/blad/#nl', true, false, 857, NULL);
-INSERT INTO public.vocabulary VALUES ('laten zien', 'to show', NULL, 'https://forvo.com/word/laten/#nl', true, false, 1641, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('toets', 'test', 'n/a', 'https://forvo.com/word/toets/#nl', false, false, 370, NULL);
-INSERT INTO public.vocabulary VALUES ('rij', 'row', 'n/a', 'https://forvo.com/word/rij/#nl', false, false, 606, NULL);
-INSERT INTO public.vocabulary VALUES ('tijdens', 'during', 'n/a', 'https://forvo.com/word/tijdens/#nl', false, false, 457, NULL);
-INSERT INTO public.vocabulary VALUES ('tong', 'tongue', NULL, 'https://forvo.com/word/tong/#nl', false, false, 2142, 'body');
-INSERT INTO public.vocabulary VALUES ('dun', 'thin', NULL, 'https://forvo.com/word/dun/#nl', false, false, 1986, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('waarnemen', 'observe', 'n/a', 'https://forvo.com/word/waarnemen/#nl', false, false, 665, NULL);
-INSERT INTO public.vocabulary VALUES ('natuur', 'nature', 'n/a', 'https://forvo.com/word/natuur/#nl', false, false, 890, 'nature');
-INSERT INTO public.vocabulary VALUES ('uitschakelen', 'to turn off', NULL, 'https://forvo.com/word/uitschakelen/#nl', false, false, 2148, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('de kleur', 'the colour', NULL, 'https://forvo.com/word/kleur/#nl', false, false, 1967, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('juist', 'correct', NULL, 'https://forvo.com/word/juist/#nl', false, false, 1707, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('zeer', 'the ache, very', NULL, 'https://forvo.com/word/zeer/#nl', false, false, 1721, 'doctor');
-INSERT INTO public.vocabulary VALUES ('donker', 'dark', NULL, 'https://forvo.com/word/donker/#nl', false, false, 1286, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('pagina', 'page', 'n/a', 'https://forvo.com/word/pagina/#nl', false, false, 205, NULL);
-INSERT INTO public.vocabulary VALUES ('leiden', 'to lead', NULL, 'https://forvo.com/word/leiden/#nl', false, false, 2101, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de klomp', 'the wooden shoe', NULL, 'https://forvo.com/word/klomp/#nl', false, false, 1472, 'clothes');
-INSERT INTO public.vocabulary VALUES ('regio', 'region', 'n/a', 'https://forvo.com/word/regio/#nl', false, false, 521, NULL);
-INSERT INTO public.vocabulary VALUES ('zelfs', 'even', 'n/a', 'https://forvo.com/word/zelfs/#nl', false, false, 70, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('de boer', 'the farmer', NULL, 'https://forvo.com/word/boer/#nl', false, false, 1136, 'professions');
-INSERT INTO public.vocabulary VALUES ('de visser', 'the fisherman', NULL, 'https://forvo.com/word/visser/#nl', false, false, 1137, 'professions');
-INSERT INTO public.vocabulary VALUES ('de advocaat', 'the lawyer', NULL, 'https://forvo.com/word/advocaat/#nl', false, false, 1138, 'professions');
-INSERT INTO public.vocabulary VALUES ('de dokter', 'the doctor', NULL, 'https://forvo.com/word/dokter/#nl', false, false, 1139, 'professions');
-INSERT INTO public.vocabulary VALUES ('vertelde', 'told', 'n/a', 'https://forvo.com/word/vertelde/#nl', false, false, 344, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de knoflook', 'the garlic', NULL, 'https://forvo.com/word/knoflook/#nl', false, false, 1857, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de sla', 'the lettuce', NULL, 'https://forvo.com/word/sla/#nl', false, false, 1858, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de sinaasappel', 'the orange', NULL, 'https://forvo.com/word/sinaasappel/#nl', false, false, 1873, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de afspraak', 'the appointment', NULL, 'https://forvo.com/word/afspraak/#nl', false, false, 1730, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de verwijsbrief', 'the referral letter', NULL, 'https://forvo.com/word/verwijsbrief/#nl', false, false, 1731, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het huurcontract', 'the rental contract', NULL, 'https://forvo.com/word/huurcontract/#nl', false, false, 1772, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('december', 'December', NULL, 'https://forvo.com/word/december/#nl', false, false, 1324, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('zomer', 'summer', NULL, 'https://forvo.com/word/zomer/#nl', false, false, 1327, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('herfst', 'autumn', NULL, 'https://forvo.com/word/herfst/#nl', false, false, 1328, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('met', 'with', NULL, 'https://forvo.com/word/met/#nl', false, false, 1329, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('naar', 'to', NULL, 'https://forvo.com/word/naar/#nl', false, false, 1331, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('beschermen', 'protect', 'n/a', 'https://forvo.com/word/beschermen/#nl', false, false, 767, NULL);
-INSERT INTO public.vocabulary VALUES ('achter', 'behind', NULL, 'https://forvo.com/word/achter/#nl', false, false, 1334, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('zielig', 'pathetic', NULL, 'https://forvo.com/word/zielig/#nl', false, false, 1818, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('eenzame', 'lone', 'n/a', 'https://forvo.com/word/eenzame/#nl', false, false, 562, NULL);
-INSERT INTO public.vocabulary VALUES ('schelp', 'shell', 'n/a', 'https://forvo.com/word/schelp/#nl', false, false, 900, NULL);
-INSERT INTO public.vocabulary VALUES ('van', 'from/of', NULL, 'https://forvo.com/word/van/#nl', false, false, 1330, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('manier', 'way', 'n/a', 'https://forvo.com/word/manier/#nl', false, false, 158, NULL);
-INSERT INTO public.vocabulary VALUES ('de opa', 'the grandfather', NULL, 'https://forvo.com/word/opa/#nl', false, false, 1548, 'family');
-INSERT INTO public.vocabulary VALUES ('het pensioen', 'the pension', NULL, 'https://forvo.com/word/pensioen/#nl', false, false, 1535, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('tijd', 'time', 'n/a', 'https://forvo.com/word/tijd/#nl', false, false, 44, 'time');
-INSERT INTO public.vocabulary VALUES ('de verjaardag', 'the birthday', NULL, 'https://forvo.com/word/verjaardag/#nl', false, false, 2022, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('kort', 'short', NULL, 'https://forvo.com/word/kort/#nl', false, false, 1684, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('uitgaan', 'to go out', NULL, 'https://forvo.com/word/uitgaan/#nl', false, false, 1372, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('beschikbaar', 'available', NULL, 'https://forvo.com/word/beschikbaar/#nl', false, false, 1702, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('waarschijnlijk', 'probable', NULL, 'https://forvo.com/word/waarschijnlijk/#nl', false, false, 1703, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('schaal', 'scale', 'n/a', 'https://forvo.com/word/schaal/#nl', false, false, 662, NULL);
-INSERT INTO public.vocabulary VALUES ('baas', 'boss', NULL, 'https://forvo.com/word/baas/#nl', false, false, 2146, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('staal', 'steel', 'n/a', 'https://forvo.com/word/staal/#nl', false, false, 921, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('langzaam', 'slow', 'n/a', 'https://forvo.com/word/langzaam/#nl', false, false, 486, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de vinger', 'the finger', NULL, 'https://forvo.com/word/vinger/#nl', false, false, 1447, 'body');
-INSERT INTO public.vocabulary VALUES ('de lucht', 'the air', NULL, 'https://forvo.com/word/lucht/#nl', false, false, 1931, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('het doelpunt', 'the goal', NULL, 'https://forvo.com/word/doelpunt/#nl', false, false, 1598, 'football');
-INSERT INTO public.vocabulary VALUES ('het politiebureau', 'the police station', NULL, 'https://forvo.com/word/politiebureau/#nl', false, false, 1218, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de universiteit', 'the university', NULL, 'https://forvo.com/word/universiteit/#nl', false, false, 1221, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de wal', 'the shore', NULL, 'https://forvo.com/word/wal/#nl', false, false, 1753, 'geography');
-INSERT INTO public.vocabulary VALUES ('de EHBO, de eerste hulp', 'the first aid', NULL, 'https://forvo.com/word/EHBO/#nl', false, false, 1726, 'doctor');
-INSERT INTO public.vocabulary VALUES ('planten', 'plant', 'n/a', 'https://forvo.com/word/planten/#nl', false, false, 215, NULL);
-INSERT INTO public.vocabulary VALUES ('antwoorden', 'to answer/reply', NULL, 'https://forvo.com/word/antwoorden/#nl', false, false, 1252, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('de kruk', 'the stool', NULL, 'https://forvo.com/word/kruk/#nl', false, false, 1411, 'household');
-INSERT INTO public.vocabulary VALUES ('voedsel', 'food', 'n/a', 'https://forvo.com/word/voedsel/#nl', false, false, 217, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('alstublieft', 'here you are', NULL, 'https://forvo.com/word/alstublieft/#nl', false, false, 1104, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de slang', 'the snake', NULL, 'https://forvo.com/word/slang/#nl', false, false, 2050, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('passen', 'fit', 'n/a', 'https://forvo.com/word/passen/#nl', false, false, 644, NULL);
-INSERT INTO public.vocabulary VALUES ('het geluid', 'the sound', NULL, 'https://forvo.com/word/geluid/#nl', false, false, 2133, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('trein', 'train', 'n/a', 'https://forvo.com/word/trein/#nl', false, false, 559, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de oma', 'the grandmother', NULL, 'https://forvo.com/word/oma/#nl', false, false, 1549, 'family');
-INSERT INTO public.vocabulary VALUES ('daar, er', 'there', NULL, 'https://forvo.com/word/daar/#nl', false, false, 1183, 'question words');
-INSERT INTO public.vocabulary VALUES ('de stoel', 'the chair', NULL, 'https://forvo.com/word/stoel/#nl', false, false, 1410, 'household');
-INSERT INTO public.vocabulary VALUES ('de abrikoos', 'the apricot', NULL, 'https://forvo.com/word/abrikoos/#nl', false, false, 1872, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('het cadeau', 'the present', NULL, 'https://forvo.com/word/cadeau/#nl', false, false, 2026, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('verandering', 'change', 'n/a', 'https://forvo.com/word/verandering/#nl', true, false, 82, NULL);
-INSERT INTO public.vocabulary VALUES ('twintig', 'twenty', NULL, 'https://forvo.com/word/twintig/#nl', true, false, 1238, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('verder', 'further', NULL, 'https://forvo.com/word/verder/#nl', true, false, 1965, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('veel', 'lot/much/many', 'n/a', 'https://forvo.com/word/veel/#nl', false, true, 688, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('nat', 'wet', NULL, 'https://forvo.com/word/nat/#nl', false, false, 2055, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('de melk', 'the milk', NULL, 'https://forvo.com/word/melk/#nl', false, false, 1156, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de collega', 'the colleague', NULL, 'https://forvo.com/word/collega/#nl', false, false, 1539, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('ontspannen', 'relaxed', NULL, 'https://forvo.com/word/ontspannen/#nl', false, false, 1813, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('zacht', 'soft, slow', NULL, 'https://forvo.com/word/zacht/#nl', false, false, 1290, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('goedkoop', 'cheap', NULL, 'https://forvo.com/word/goedkoop/#nl', false, false, 1297, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('bruto', 'gross', NULL, 'https://forvo.com/word/bruto/#nl', false, false, 1530, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de baard', 'the beard', NULL, 'https://forvo.com/word/baard/#nl', false, false, 1457, 'body');
-INSERT INTO public.vocabulary VALUES ('hoofdstad', 'capital', 'n/a', 'https://forvo.com/word/hoofdstad/#nl', false, false, 752, 'geography');
-INSERT INTO public.vocabulary VALUES ('stoel', 'chair', 'n/a', 'https://forvo.com/word/stoel/#nl', false, false, 754, 'household');
-INSERT INTO public.vocabulary VALUES ('wereld', 'world', 'n/a', 'https://forvo.com/word/wereld/#nl', false, false, 96, NULL);
-INSERT INTO public.vocabulary VALUES ('drankje', 'drink', 'n/a', 'https://forvo.com/word/drankje/#nl', false, false, 886, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('kosten', 'to cost', NULL, 'https://forvo.com/word/kosten/#nl', false, false, 2099, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('groeide', 'grew', 'n/a', 'https://forvo.com/word/groeide/#nl', false, false, 630, NULL);
-INSERT INTO public.vocabulary VALUES ('beslissen', 'to decide', NULL, 'https://forvo.com/word/beslissen/#nl', false, false, 1497, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('stap', 'step', 'n/a', 'https://forvo.com/word/stap/#nl', false, false, 461, NULL);
-INSERT INTO public.vocabulary VALUES ('de plank', 'the plank', NULL, 'https://forvo.com/word/plank/#nl', false, false, 1930, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de zak', 'the bag', NULL, 'https://forvo.com/word/zak/#nl', false, false, 2004, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('Kerstmis', 'Christmas', NULL, 'https://forvo.com/word/Kerstmis/#nl', false, false, 2005, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('aanbieden', 'to offer', NULL, 'https://forvo.com/word/aanbieden/#nl', false, false, 1650, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('suiker', 'sugar', 'n/a', 'https://forvo.com/word/suiker/#nl', false, false, 903, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('geweest', 'been', 'n/a', 'https://forvo.com/word/geweest/#nl', false, false, 199, NULL);
-INSERT INTO public.vocabulary VALUES ('lieve', 'dear', 'n/a', 'https://forvo.com/word/lieve/#nl', false, false, 883, NULL);
-INSERT INTO public.vocabulary VALUES ('gratis', 'free', 'n/a', 'https://forvo.com/word/gratis/#nl', false, false, 441, NULL);
-INSERT INTO public.vocabulary VALUES ('oog', 'eye', 'n/a', 'https://forvo.com/word/oog/#nl', false, false, 223, 'body');
-INSERT INTO public.vocabulary VALUES ('lijn', 'line', 'n/a', 'https://forvo.com/word/lijn/#nl', false, false, 138, NULL);
-INSERT INTO public.vocabulary VALUES ('eten & drinken', 'food & drinks', NULL, '#', false, false, 1148, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('end', 'end', 'n/a', 'https://forvo.com/word/end/#nl', false, false, 61, NULL);
-INSERT INTO public.vocabulary VALUES ('jouw / je / uw', 'your', NULL, 'https://forvo.com/word/jouw/#nl', false, false, 2114, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('deas', 'dollar', 'n/a', 'https://forvo.com/word/deas/#nl', false, false, 822, NULL);
-INSERT INTO public.vocabulary VALUES ('soort', 'type/kind', 'n/a', 'https://forvo.com/word/soort/#nl', false, false, 730, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('woede', 'anger', 'n/a', 'https://forvo.com/word/woede/#nl', false, false, 999, NULL);
-INSERT INTO public.vocabulary VALUES ('vijand', 'enemy', 'n/a', 'https://forvo.com/word/vijand/#nl', false, false, 884, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('staat', 'state', 'n/a', 'https://forvo.com/word/staat/#nl', false, false, 221, NULL);
-INSERT INTO public.vocabulary VALUES ('zat', 'sat', 'n/a', 'https://forvo.com/word/zat/#nl', false, false, 573, NULL);
-INSERT INTO public.vocabulary VALUES ('eerder', 'rather', 'n/a', 'https://forvo.com/word/eerder/#nl', false, false, 810, NULL);
-INSERT INTO public.vocabulary VALUES ('achtervoegsel', 'suffix', 'n/a', 'https://forvo.com/word/achtervoegsel/#nl', false, false, 915, 'grammar');
-INSERT INTO public.vocabulary VALUES ('wiel', 'wheel', 'n/a', 'https://forvo.com/word/wiel/#nl', false, false, 357, NULL);
-INSERT INTO public.vocabulary VALUES ('oorzaak', 'cause', 'n/a', 'https://forvo.com/word/oorzaak/#nl', false, false, 141, NULL);
-INSERT INTO public.vocabulary VALUES ('de benzine', 'the petrol', NULL, 'https://forvo.com/word/benzine/#nl', false, false, 1925, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('cijfer', 'numeral', 'n/a', 'https://forvo.com/word/cijfer/#nl', false, false, 329, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('voorbeeld', 'example', 'n/a', 'https://forvo.com/word/voorbeeld/#nl', false, false, 284, 'grammar');
-INSERT INTO public.vocabulary VALUES ('het beest', 'the animal, the beast', NULL, 'https://forvo.com/word/beest/#nl', false, false, 2027, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('het einde', 'the end', NULL, 'https://forvo.com/word/einde/#nl', false, false, 2092, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('termijn', 'term', 'n/a', 'https://forvo.com/word/termijn/#nl', false, false, 963, NULL);
-INSERT INTO public.vocabulary VALUES ('het land', 'the country', NULL, 'https://forvo.com/word/land/#nl', false, false, 1740, 'geography');
-INSERT INTO public.vocabulary VALUES ('team', 'team', 'n/a', 'https://forvo.com/word/team/#nl', false, false, 633, NULL);
-INSERT INTO public.vocabulary VALUES ('verloofd', 'to be engaged', NULL, 'https://forvo.com/word/verloofd/#nl', false, false, 1563, 'family');
-INSERT INTO public.vocabulary VALUES ('het, de colbert', 'the suit jacket', NULL, 'https://forvo.com/word/colbert/#nl', false, false, 1479, 'clothes');
-INSERT INTO public.vocabulary VALUES ('kust', 'coast', 'n/a', 'https://forvo.com/word/kust/#nl', false, false, 733, 'nature');
-INSERT INTO public.vocabulary VALUES ('positie', 'position', 'n/a', 'https://forvo.com/word/positie/#nl', false, false, 547, NULL);
-INSERT INTO public.vocabulary VALUES ('reisbureau', 'travel agency', 'noun', 'https://forvo.com/word/reisbureau/#nl', false, false, 1008, NULL);
-INSERT INTO public.vocabulary VALUES ('dood', 'dead/death', NULL, 'https://forvo.com/word/dood/#nl', false, false, 2087, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('zijn', 'his/are/be', NULL, 'https://forvo.com/word/zijn/#nl', false, false, 2116, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('beweging', 'motion', 'n/a', 'https://forvo.com/word/beweging/#nl', false, false, 893, NULL);
-INSERT INTO public.vocabulary VALUES ('de bril', 'the glasses', NULL, 'https://forvo.com/word/bril/#nl', false, false, 1440, 'body');
-INSERT INTO public.vocabulary VALUES ('éénentwintig', 'twenty one', NULL, 'https://forvo.com/word/éénentwintig/#nl', false, false, 1239, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('magneet', 'magnet', 'n/a', 'https://forvo.com/word/magneet/#nl', false, false, 910, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('zorg', 'care', 'n/a', 'https://forvo.com/word/zorg/#nl', false, false, 300, NULL);
-INSERT INTO public.vocabulary VALUES ('de appel', 'the apple', NULL, 'https://forvo.com/word/appel/#nl', false, false, 1868, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('het ijzer', 'the iron', NULL, 'https://forvo.com/word/ijzer/#nl', false, false, 1932, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('het staal', 'the steel', NULL, 'https://forvo.com/word/staal/#nl', false, false, 1933, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('het been', 'the leg', NULL, 'https://forvo.com/word/been/#nl', false, false, 1448, 'body');
-INSERT INTO public.vocabulary VALUES ('de knie', 'the knee', NULL, 'https://forvo.com/word/knie/#nl', false, false, 1449, 'body');
-INSERT INTO public.vocabulary VALUES ('zonnen', 'to sunbathe', NULL, 'https://forvo.com/word/zonnen/#nl', false, false, 1360, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('het pretpark', 'the theme park', NULL, 'https://forvo.com/word/pretpark/#nl', false, false, 1361, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('tuinieren', 'gardening', NULL, 'https://forvo.com/word/tuinieren/#nl', false, false, 1362, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('mark', 'mark', 'n/a', 'https://forvo.com/word/mark/#nl', false, false, 292, NULL);
-INSERT INTO public.vocabulary VALUES ('gebruikelijke', 'usual', 'n/a', 'https://forvo.com/word/gebruikelijke/#nl', false, false, 305, NULL);
-INSERT INTO public.vocabulary VALUES ('de koffie', 'the coffee', NULL, 'https://forvo.com/word/koffie/#nl', false, false, 1157, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('romantisch', 'romantic', NULL, 'https://forvo.com/word/romantisch/#nl', false, false, 1814, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('lijst', 'list', 'n/a', 'https://forvo.com/word/lijst/#nl', false, false, 311, NULL);
-INSERT INTO public.vocabulary VALUES ('dansen', 'to dance', NULL, 'https://forvo.com/word/dansen/#nl', false, true, 1381, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('draaien', 'to turn', NULL, 'https://forvo.com/word/draaien/#nl', true, false, 2098, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('ooit', 'ever', NULL, 'https://forvo.com/word/ooit/#nl', true, false, 1959, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('hoe lang?', 'how long?', '', '#', false, true, 1063, 'time');
-INSERT INTO public.vocabulary VALUES ('het', 'the, it', NULL, 'https://forvo.com/word/het/#nl', true, false, 1083, 'introductory');
-INSERT INTO public.vocabulary VALUES ('zoeken', 'to search', NULL, 'https://forvo.com/word/zoeken/#nl', false, true, 1905, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de twaalfde man', 'the fans', NULL, '#', true, false, 1609, 'football');
-INSERT INTO public.vocabulary VALUES ('noch', 'nor', 'n/a', 'https://forvo.com/word/noch/#nl', true, false, 948, NULL);
-INSERT INTO public.vocabulary VALUES ('(zich) ziek melden', 'to report oneself ill', NULL, '#', false, false, 1712, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het bloed', 'the blood', NULL, 'https://forvo.com/word/bloed/#nl', false, false, 2086, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('lang', 'long', NULL, 'https://forvo.com/word/lang/#nl', false, false, 1685, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('half vier', 'half past three', '', '#', false, false, 1052, 'time');
-INSERT INTO public.vocabulary VALUES ('decennium', 'decade', 'noun', 'https://forvo.com/word/decennium/#nl', false, false, 1042, 'time');
-INSERT INTO public.vocabulary VALUES ('de aardappel', 'the potato', NULL, 'https://forvo.com/word/aardappel/#nl', false, false, 1159, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('wachten', 'to wait', NULL, 'https://forvo.com/word/wachten/#nl', false, false, 1273, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('op te lossen', 'solve', 'n/a', 'https://forvo.com/word/lossen/#nl', false, false, 709, NULL);
-INSERT INTO public.vocabulary VALUES ('het platteland', 'the countryside', NULL, 'https://forvo.com/word/platteland/#nl', false, false, 1749, 'geography');
-INSERT INTO public.vocabulary VALUES ('de polder', 'the polder', NULL, 'https://forvo.com/word/polder/#nl', false, false, 1750, 'geography');
-INSERT INTO public.vocabulary VALUES ('de huur', 'the rent', NULL, 'https://forvo.com/word/huur/#nl', false, false, 1773, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('cursus', 'course', 'n/a', 'https://forvo.com/word/cursus/#nl', false, false, 355, NULL);
-INSERT INTO public.vocabulary VALUES ('maandag', 'Monday', NULL, 'https://forvo.com/word/maandag/#nl', false, false, 1304, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('het sollicitatiegesprek', 'the job interview', NULL, 'https://forvo.com/word/sollicitatiegesprek/#nl', false, false, 1526, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('pose', 'pose', 'n/a', 'https://forvo.com/word/pose/#nl', false, false, 321, NULL);
-INSERT INTO public.vocabulary VALUES ('oplossing', 'solution', 'n/a', 'https://forvo.com/word/oplossing/#nl', false, false, 909, NULL);
-INSERT INTO public.vocabulary VALUES ('heldere', 'bright', 'n/a', 'https://forvo.com/word/heldere/#nl', false, false, 588, NULL);
-INSERT INTO public.vocabulary VALUES ('de wc', 'the toilet', NULL, 'https://forvo.com/word/wc/#nl', false, false, 1416, 'household');
-INSERT INTO public.vocabulary VALUES ('de keuken', 'the kitchen', NULL, 'https://forvo.com/word/keuken/#nl', false, false, 1417, 'household');
-INSERT INTO public.vocabulary VALUES ('het fornuis', 'the cooker', NULL, 'https://forvo.com/word/fornuis/#nl', false, false, 1418, 'household');
-INSERT INTO public.vocabulary VALUES ('lengte', 'length', 'n/a', 'https://forvo.com/word/lengte/#nl', false, false, 517, NULL);
-INSERT INTO public.vocabulary VALUES ('ongeduldig', 'impatient', NULL, 'https://forvo.com/word/ongeduldig/#nl', false, false, 1805, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('tevreden', 'satisfied', NULL, 'https://forvo.com/word/tevreden/#nl', false, false, 1809, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('ontevreden', 'dissatisfied', NULL, 'https://forvo.com/word/ontevreden/#nl', false, false, 1810, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('partij', 'party', 'n/a', 'https://forvo.com/word/partij/#nl', false, false, 775, NULL);
-INSERT INTO public.vocabulary VALUES ('dank je wel', 'thank you', NULL, 'https://forvo.com/word/dankjewel/#nl', false, false, 1107, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de temperatuur', 'the temperature', NULL, 'https://forvo.com/word/temperatuur/#nl', false, false, 1663, 'weather');
-INSERT INTO public.vocabulary VALUES ('de thermometer', 'the thermometer', NULL, 'https://forvo.com/word/thermometer/#nl', false, false, 1664, 'weather');
-INSERT INTO public.vocabulary VALUES ('quotiënt', 'quotient', 'n/a', 'https://forvo.com/word/quotiënt/#nl', false, false, 898, NULL);
-INSERT INTO public.vocabulary VALUES ('yard', 'yard', 'n/a', 'https://forvo.com/word/yard/#nl', false, false, 623, 'household');
-INSERT INTO public.vocabulary VALUES ('dan', 'then/than', NULL, 'https://forvo.com/word/dan/#nl', false, false, 1185, 'question words');
-INSERT INTO public.vocabulary VALUES ('het recept', 'the prescription', NULL, 'https://forvo.com/word/recept/#nl', false, false, 1738, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het bord', 'the plate', NULL, 'https://forvo.com/word/bord/#nl', false, false, 1844, 'cooking');
-INSERT INTO public.vocabulary VALUES ('finale', 'final', 'n/a', 'https://forvo.com/word/finale/#nl', false, false, 433, NULL);
-INSERT INTO public.vocabulary VALUES ('regen', 'rain', 'n/a', 'https://forvo.com/word/regen/#nl', false, false, 495, 'weather');
-INSERT INTO public.vocabulary VALUES ('de driehoek', 'the triangle', NULL, 'https://forvo.com/word/driehoek/#nl', false, false, 1971, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('de tafel', 'the table', NULL, 'https://forvo.com/word/tafel/#nl', false, false, 1412, 'household');
-INSERT INTO public.vocabulary VALUES ('onthouden', 'remember', 'n/a', 'https://forvo.com/word/onthouden/#nl', false, false, 460, NULL);
-INSERT INTO public.vocabulary VALUES ('de bakker', 'the baker', NULL, 'https://forvo.com/word/bakker/#nl', false, false, 1134, 'professions');
-INSERT INTO public.vocabulary VALUES ('willen', 'to want', NULL, 'https://forvo.com/word/willen/#nl', false, false, 1635, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('drukke', 'busy', 'n/a', 'https://forvo.com/word/drukke/#nl', false, false, 369, NULL);
-INSERT INTO public.vocabulary VALUES ('ran', 'ran', 'n/a', 'https://forvo.com/word/ran/#nl', false, false, 383, NULL);
-INSERT INTO public.vocabulary VALUES ('verschillen', 'differ', 'n/a', 'https://forvo.com/word/verschillen/#nl', false, false, 139, NULL);
-INSERT INTO public.vocabulary VALUES ('schoonheid', 'beauty', 'n/a', 'https://forvo.com/word/schoonheid/#nl', false, false, 426, NULL);
-INSERT INTO public.vocabulary VALUES ('het n2-examen', 'the exam for Dutch as a second language', NULL, 'https://forvo.com/word/n2-examen/#nl', false, false, 1789, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('meten', 'measure', 'n/a', 'https://forvo.com/word/meten/#nl', false, false, 324, NULL);
-INSERT INTO public.vocabulary VALUES ('ons / onze', 'our', NULL, 'https://forvo.com/word/onze/#nl', false, false, 2117, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('heet', 'hot', NULL, 'https://forvo.com/word/heet/#nl', false, false, 2103, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de markt', 'the market', NULL, 'https://forvo.com/word/markt/#nl', false, false, 2104, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('bril', 'glasses', NULL, 'https://forvo.com/word/bril/#nl', false, false, 2144, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('dronken zijn', 'being drunk', NULL, 'https://forvo.com/word/dronken/#nl', false, false, 1374, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('bijvoorbeeld', 'for example', NULL, 'https://forvo.com/word/bijvoorbeeld/#nl', false, false, 1956, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('de hand', 'the hand', NULL, 'https://forvo.com/word/hand/#nl', false, false, 1446, 'body');
-INSERT INTO public.vocabulary VALUES ('gehoord', 'heard', 'n/a', 'https://forvo.com/word/gehoord/#nl', false, false, 452, NULL);
-INSERT INTO public.vocabulary VALUES ('gebied', 'area', 'n/a', 'https://forvo.com/word/gebied/#nl', false, false, 336, NULL);
-INSERT INTO public.vocabulary VALUES ('de winter', 'winter', NULL, 'https://forvo.com/word/winter/#nl', false, false, 1325, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de tomaat', 'the tomato', NULL, 'https://forvo.com/word/tomaat/#nl', false, false, 1860, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('gunst', 'favor', 'n/a', 'https://forvo.com/word/gunst/#nl', false, false, 859, NULL);
-INSERT INTO public.vocabulary VALUES ('het leger', 'the army', NULL, 'https://forvo.com/word/leger/#nl', false, false, 2082, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de oefening', 'the exercise', NULL, 'https://forvo.com/word/oefening/#nl', false, false, 2083, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('metalen', 'metal', 'n/a', 'https://forvo.com/word/metalen/#nl', false, false, 710, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('verre', 'distant', 'n/a', 'https://forvo.com/word/verre/#nl', false, false, 396, NULL);
-INSERT INTO public.vocabulary VALUES ('vullen', 'fill', 'n/a', 'https://forvo.com/word/vullen/#nl', false, false, 397, NULL);
-INSERT INTO public.vocabulary VALUES ('spraak', 'speech', 'n/a', 'https://forvo.com/word/spraak/#nl', false, false, 889, NULL);
-INSERT INTO public.vocabulary VALUES ('vouw', 'crease', 'n/a', 'https://forvo.com/word/vouw/#nl', false, false, 699, NULL);
-INSERT INTO public.vocabulary VALUES ('de coffeeshop', 'bar where soft drugs is sold', NULL, 'https://forvo.com/word/coffeeshop/#nl', false, false, 1400, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('werk', 'job/work', 'n/a', 'https://forvo.com/word/werk/#nl', false, false, 581, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('plek', 'spot', 'n/a', 'https://forvo.com/word/plek/#nl', false, false, 845, NULL);
-INSERT INTO public.vocabulary VALUES ('de rode kaart', 'the red card', NULL, '#', false, false, 1619, 'football');
-INSERT INTO public.vocabulary VALUES ('spoor', 'rail/track', 'n/a', 'https://forvo.com/word/spoor/#nl', false, false, 794, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de suiker', 'the sugar', NULL, 'https://forvo.com/word/suiker/#nl', false, false, 1867, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de badkamer', 'the bathroom', NULL, 'https://forvo.com/word/badkamer/#nl', false, false, 1425, 'household');
-INSERT INTO public.vocabulary VALUES ('ja', 'yes', NULL, 'https://forvo.com/word/ja/#nl', false, false, 1108, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de geur', 'the smell', NULL, 'https://forvo.com/word/geur/#nl', false, false, 1836, 'cooking');
-INSERT INTO public.vocabulary VALUES ('kookplaten', 'ring', 'n/a', 'https://forvo.com/word/kookplaten/#nl', false, false, 779, NULL);
-INSERT INTO public.vocabulary VALUES ('tussen', 'between', NULL, 'https://forvo.com/word/tussen/#nl', false, false, 1340, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('het midden', 'the middle', NULL, 'https://forvo.com/word/midden/#nl', true, false, 1341, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('nee', 'no', NULL, 'https://forvo.com/word/nee/#nl', false, true, 1109, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de lamp', 'the lamp', NULL, 'https://forvo.com/word/lamp/#nl', false, false, 1413, 'household');
-INSERT INTO public.vocabulary VALUES ('de fiets', 'the bicycle', NULL, 'https://forvo.com/word/fiets/#nl', false, false, 1300, 'dutch symbols');
-INSERT INTO public.vocabulary VALUES ('hockeyen', 'to play hockey', NULL, 'https://forvo.com/word/hockeyen/#nl', false, false, 1369, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('het vlees', 'the meat', NULL, 'https://forvo.com/word/vlees/#nl', false, false, 1164, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('divisie', 'division', 'n/a', 'https://forvo.com/word/divisie/#nl', false, false, 856, NULL);
-INSERT INTO public.vocabulary VALUES ('vrouw', 'wife, woman', 'n/a', 'https://forvo.com/word/vrouw/#nl', false, false, 965, 'family');
-INSERT INTO public.vocabulary VALUES ('gaan', 'to go', NULL, 'https://forvo.com/word/gaan/#nl', false, false, 1250, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('vragen', 'to ask', NULL, 'https://forvo.com/word/vragen/#nl', false, false, 1251, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('daarom', 'that’s why', NULL, 'https://forvo.com/word/daarom/#nl', false, false, 1192, 'question words');
-INSERT INTO public.vocabulary VALUES ('vestigen', 'settle', 'n/a', 'https://forvo.com/word/vestigen/#nl', false, false, 524, NULL);
-INSERT INTO public.vocabulary VALUES ('buurman', 'neighbor', 'n/a', 'https://forvo.com/word/buurman/#nl', false, false, 807, NULL);
-INSERT INTO public.vocabulary VALUES ('snel', 'fast/quick', NULL, 'https://forvo.com/word/snel/#nl', false, false, 1291, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('oranje', 'orange', NULL, 'https://forvo.com/word/oranje/#nl', false, false, 1977, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('controle', 'control', 'n/a', 'https://forvo.com/word/controle/#nl', false, false, 650, NULL);
-INSERT INTO public.vocabulary VALUES ('de rust', 'half time', NULL, 'https://forvo.com/word/rust/#nl', false, false, 1611, 'football');
-INSERT INTO public.vocabulary VALUES ('zwaar', 'heavy', NULL, 'https://forvo.com/word/zwaar/#nl', false, false, 1288, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de hoer', 'the prostitute', NULL, 'https://forvo.com/word/hoer/#nl', false, false, 1404, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('ding', 'thing', 'n/a', 'https://forvo.com/word/ding/#nl', false, false, 171, NULL);
-INSERT INTO public.vocabulary VALUES ('de griep', 'the flu', NULL, 'https://forvo.com/word/griep/#nl', false, false, 1713, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het fietspad', 'the bicycle track', NULL, 'https://forvo.com/word/fietspad/#nl', false, false, 1396, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('wedstrijd', 'match', 'n/a', 'https://forvo.com/word/wedstrijd/#nl', false, false, 914, NULL);
-INSERT INTO public.vocabulary VALUES ('de verkering', 'the relationship (love)', NULL, 'https://forvo.com/word/verkering/#nl', false, false, 1561, 'family');
-INSERT INTO public.vocabulary VALUES ('de bij', 'the bee', NULL, 'https://forvo.com/word/bij/#nl', false, false, 1592, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de vlinder', 'the butterfly', NULL, 'https://forvo.com/word/vlinder/#nl', false, false, 1593, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de spin', 'the spider', NULL, 'https://forvo.com/word/spin/#nl', false, false, 1594, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('koord', 'string', 'n/a', 'https://forvo.com/word/koord/#nl', false, false, 815, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de voetbal', 'the football', NULL, 'https://forvo.com/word/voetbal/#nl', false, false, 1595, 'football');
-INSERT INTO public.vocabulary VALUES ('vertrouwen', 'to trust', NULL, 'https://forvo.com/word/vertrouwen/#nl', false, false, 1900, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('serieus', 'serious', NULL, 'https://forvo.com/word/serieus/#nl', false, false, 1819, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('de maaltijd', 'the meal', NULL, 'https://forvo.com/word/maaltijd/#nl', false, false, 1820, 'cooking');
-INSERT INTO public.vocabulary VALUES ('elementaire', 'basic', 'n/a', 'https://forvo.com/word/elementaire/#nl', false, false, 945, NULL);
-INSERT INTO public.vocabulary VALUES ('of', 'or/whether', NULL, 'https://forvo.com/word/of/#nl', false, false, 1116, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('het grachtenpand', 'the canal house', NULL, 'https://forvo.com/word/grachtenpand/#nl', false, false, 1385, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('drinken', 'to drink', NULL, 'https://forvo.com/word/drinken/#nl', false, false, 1256, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('horen', 'to hear', NULL, 'https://forvo.com/word/horen/#nl', false, false, 1259, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('lente/voorjaar', 'spring', NULL, 'https://forvo.com/word/lente/#nl', false, false, 1326, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de vriendin', 'the (girl) friend', NULL, 'https://forvo.com/word/vriendin/#nl', false, false, 1557, 'family');
-INSERT INTO public.vocabulary VALUES ('praten', 'to talk', NULL, 'https://forvo.com/word/praten/#nl', false, false, 1269, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('de klasgenoot', 'the classmate', NULL, 'https://forvo.com/word/klasgenoot/#nl', false, false, 1560, 'family');
-INSERT INTO public.vocabulary VALUES ('plat, flat', 'flat', NULL, 'https://forvo.com/word/plat/#nl', false, false, 1984, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('ruiken', 'to smell', NULL, 'https://forvo.com/word/ruiken/#nl', false, false, 2100, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('kwart voor zeven ‘s ochtends', 'quarter to seven am', '', '#', false, false, 1074, 'time');
-INSERT INTO public.vocabulary VALUES ('de strafschop', 'the penalty', NULL, 'https://forvo.com/word/strafschop/#nl', false, false, 1621, 'football');
-INSERT INTO public.vocabulary VALUES ('decimaal', 'decimal', 'n/a', 'https://forvo.com/word/decimaal/#nl', false, false, 651, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de broer', 'the brother', NULL, 'https://forvo.com/word/broer/#nl', false, false, 1546, 'family');
-INSERT INTO public.vocabulary VALUES ('de streek', 'the region', NULL, 'https://forvo.com/word/streek/#nl', false, false, 1742, 'geography');
-INSERT INTO public.vocabulary VALUES ('de stad', 'the city', NULL, 'https://forvo.com/word/stad/#nl', false, false, 1743, 'geography');
-INSERT INTO public.vocabulary VALUES ('winkel', 'store/shop', 'n/a', 'https://forvo.com/word/winkel/#nl', false, false, 557, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('stappen', 'to go out (and drink)', NULL, 'https://forvo.com/word/stappen/#nl', false, false, 1373, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('boven', 'above, top, up, upstairs', NULL, 'https://forvo.com/word/boven/#nl', false, false, 1337, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('rechtstreeks', 'direct', 'n/a', 'https://forvo.com/word/rechtstreeks/#nl', false, false, 320, NULL);
-INSERT INTO public.vocabulary VALUES ('gehouden', 'kept/held', 'n/a', 'https://forvo.com/word/gehouden/#nl', false, false, 577, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('win', 'win', 'n/a', 'https://forvo.com/word/win/#nl', false, false, 938, NULL);
-INSERT INTO public.vocabulary VALUES ('ijzer', 'iron', 'n/a', 'https://forvo.com/word/ijzer/#nl', false, false, 692, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('huid', 'skin', 'n/a', 'https://forvo.com/word/huid/#nl', false, false, 697, 'body');
-INSERT INTO public.vocabulary VALUES ('hoe', 'how', NULL, 'https://forvo.com/word/hoe/#nl', false, false, 1188, 'question words');
-INSERT INTO public.vocabulary VALUES ('resultaat', 'result', 'n/a', 'https://forvo.com/word/resultaat/#nl', false, false, 723, NULL);
-INSERT INTO public.vocabulary VALUES ('de vertegenwoordiger', 'the representative', NULL, 'https://forvo.com/word/vertegenwoordiger/#nl', false, false, 1147, 'professions');
-INSERT INTO public.vocabulary VALUES ('het (onder)hemd', 'the undershirt', NULL, 'https://forvo.com/word/onderhemd/#nl', false, false, 1475, 'clothes');
-INSERT INTO public.vocabulary VALUES ('vereisen', 'require', 'n/a', 'https://forvo.com/word/vereisen/#nl', false, false, 993, NULL);
-INSERT INTO public.vocabulary VALUES ('dame', 'lady', 'n/a', 'https://forvo.com/word/dame/#nl', false, false, 622, NULL);
-INSERT INTO public.vocabulary VALUES ('passeren', 'pass', 'n/a', 'https://forvo.com/word/passeren/#nl', false, false, 346, NULL);
-INSERT INTO public.vocabulary VALUES ('de mug', 'the mosquito', NULL, 'https://forvo.com/word/mug/#nl', false, false, 2036, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('glas', 'glass', 'n/a', 'https://forvo.com/word/glas/#nl', false, false, 578, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('meester', 'master', 'n/a', 'https://forvo.com/word/meester/#nl', false, false, 852, NULL);
-INSERT INTO public.vocabulary VALUES ('fractie', 'fraction', 'n/a', 'https://forvo.com/word/fractie/#nl', false, false, 552, NULL);
-INSERT INTO public.vocabulary VALUES ('waarom', 'why', NULL, 'https://forvo.com/word/waarom/#nl', false, false, 1191, 'question words');
-INSERT INTO public.vocabulary VALUES ('deze', 'these, this', NULL, 'https://forvo.com/word/deze/#nl', false, false, 1179, 'question words');
-INSERT INTO public.vocabulary VALUES ('de brief', 'the letter', NULL, 'https://forvo.com/word/brief/#nl', false, false, 1520, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('kolonie', 'colony', 'n/a', 'https://forvo.com/word/kolonie/#nl', false, false, 831, NULL);
-INSERT INTO public.vocabulary VALUES ('nul', 'zero', NULL, 'https://forvo.com/word/nul/#nl', false, false, 1222, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('dak', 'the roof', NULL, 'https://forvo.com/word/dak/#nl', false, false, 2102, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('werken', 'to work/operate', NULL, 'https://forvo.com/word/werken/#nl', false, false, 1272, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('waaien', 'to blow', NULL, 'https://forvo.com/word/waaien/#nl', false, false, 1674, 'weather');
-INSERT INTO public.vocabulary VALUES ('vieren', 'to celebrate', NULL, 'https://forvo.com/word/vieren/#nl', false, false, 1998, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('de friet', 'the French fries', NULL, 'https://forvo.com/word/friet/#nl', true, false, 1166, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('laag', 'low', NULL, 'https://forvo.com/word/laag/#nl', true, false, 1299, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('papa/dad', 'dad', NULL, 'https://forvo.com/word/papa/#nl', true, false, 1543, 'family');
-INSERT INTO public.vocabulary VALUES ('de halte', 'the stopping place', NULL, 'https://forvo.com/word/halte/#nl', false, false, 1204, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de bekende', 'the acquaintance', NULL, 'https://forvo.com/word/bekende/#nl', false, false, 1559, 'family');
-INSERT INTO public.vocabulary VALUES ('menigte', 'crowd', 'n/a', 'https://forvo.com/word/menigte/#nl', false, false, 811, NULL);
-INSERT INTO public.vocabulary VALUES ('systeem', 'system', 'n/a', 'https://forvo.com/word/systeem/#nl', false, false, 368, NULL);
-INSERT INTO public.vocabulary VALUES ('vol/volledige', 'full', NULL, 'https://forvo.com/word/vol/#nl', false, false, 1697, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('haten', 'to hate', NULL, 'https://forvo.com/word/haten/#nl', false, false, 1885, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('delen', 'to share', NULL, 'https://forvo.com/word/delen/#nl', false, false, 1886, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('natuurlijk', 'of course', NULL, 'https://forvo.com/word/natuurlijk/#nl', false, false, 1942, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('specerij', 'spice', NULL, 'https://forvo.com/word/specerij/#nl', false, false, 2152, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('vijf voor half zeven', 'twenty five past six', '', '#', false, false, 1059, 'time');
-INSERT INTO public.vocabulary VALUES ('naar beneden', 'down', 'n/a', 'https://forvo.com/word/beneden/#nl', false, false, 197, NULL);
-INSERT INTO public.vocabulary VALUES ('hebben', 'to have', NULL, 'https://forvo.com/word/hebben/#nl', false, false, 1248, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('toelaten', 'allow', 'n/a', 'https://forvo.com/word/toelaten/#nl', false, false, 842, NULL);
-INSERT INTO public.vocabulary VALUES ('kreeg', 'got', 'n/a', 'https://forvo.com/word/kreeg/#nl', false, false, 282, NULL);
-INSERT INTO public.vocabulary VALUES ('gooien', 'throw', 'n/a', 'https://forvo.com/word/gooien/#nl', false, false, 984, NULL);
-INSERT INTO public.vocabulary VALUES ('wat voor weer wordt het?', 'what will be the weather?', NULL, '#', false, false, 1656, 'weather');
-INSERT INTO public.vocabulary VALUES ('stel', 'imagine', 'n/a', 'https://forvo.com/word/stel/#nl', false, false, 795, NULL);
-INSERT INTO public.vocabulary VALUES ('staan', 'to stand', NULL, 'https://forvo.com/word/staan/#nl', false, false, 1644, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('de graad', 'the degree', NULL, 'https://forvo.com/word/graad/#nl', false, false, 1666, 'weather');
-INSERT INTO public.vocabulary VALUES ('het stof', 'the dust', NULL, 'https://forvo.com/word/stof/#nl', false, false, 1935, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de stof', 'the material', NULL, 'https://forvo.com/word/stof/#nl', false, false, 1936, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de aarde', 'the earth', NULL, 'https://forvo.com/word/aarde/#nl', false, false, 1937, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('iets', 'something', NULL, 'https://forvo.com/word/iets/#nl', false, false, 1938, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('groep', 'group', 'n/a', 'https://forvo.com/word/groep/#nl', false, false, 287, NULL);
-INSERT INTO public.vocabulary VALUES ('derde', 'third', 'n/a', 'https://forvo.com/word/derde/#nl', false, false, 715, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('herinneren', 'to remember', NULL, 'https://forvo.com/word/herinneren/#nl', false, false, 1651, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('ei', 'egg', 'n/a', 'https://forvo.com/word/ei/#nl', false, false, 507, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('ontslaan', 'to fire', NULL, 'https://forvo.com/word/ontslaan/#nl', false, false, 1541, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de kop', 'the head', NULL, 'https://forvo.com/word/kop/#nl', false, false, 1435, 'body');
-INSERT INTO public.vocabulary VALUES ('noemen', 'to call', NULL, 'https://forvo.com/word/noemen/#nl', false, false, 1908, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('stroom', 'stream', 'n/a', 'https://forvo.com/word/stroom/#nl', false, false, 823, NULL);
-INSERT INTO public.vocabulary VALUES ('oost(en)', 'east', NULL, 'https://forvo.com/word/oost/#nl', false, false, 2077, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('de stropdas', 'the tie', NULL, 'https://forvo.com/word/stropdas/#nl', false, false, 1480, 'clothes');
-INSERT INTO public.vocabulary VALUES ('oever', 'shore', 'n/a', 'https://forvo.com/word/oever/#nl', false, false, 855, 'nature');
-INSERT INTO public.vocabulary VALUES ('stof', 'dust/substance', 'noun', 'https://forvo.com/word/stof/#nl', false, false, 1009, 'household');
-INSERT INTO public.vocabulary VALUES ('genieten', 'to enjoy', NULL, 'https://forvo.com/word/genieten/#nl', false, false, 1891, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('wit', 'white', NULL, 'https://forvo.com/word/wit/#nl', false, false, 1978, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('elk', 'each', NULL, 'https://forvo.com/word/elk/#nl', false, false, 1991, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('glad', 'slippery', NULL, 'https://forvo.com/word/glad/#nl', false, false, 2064, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('beroemd', 'famous', NULL, 'https://forvo.com/word/beroemd/#nl', false, false, 2065, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('kamperen', 'to camp out', NULL, 'https://forvo.com/word/kamperen/#nl', false, false, 1358, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('het strand', 'the beach', NULL, 'https://forvo.com/word/strand/#nl', false, false, 1359, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('de wolk', 'the cloud', NULL, 'https://forvo.com/word/wolk/#nl', false, false, 1679, 'weather');
-INSERT INTO public.vocabulary VALUES ('de snelweg', 'the highway', NULL, 'https://forvo.com/word/snelweg/#nl', false, false, 1199, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('hardlopen', 'to run', NULL, 'https://forvo.com/word/hardlopen/#nl', false, false, 1366, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('missen', 'to miss', 'n/a', 'https://forvo.com/word/miss/#nl', false, false, 389, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('volgen', 'to follow', NULL, 'https://forvo.com/word/volgen/#nl', false, false, 1500, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('gebeuren', 'to happen', NULL, 'https://forvo.com/word/gebeuren/#nl', false, false, 1501, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('de bliksem', 'the lightning', NULL, 'https://forvo.com/word/bliksem/#nl', false, false, 1677, 'weather');
-INSERT INTO public.vocabulary VALUES ('de donder', 'the thunder', NULL, 'https://forvo.com/word/donder/#nl', false, false, 1678, 'weather');
-INSERT INTO public.vocabulary VALUES ('schoon', 'clean', NULL, 'https://forvo.com/word/schoon/#nl', false, false, 1278, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('gebruikelijk/gemeenschappelijke', 'common', NULL, 'https://forvo.com/word/gebruikelijk/#nl', false, false, 2059, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('geen', 'no / none', NULL, 'https://forvo.com/word/geen/#nl', false, false, 2121, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het verschil', 'the difference', NULL, 'https://forvo.com/word/verschil/#nl', false, false, 2124, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('bedoelen', 'to mean', NULL, 'https://forvo.com/word/bedoelen/#nl', false, false, 1631, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('nemen', 'to take', NULL, 'https://forvo.com/word/nemen/#nl', false, false, 1633, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('auto', 'car', 'n/a', 'https://forvo.com/word/auto/#nl', false, false, 298, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('stok', 'stick', 'n/a', 'https://forvo.com/word/stok/#nl', false, false, 694, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('weg', 'road', 'n/a', 'https://forvo.com/word/weg/#nl', false, false, 493, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('warmte', 'heat', 'n/a', 'https://forvo.com/word/warmte/#nl', false, false, 391, NULL);
-INSERT INTO public.vocabulary VALUES ('melk', 'milk', 'n/a', 'https://forvo.com/word/melk/#nl', false, false, 671, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('ijs', 'ice', 'n/a', 'https://forvo.com/word/ijs/#nl', false, false, 528, 'nature');
-INSERT INTO public.vocabulary VALUES ('broer', 'brother', 'n/a', 'https://forvo.com/word/broer/#nl', false, false, 506, 'family');
-INSERT INTO public.vocabulary VALUES ('cirkel', 'circle', 'n/a', 'https://forvo.com/word/cirkel/#nl', false, false, 530, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('lol', 'fun', 'n/a', 'https://forvo.com/word/lol/#nl', false, false, 587, NULL);
-INSERT INTO public.vocabulary VALUES ('vijg', 'fig', 'n/a', 'https://forvo.com/word/vijg/#nl', false, false, 917, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('bedden', 'bed', 'n/a', 'https://forvo.com/word/bedden/#nl', false, false, 505, 'household');
-INSERT INTO public.vocabulary VALUES ('geld', 'money', 'n/a', 'https://forvo.com/word/geld/#nl', false, false, 490, NULL);
-INSERT INTO public.vocabulary VALUES ('seconde', 'second', 'noun', 'https://forvo.com/word/seconde/#nl', false, false, 1044, 'time');
-INSERT INTO public.vocabulary VALUES ('de maand', 'the month', NULL, 'https://forvo.com/word/maand/#nl', false, false, 1311, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('het pak', 'the suit', NULL, 'https://forvo.com/word/pak/#nl', false, false, 1478, 'clothes');
-INSERT INTO public.vocabulary VALUES ('leren', 'to learn, to teach', NULL, 'https://forvo.com/word/leren/#nl', false, false, 1264, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('Pasen', 'Easter', NULL, 'https://forvo.com/word/Pasen/#nl', false, false, 2012, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('bewegen', 'to move', NULL, 'https://forvo.com/word/bewegen/#nl', false, false, 1632, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('zus', 'sister', 'n/a', 'https://forvo.com/word/zus/#nl', false, false, 920, 'family');
-INSERT INTO public.vocabulary VALUES ('de student', 'the student', NULL, 'https://forvo.com/word/student/#nl', false, false, 1131, 'professions');
-INSERT INTO public.vocabulary VALUES ('driehoek', 'triangle', 'n/a', 'https://forvo.com/word/driehoek/#nl', false, false, 827, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('sense', 'sense', 'n/a', 'https://forvo.com/word/sense/#nl', true, false, 751, NULL);
-INSERT INTO public.vocabulary VALUES ('kind', 'child', 'n/a', 'https://forvo.com/word/kind/#nl', false, true, 666, 'family');
-INSERT INTO public.vocabulary VALUES ('planeet', 'planet', 'n/a', 'https://forvo.com/word/planeet/#nl', false, false, 828, 'nature');
-INSERT INTO public.vocabulary VALUES ('de kast', 'the closet', NULL, 'https://forvo.com/word/kast/#nl', false, false, 1415, 'household');
-INSERT INTO public.vocabulary VALUES ('anamnese', 'medical history', NULL, 'https://forvo.com/word/anamnese/#nl', false, false, 2145, 'doctor');
-INSERT INTO public.vocabulary VALUES ('lief', 'lovely, sweet', NULL, 'https://forvo.com/word/lief/#nl', false, false, 1292, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('stout', 'naughty', NULL, 'https://forvo.com/word/stout/#nl', false, false, 1293, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('immigreren', 'to immigrate', NULL, 'https://forvo.com/word/immigreren/#nl', false, false, 1766, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de kerstman', 'Santa Claus', NULL, 'https://forvo.com/word/kerstman/#nl', false, false, 2007, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('paar', 'pair', 'n/a', 'https://forvo.com/word/paar/#nl', false, false, 531, NULL);
-INSERT INTO public.vocabulary VALUES ('zwak', 'weak', NULL, 'https://forvo.com/word/zwak/#nl', false, false, 2071, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('het spreekuur', 'the consultation hours', NULL, 'https://forvo.com/word/spreekuur/#nl', false, false, 1725, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de hagelslag', 'the chocolate sprinkles', NULL, 'https://forvo.com/word/hagelslag/#nl', false, false, 1154, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de eekhoorn', 'the squirrel', NULL, 'https://forvo.com/word/eekhoorn/#nl', false, false, 2039, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('het schot', 'the shot', NULL, 'https://forvo.com/word/schot/#nl', false, false, 1614, 'football');
-INSERT INTO public.vocabulary VALUES ('de redding', 'the save', NULL, 'https://forvo.com/word/redding/#nl', false, false, 1615, 'football');
-INSERT INTO public.vocabulary VALUES ('redden', 'to save', NULL, 'https://forvo.com/word/redden/#nl', false, false, 1616, 'football');
-INSERT INTO public.vocabulary VALUES ('de voorzet', 'the assist', NULL, 'https://forvo.com/word/voorzet/#nl', false, false, 1617, 'football');
-INSERT INTO public.vocabulary VALUES ('echt', 'real', NULL, 'https://forvo.com/word/echt/#nl', false, false, 1696, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('lettergreep', 'syllable', 'n/a', 'https://forvo.com/word/lettergreep/#nl', false, false, 534, 'grammar');
-INSERT INTO public.vocabulary VALUES ('bloed', 'blood', 'n/a', 'https://forvo.com/word/bloed/#nl', false, false, 628, 'body');
-INSERT INTO public.vocabulary VALUES ('persoon', 'person', 'n/a', 'https://forvo.com/word/persoon/#nl', false, false, 489, NULL);
-INSERT INTO public.vocabulary VALUES ('gras', 'grass', 'n/a', 'https://forvo.com/word/gras/#nl', false, false, 579, 'nature');
-INSERT INTO public.vocabulary VALUES ('huis', 'house', 'n/a', 'https://forvo.com/word/huis/#nl', false, false, 88, 'household');
-INSERT INTO public.vocabulary VALUES ('duw', 'push', 'n/a', 'https://forvo.com/word/duw/#nl', false, false, 712, NULL);
-INSERT INTO public.vocabulary VALUES ('de nicht', 'the cousin, the niece', NULL, 'https://forvo.com/word/nicht/#nl', false, false, 1553, 'family');
-INSERT INTO public.vocabulary VALUES ('frietje met', 'French fries with mayonnaise', NULL, 'https://forvo.com/word/frietje/#nl', false, false, 1167, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de frikandel', 'Dutch meat sausage', NULL, 'https://forvo.com/word/frikandel/#nl', false, false, 1168, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de leeuw', 'the lion', NULL, 'https://forvo.com/word/leeuw/#nl', false, false, 2054, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('gezond', 'healthy', NULL, 'https://forvo.com/word/gezond/#nl', false, false, 1710, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de opleiding', 'the education', NULL, 'https://forvo.com/word/opleiding/#nl', false, false, 1523, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de ervaring', 'the experience', NULL, 'https://forvo.com/word/ervaring/#nl', false, false, 1524, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de aanval', 'the attack', NULL, 'https://forvo.com/word/aanval/#nl', false, false, 2085, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de wortel', 'the carrot', NULL, 'https://forvo.com/word/wortel/#nl', false, false, 1851, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('veilig', 'safe', NULL, 'https://forvo.com/word/veilig/#nl', false, false, 2080, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('gevaarlijk', 'dangerous', NULL, 'https://forvo.com/word/gevaarlijk/#nl', false, false, 2081, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de supporter', 'the fan', NULL, 'https://forvo.com/word/supporter/#nl', false, false, 1608, 'football');
-INSERT INTO public.vocabulary VALUES ('de steen', 'the stone', NULL, 'https://forvo.com/word/steen/#nl', false, false, 1934, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('zaterdag', 'Saturday', NULL, 'https://forvo.com/word/zaterdag/#nl', false, false, 1309, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de rekenmachine', 'the calculator', NULL, 'https://forvo.com/word/rekenmachine/#nl', false, false, 1915, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de peer', 'the pear', NULL, 'https://forvo.com/word/peer/#nl', false, false, 1869, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de banaan', 'the banana', NULL, 'https://forvo.com/word/banaan/#nl', false, false, 1870, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('vrije tijd', 'leisure time', NULL, '#', false, false, 1354, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('niveau', 'level', 'n/a', 'https://forvo.com/word/niveau/#nl', false, false, 979, NULL);
-INSERT INTO public.vocabulary VALUES ('de bank', 'the couch', NULL, 'https://forvo.com/word/bank/#nl', false, false, 1422, 'household');
-INSERT INTO public.vocabulary VALUES ('iedereen', 'everybody', NULL, 'https://forvo.com/word/iedereen/#nl', false, false, 2127, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('samen', 'together', NULL, 'https://forvo.com/word/samen/#nl', false, false, 2128, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('dichtbij', 'nearby', NULL, 'https://forvo.com/word/dichtbij/#nl', false, false, 2129, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het eiland', 'the island', NULL, 'https://forvo.com/word/eiland/#nl', false, false, 1398, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het gesprek', 'the conversation, the interview', NULL, 'https://forvo.com/word/gesprek/#nl', false, false, 1525, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('land', 'land/country', 'n/a', 'https://forvo.com/word/land/#nl', false, false, 71, 'geography');
-INSERT INTO public.vocabulary VALUES ('de verkoper', 'the salesman', NULL, 'https://forvo.com/word/verkoper/#nl', false, false, 1146, 'professions');
-INSERT INTO public.vocabulary VALUES ('om tien uur', 'at ten o’clock', '', '#', false, false, 1051, 'time');
-INSERT INTO public.vocabulary VALUES ('links', 'left', NULL, 'https://forvo.com/word/links/#nl', false, false, 1114, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('een', 'a/an/any', NULL, 'https://forvo.com/word/een/#nl', false, false, 1081, 'introductory');
-INSERT INTO public.vocabulary VALUES ('het nieuws', 'the news', NULL, 'https://forvo.com/word/nieuws/#nl', false, false, 2088, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de krant', 'the newspaper', NULL, 'https://forvo.com/word/krant/#nl', false, false, 2089, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de vlag', 'the flag', NULL, 'https://forvo.com/word/vlag/#nl', false, false, 2090, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('tanden', 'teeth', 'n/a', 'https://forvo.com/word/tanden/#nl', false, false, 899, 'body');
-INSERT INTO public.vocabulary VALUES ('nacht', 'night', 'n/a', 'https://forvo.com/word/nacht/#nl', false, false, 247, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('origineel', 'original', 'n/a', 'https://forvo.com/word/origineel/#nl', false, false, 866, NULL);
-INSERT INTO public.vocabulary VALUES ('kwart voor zeven', 'quarter to seven', '', '#', false, false, 1056, 'time');
-INSERT INTO public.vocabulary VALUES ('de ochtend, de morgen', 'the morning', '', 'https://forvo.com/word/ochtend/#nl', false, false, 1068, 'time');
-INSERT INTO public.vocabulary VALUES ('de olifant', 'the elephant', NULL, 'https://forvo.com/word/olifant/#nl', false, false, 2046, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de beer', 'the bear', NULL, 'https://forvo.com/word/beer/#nl', false, false, 2047, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('ik', 'I', NULL, 'https://forvo.com/word/ik/#nl', false, false, 1078, 'introductory');
-INSERT INTO public.vocabulary VALUES ('ik heet', 'my name is', NULL, 'https://forvo.com/word/heet/#nl', false, false, 1079, 'introductory');
-INSERT INTO public.vocabulary VALUES ('ik ben', 'I am', NULL, 'https://forvo.com/word/ben/#nl', false, false, 1080, 'introductory');
-INSERT INTO public.vocabulary VALUES ('de', 'the', NULL, 'https://forvo.com/word/de/#nl', false, false, 1082, 'introductory');
-INSERT INTO public.vocabulary VALUES ('twintig voor vijf', 'twenty to five', '', '#', false, false, 1062, 'time');
-INSERT INTO public.vocabulary VALUES ('toekomst', 'the future', NULL, 'https://forvo.com/word/toekomst/#nl', false, false, 2091, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('Oudjaar', 'New year’s eve', NULL, 'https://forvo.com/word/Oudjaar/#nl', false, false, 2008, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('de oliebol', 'Dutch fritter with raisins', NULL, 'https://forvo.com/word/oliebol/#nl', false, false, 2009, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('van twee uur tot vijf uur', 'from two till five o’clock', '', '#', false, false, 1065, 'time');
-INSERT INTO public.vocabulary VALUES ('voeren', 'enter', 'n/a', 'https://forvo.com/word/voeren/#nl', false, false, 835, NULL);
-INSERT INTO public.vocabulary VALUES ('muur', 'wall', 'n/a', 'https://forvo.com/word/muur/#nl', false, false, 565, 'household');
-INSERT INTO public.vocabulary VALUES ('minder', 'less', NULL, 'https://forvo.com/word/minder/#nl', false, false, 1964, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('sectie', 'section', 'n/a', 'https://forvo.com/word/sectie/#nl', true, false, 677, 'grammar');
-INSERT INTO public.vocabulary VALUES ('zuid(en)', 'south', NULL, 'https://forvo.com/word/zuid/#nl', true, false, 2078, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('vriend', 'friend', 'n/a', 'https://forvo.com/word/vriend/#nl', false, false, 258, NULL);
-INSERT INTO public.vocabulary VALUES ('de jongen', 'the boy', NULL, 'https://forvo.com/word/jongen/#nl', false, true, 1086, 'introductory');
-INSERT INTO public.vocabulary VALUES ('de middag', 'the afternoon', '', 'https://forvo.com/word/middag/#nl', true, false, 1070, 'time');
-INSERT INTO public.vocabulary VALUES ('de moeder', 'the mother', NULL, 'https://forvo.com/word/moeder/#nl', true, false, 1544, 'family');
-INSERT INTO public.vocabulary VALUES ('ontwerp', 'design', 'n/a', 'https://forvo.com/word/ontwerp/#nl', false, false, 686, NULL);
-INSERT INTO public.vocabulary VALUES ('de machine', 'the machine', NULL, 'https://forvo.com/word/machine/#nl', false, false, 1914, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('maar', 'but', NULL, 'https://forvo.com/word/maar/#nl', false, false, 1195, 'question words');
-INSERT INTO public.vocabulary VALUES ('laten', 'to leave, let', NULL, 'https://forvo.com/word/laten/#nl', false, false, 1509, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('de doelverdediger', 'the goalkeeper', NULL, 'https://forvo.com/word/doelverdediger/#nl', false, false, 1606, 'football');
-INSERT INTO public.vocabulary VALUES ('misverstand', 'misunderstanding', 'noun', 'https://forvo.com/word/misverstand/#nl', false, false, 1028, NULL);
-INSERT INTO public.vocabulary VALUES ('zinsnede', 'phrase', 'n/a', 'https://forvo.com/word/zinsnede/#nl', false, false, 735, 'grammar');
-INSERT INTO public.vocabulary VALUES ('de bijkeuken', 'the scullery', NULL, 'https://forvo.com/word/bijkeuken/#nl', false, false, 1428, 'household');
-INSERT INTO public.vocabulary VALUES ('wassen', 'to wash', NULL, 'https://forvo.com/word/wassen/#nl', false, false, 1883, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('gedragen', 'to behave', NULL, 'https://forvo.com/word/gedragen/#nl', false, false, 1884, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('kalm', 'calm', NULL, 'https://forvo.com/word/kalm/#nl', false, false, 2143, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('verwachten', 'to expect', NULL, 'https://forvo.com/word/verwachten/#nl', false, false, 1901, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('in verwachting', 'expecting (a baby)', NULL, 'https://forvo.com/word/verwachting/#nl', false, false, 1902, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('zwanger', 'pregnant', NULL, 'https://forvo.com/word/zwanger/#nl', false, false, 1903, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('aardrijkskunde', 'geography', NULL, 'https://forvo.com/word/aardrijkskunde/#nl', false, false, 1739, 'geography');
-INSERT INTO public.vocabulary VALUES ('de makelaar', 'the real estate agent', NULL, 'https://forvo.com/word/makelaar/#nl', false, false, 1771, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de minuut', 'the minute', '', 'https://forvo.com/word/minuut/#nl', false, false, 1057, 'time');
-INSERT INTO public.vocabulary VALUES ('het varken', 'the pig', NULL, 'https://forvo.com/word/varken/#nl', false, false, 1577, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de reiskostenvergoeding', 'the compensation for travel expenses', NULL, 'https://forvo.com/word/reiskostenvergoeding/#nl', false, false, 1538, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de hobby', 'the hobby', NULL, 'https://forvo.com/word/hobby/#nl', false, false, 1355, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('de vakantie', 'the holiday', NULL, 'https://forvo.com/word/vakantie/#nl', false, false, 1357, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('artikel', 'product', 'n/a', 'https://forvo.com/word/artikel/#nl', false, false, 326, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('boot', 'boat', 'n/a', 'https://forvo.com/word/boot/#nl', false, false, 372, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('pand', 'property', 'n/a', 'https://forvo.com/word/pand/#nl', false, false, 986, 'household');
-INSERT INTO public.vocabulary VALUES ('gesneden', 'cut', 'n/a', 'https://forvo.com/word/gesneden/#nl', false, false, 268, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('het ijs', 'the ice', NULL, 'https://forvo.com/word/ijs/#nl', false, false, 1682, 'weather');
-INSERT INTO public.vocabulary VALUES ('niet', 'not, don''t', NULL, 'https://forvo.com/word/niet/#nl', false, false, 1110, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('verslaan', 'beat', 'n/a', 'https://forvo.com/word/verslaan/#nl', false, false, 747, NULL);
-INSERT INTO public.vocabulary VALUES ('vilt', 'felt', 'n/a', 'https://forvo.com/word/vilt/#nl', false, false, 535, NULL);
-INSERT INTO public.vocabulary VALUES ('dikke', 'thick', 'n/a', 'https://forvo.com/word/dikke/#nl', false, false, 758, NULL);
-INSERT INTO public.vocabulary VALUES ('eiland', 'island', 'n/a', 'https://forvo.com/word/eiland/#nl', false, false, 366, 'nature');
-INSERT INTO public.vocabulary VALUES ('voet', 'foot', 'n/a', 'https://forvo.com/word/voet/#nl', false, false, 367, 'body');
-INSERT INTO public.vocabulary VALUES ('werkwoord', 'verb', 'n/a', 'https://forvo.com/word/werkwoord/#nl', false, false, 469, 'grammar');
-INSERT INTO public.vocabulary VALUES ('belangrijk', 'important', NULL, 'https://forvo.com/word/belangrijk/#nl', false, false, 1686, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('beter', 'better', NULL, 'https://forvo.com/word/beter/#nl', false, false, 1687, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de nacht', 'the night', '', 'https://forvo.com/word/nacht/#nl', false, false, 1066, 'time');
-INSERT INTO public.vocabulary VALUES ('heeft', 'has', 'n/a', 'https://forvo.com/word/heeft/#nl', false, false, 175, NULL);
-INSERT INTO public.vocabulary VALUES ('deel', 'part', 'n/a', 'https://forvo.com/word/deel/#nl', false, false, 105, NULL);
-INSERT INTO public.vocabulary VALUES ('grootte', 'size', 'n/a', 'https://forvo.com/word/grootte/#nl', false, false, 522, NULL);
-INSERT INTO public.vocabulary VALUES ('zei', 'said', 'n/a', 'https://forvo.com/word/zei/#nl', false, false, 48, NULL);
-INSERT INTO public.vocabulary VALUES ('de man', 'the man', NULL, 'https://forvo.com/word/man/#nl', false, false, 1084, 'introductory');
-INSERT INTO public.vocabulary VALUES ('de vrouw', 'the woman', NULL, 'https://forvo.com/word/vrouw/#nl', false, false, 1085, 'introductory');
-INSERT INTO public.vocabulary VALUES ('het meisje', 'the girl', NULL, 'https://forvo.com/word/meisje/#nl', false, false, 1087, 'introductory');
-INSERT INTO public.vocabulary VALUES ('procent', 'cent', 'n/a', 'https://forvo.com/word/procent/#nl', false, false, 631, NULL);
-INSERT INTO public.vocabulary VALUES ('variëren', 'vary', 'n/a', 'https://forvo.com/word/variëren/#nl', false, false, 523, NULL);
-INSERT INTO public.vocabulary VALUES ('aftrekken', 'subtract', 'n/a', 'https://forvo.com/word/aftrekken/#nl', false, false, 958, NULL);
-INSERT INTO public.vocabulary VALUES ('streken', 'pranks', 'noun', 'https://forvo.com/word/streken/#nl', false, false, 1026, NULL);
-INSERT INTO public.vocabulary VALUES ('hard', 'hard, fast', NULL, 'https://forvo.com/word/hard/#nl', false, false, 1289, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de strik', 'the bow', NULL, 'https://forvo.com/word/strik/#nl', false, false, 1481, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de krokodil', 'the crocodile', NULL, 'https://forvo.com/word/krokodil/#nl', false, false, 2051, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('bepaalde', 'certain', 'n/a', 'https://forvo.com/word/bepaalde/#nl', false, false, 406, NULL);
-INSERT INTO public.vocabulary VALUES ('het oor', 'the ear', NULL, 'https://forvo.com/word/oor/#nl', false, false, 1438, 'body');
-INSERT INTO public.vocabulary VALUES ('reusachtig', 'huge', 'n/a', 'https://forvo.com/word/reusachtig/#nl', false, false, 919, NULL);
-INSERT INTO public.vocabulary VALUES ('bar', 'bar', 'n/a', 'https://forvo.com/word/bar/#nl', false, false, 873, NULL);
-INSERT INTO public.vocabulary VALUES ('afvragen', 'wonder', 'n/a', 'https://forvo.com/word/afvragen/#nl', false, false, 379, NULL);
-INSERT INTO public.vocabulary VALUES ('meisje', 'girl', 'n/a', 'https://forvo.com/word/meisje/#nl', false, false, 304, NULL);
-INSERT INTO public.vocabulary VALUES ('gelijk', 'equal/equate', NULL, 'https://forvo.com/word/gelijk/#nl', false, false, 1992, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('dertien', 'thirteen', NULL, 'https://forvo.com/word/dertien/#nl', false, false, 1235, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('het onweer', 'the thunderstorm', NULL, 'https://forvo.com/word/onweer/#nl', false, false, 1676, 'weather');
-INSERT INTO public.vocabulary VALUES ('tegen', 'against', NULL, 'https://forvo.com/word/tegen/#nl', false, false, 1347, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('het woord', 'the word', NULL, 'https://forvo.com/word/woord/#nl', false, false, 2139, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('als', 'if, as', NULL, 'https://forvo.com/word/als/#nl', false, false, 2123, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('geschiedenis', 'history', 'n/a', 'https://forvo.com/word/geschiedenis/#nl', false, false, 789, NULL);
-INSERT INTO public.vocabulary VALUES ('welke', 'which', NULL, 'https://forvo.com/word/welke/#nl', false, false, 1178, 'question words');
-INSERT INTO public.vocabulary VALUES ('makkelijk', 'easy', NULL, 'https://forvo.com/word/makkelijk/#nl', false, false, 1995, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('toevoegen', 'add', 'n/a', 'https://forvo.com/word/toevoegen/#nl', false, false, 69, NULL);
-INSERT INTO public.vocabulary VALUES ('ruimte', 'space', 'n/a', 'https://forvo.com/word/ruimte/#nl', false, false, 451, NULL);
-INSERT INTO public.vocabulary VALUES ('vet', 'fat', 'n/a', 'https://forvo.com/word/vet/#nl', false, false, 864, NULL);
-INSERT INTO public.vocabulary VALUES ('man', 'man/husband', 'n/a', 'https://forvo.com/word/man/#nl', false, false, 117, NULL);
-INSERT INTO public.vocabulary VALUES ('natuurlijke', 'natural', 'n/a', 'https://forvo.com/word/natuurlijke/#nl', true, false, 749, 'nature');
-INSERT INTO public.vocabulary VALUES ('de storm', 'the storm', NULL, 'https://forvo.com/word/storm/#nl', false, true, 1675, 'weather');
-INSERT INTO public.vocabulary VALUES ('de framboos', 'the raspberry', NULL, 'https://forvo.com/word/framboos/#nl', false, true, 1878, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('medeklinker', 'consonant', 'n/a', 'https://forvo.com/word/medeklinker/#nl', false, false, 668, 'grammar');
-INSERT INTO public.vocabulary VALUES ('rest', 'rest', 'n/a', 'https://forvo.com/word/rest/#nl', false, false, 421, NULL);
-INSERT INTO public.vocabulary VALUES ('het meer', 'the lake', NULL, 'https://forvo.com/word/meer/#nl', false, false, 1755, 'geography');
-INSERT INTO public.vocabulary VALUES ('moeder', 'mother', 'n/a', 'https://forvo.com/word/moeder/#nl', false, false, 95, 'family');
-INSERT INTO public.vocabulary VALUES ('moeilijk', 'difficult', NULL, 'https://forvo.com/word/moeilijk/#nl', false, false, 1996, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('begon', 'began', 'n/a', 'https://forvo.com/word/begon/#nl', false, false, 259, NULL);
-INSERT INTO public.vocabulary VALUES ('gewoon', 'usual, just', NULL, 'https://forvo.com/word/gewoon/#nl', false, false, 2122, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('vinger', 'finger', 'n/a', 'https://forvo.com/word/vinger/#nl', false, false, 742, 'body');
-INSERT INTO public.vocabulary VALUES ('de naturalisatie', 'the naturalisation', NULL, 'https://forvo.com/word/naturalisatie/#nl', false, false, 1790, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('heimwee', 'homesick', NULL, 'https://forvo.com/word/heimwee/#nl', false, false, 1791, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('bedrijf', 'company', 'n/a', 'https://forvo.com/word/bedrijf/#nl', false, false, 957, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('oversteken', 'cross', 'n/a', 'https://forvo.com/word/oversteken/#nl', false, false, 230, NULL);
-INSERT INTO public.vocabulary VALUES ('gaf', 'gave', 'n/a', 'https://forvo.com/word/gaf/#nl', false, false, 434, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('bot', 'bone', 'n/a', 'https://forvo.com/word/bot/#nl', false, false, 793, 'body');
-INSERT INTO public.vocabulary VALUES ('onrustig', 'restless', NULL, 'https://forvo.com/word/onrustig/#nl', false, false, 1803, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('gevonden', 'found', 'n/a', 'https://forvo.com/word/gevonden/#nl', false, false, 208, NULL);
-INSERT INTO public.vocabulary VALUES ('mijl', 'mile', 'n/a', 'https://forvo.com/word/mijl/#nl', false, false, 296, NULL);
-INSERT INTO public.vocabulary VALUES ('het europees kampioenschap (ek)', 'the european championship', NULL, '#', false, false, 1626, 'football');
-INSERT INTO public.vocabulary VALUES ('houden', 'to hold, to keep', NULL, 'https://forvo.com/word/houden/#nl', false, false, 1504, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('verliezen', 'to lose', NULL, 'https://forvo.com/word/verliezen/#nl', false, false, 1510, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('aannemen', 'to hire', NULL, 'https://forvo.com/word/aannemen/#nl', false, false, 1540, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de fles', 'the bottle', NULL, 'https://forvo.com/word/fles/#nl', false, false, 1847, 'cooking');
-INSERT INTO public.vocabulary VALUES ('edge', 'edge', 'n/a', 'https://forvo.com/word/edge/#nl', false, false, 582, NULL);
-INSERT INTO public.vocabulary VALUES ('hun', 'their', NULL, 'https://forvo.com/word/hun/#nl', false, false, 2120, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('hoek', 'corner', 'n/a', 'https://forvo.com/word/hoek/#nl', false, false, 774, NULL);
-INSERT INTO public.vocabulary VALUES ('methode', 'method', 'n/a', 'https://forvo.com/word/methode/#nl', false, false, 673, NULL);
-INSERT INTO public.vocabulary VALUES ('regeren', 'govern', 'n/a', 'https://forvo.com/word/regeren/#nl', false, false, 497, NULL);
-INSERT INTO public.vocabulary VALUES ('kennisgeving', 'notice', 'n/a', 'https://forvo.com/word/kennisgeving/#nl', false, false, 500, NULL);
-INSERT INTO public.vocabulary VALUES ('hunt', 'hunt', 'n/a', 'https://forvo.com/word/hunt/#nl', false, false, 503, NULL);
-INSERT INTO public.vocabulary VALUES ('zout', 'salt', 'n/a', 'https://forvo.com/word/zout/#nl', false, false, 996, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de tante', 'the aunt', NULL, 'https://forvo.com/word/tante/#nl', false, false, 1550, 'family');
-INSERT INTO public.vocabulary VALUES ('post', 'post', 'n/a', 'https://forvo.com/word/post/#nl', false, false, 861, NULL);
-INSERT INTO public.vocabulary VALUES ('eenmaal', 'once', 'n/a', 'https://forvo.com/word/eenmaal/#nl', false, false, 264, NULL);
-INSERT INTO public.vocabulary VALUES ('sneeuw', 'snow', 'n/a', 'https://forvo.com/word/sneeuw/#nl', false, false, 392, 'nature');
-INSERT INTO public.vocabulary VALUES ('grond', 'ground', 'n/a', 'https://forvo.com/word/grond/#nl', false, false, 465, 'nature');
-INSERT INTO public.vocabulary VALUES ('voorzichtig', 'careful', NULL, 'https://forvo.com/word/voorzichtig/#nl', false, false, 2069, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('aandeel', 'share', 'n/a', 'https://forvo.com/word/aandeel/#nl', false, false, 867, NULL);
-INSERT INTO public.vocabulary VALUES ('millennium', 'millennium', 'noun', 'https://forvo.com/word/millennium/#nl', false, false, 1043, 'time');
-INSERT INTO public.vocabulary VALUES ('de tweede helft', 'the second half', NULL, '#', false, false, 1612, 'football');
-INSERT INTO public.vocabulary VALUES ('voorzijde', 'front', 'n/a', 'https://forvo.com/word/voorzijde/#nl', false, false, 430, NULL);
-INSERT INTO public.vocabulary VALUES ('ochtend', 'morning', 'n/a', 'https://forvo.com/word/ochtend/#nl', false, false, 476, 'time');
-INSERT INTO public.vocabulary VALUES ('de voetballer', 'the football player', NULL, 'https://forvo.com/word/voetballer/#nl', false, false, 1129, 'professions');
-INSERT INTO public.vocabulary VALUES ('slecht weer', 'bad weather', NULL, '#', false, false, 1668, 'weather');
-INSERT INTO public.vocabulary VALUES ('vijf voor acht', 'five to eight', '', '#', false, false, 1060, 'time');
-INSERT INTO public.vocabulary VALUES ('het huis', 'the house', NULL, 'https://forvo.com/word/huis/#nl', false, false, 1088, 'introductory');
-INSERT INTO public.vocabulary VALUES ('hallo', 'hello', NULL, 'https://forvo.com/word/hallo/#nl', false, false, 1089, 'introductory');
-INSERT INTO public.vocabulary VALUES ('hoi', 'hi', NULL, 'https://forvo.com/word/hoi/#nl', false, false, 1090, 'introductory');
-INSERT INTO public.vocabulary VALUES ('de wolf', 'the wolf', NULL, 'https://forvo.com/word/wolf/#nl', false, false, 2048, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('slecht', 'bad', NULL, 'https://forvo.com/word/slecht/#nl', false, false, 1092, 'introductory');
-INSERT INTO public.vocabulary VALUES ('de giraffe', 'the giraffe', NULL, 'https://forvo.com/word/giraffe/#nl', false, false, 2049, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('goedemorgen', 'good morning', NULL, 'https://forvo.com/word/goedemorgen/#nl', false, false, 1095, 'introductory');
-INSERT INTO public.vocabulary VALUES ('slip', 'slip', 'n/a', 'https://forvo.com/word/slip/#nl', false, false, 937, NULL);
-INSERT INTO public.vocabulary VALUES ('helpen', 'to help', NULL, 'https://forvo.com/word/helpen/#nl', false, false, 1503, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('zaad', 'seed', 'n/a', 'https://forvo.com/word/zaad/#nl', false, false, 616, 'nature');
-INSERT INTO public.vocabulary VALUES ('het instrument', 'the tool, the (musical) instrument', NULL, 'https://forvo.com/word/instrument/#nl', false, false, 1910, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('succes', 'success', 'n/a', 'https://forvo.com/word/succes/#nl', false, false, 956, NULL);
-INSERT INTO public.vocabulary VALUES ('dit', 'this', NULL, 'https://forvo.com/word/dit/#nl', false, false, 1177, 'question words');
-INSERT INTO public.vocabulary VALUES ('kapitein', 'captain', 'n/a', 'https://forvo.com/word/kapitein/#nl', false, false, 801, NULL);
-INSERT INTO public.vocabulary VALUES ('vervelen', 'to annoy', NULL, 'https://forvo.com/word/vervelen/#nl', false, false, 1798, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('de wallen', 'the red light district', NULL, 'https://forvo.com/word/wallen/#nl', false, false, 1403, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('apparaat', 'machine', 'n/a', 'https://forvo.com/word/apparaat/#nl', false, false, 412, NULL);
-INSERT INTO public.vocabulary VALUES ('zand', 'sand', 'n/a', 'https://forvo.com/word/zand/#nl', false, false, 738, 'nature');
-INSERT INTO public.vocabulary VALUES ('het weer', 'the weather', NULL, 'https://forvo.com/word/weer/#nl', false, false, 1655, 'weather');
-INSERT INTO public.vocabulary VALUES ('de dagen van de week', 'the days of the week', NULL, '#', false, false, 1302, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('kennen', 'to know (familiarity)', NULL, 'https://forvo.com/word/kennen/#nl', false, false, 1507, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('act', 'act', 'n/a', 'https://forvo.com/word/act/#nl', false, false, 78, NULL);
-INSERT INTO public.vocabulary VALUES ('denk', 'guess', 'n/a', 'https://forvo.com/word/denk/#nl', false, false, 802, NULL);
-INSERT INTO public.vocabulary VALUES ('instemmen', 'agree', 'n/a', 'https://forvo.com/word/instemmen/#nl', false, false, 797, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('reisleider', 'guide', '', 'https://forvo.com/word/reisleider/#nl', false, false, 1004, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het elftal', 'the football team', NULL, 'https://forvo.com/word/elftal/#nl', false, false, 1599, 'football');
-INSERT INTO public.vocabulary VALUES ('bitter', 'bitter', NULL, 'https://forvo.com/word/bitter/#nl', false, false, 1834, 'cooking');
-INSERT INTO public.vocabulary VALUES ('schouder', 'shoulder', 'n/a', 'https://forvo.com/word/schouder/#nl', false, false, 967, 'body');
-INSERT INTO public.vocabulary VALUES ('de allochtoon', 'the immigrant', NULL, 'https://forvo.com/word/allochtoon/#nl', false, false, 1768, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('hemel', 'sky', 'n/a', 'https://forvo.com/word/hemel/#nl', false, false, 569, 'nature');
-INSERT INTO public.vocabulary VALUES ('maïs', 'corn', 'n/a', 'https://forvo.com/word/maïs/#nl', true, false, 812, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de televisie', 'the television', NULL, 'https://forvo.com/word/televisie/#nl', false, true, 1414, 'household');
-INSERT INTO public.vocabulary VALUES ('aan', 'to', 'n/a', 'https://forvo.com/word/aan/#nl', false, false, 32, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('duur', 'expensive', NULL, 'https://forvo.com/word/duur/#nl', true, false, 1296, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('minste', 'least', 'n/a', 'https://forvo.com/word/minste/#nl', true, false, 611, NULL);
-INSERT INTO public.vocabulary VALUES ('het cv (curriculum vitae)', 'the resume', NULL, '#', false, true, 1522, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('hoewel', 'though', 'n/a', 'https://forvo.com/word/hoewel/#nl', false, false, 312, NULL);
-INSERT INTO public.vocabulary VALUES ('goed', 'good/well', NULL, 'https://forvo.com/word/goed/#nl', false, false, 1091, 'introductory');
-INSERT INTO public.vocabulary VALUES ('haar', 'her/hair', NULL, 'https://forvo.com/word/haar/#nl', false, false, 2115, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('vooruit', 'forward', 'n/a', 'https://forvo.com/word/vooruit/#nl', false, false, 923, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('verrassen', 'to surprise', NULL, 'https://forvo.com/word/verrassen/#nl', false, false, 2025, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('onmiddellijke', 'instant', 'n/a', 'https://forvo.com/word/onmiddellijke/#nl', false, false, 878, NULL);
-INSERT INTO public.vocabulary VALUES ('hen', 'them', 'n/a', 'https://forvo.com/word/hen/#nl', false, false, 162, NULL);
-INSERT INTO public.vocabulary VALUES ('geleden', 'ago', 'n/a', 'https://forvo.com/word/geleden/#nl', false, false, 382, 'time');
-INSERT INTO public.vocabulary VALUES ('even', 'just (as)', NULL, 'https://forvo.com/word/even/#nl', false, false, 1949, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('gebruiken', 'to use', NULL, 'https://forvo.com/word/gebruiken/#nl', false, false, 1636, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('mannen', 'men', 'n/a', 'https://forvo.com/word/mannen/#nl', false, false, 81, NULL);
-INSERT INTO public.vocabulary VALUES ('spelen', 'to play', NULL, 'https://forvo.com/word/spelen/#nl', false, false, 1642, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('voorwaarde', 'condition', 'n/a', 'https://forvo.com/word/voorwaarde/#nl', false, false, 941, NULL);
-INSERT INTO public.vocabulary VALUES ('voer', 'feed', 'n/a', 'https://forvo.com/word/voer/#nl', false, false, 942, NULL);
-INSERT INTO public.vocabulary VALUES ('familie', 'family', 'n/a', 'https://forvo.com/word/familie/#nl', false, false, 319, 'family');
-INSERT INTO public.vocabulary VALUES ('het uur', 'the hour', '', 'https://forvo.com/word/uur/#nl', false, false, 1050, 'time');
-INSERT INTO public.vocabulary VALUES ('kopie', 'copy', 'n/a', 'https://forvo.com/word/kopie/#nl', false, false, 734, NULL);
-INSERT INTO public.vocabulary VALUES ('erg', 'very', NULL, 'https://forvo.com/word/erg/#nl', false, false, 1948, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('de hei', 'the moor', NULL, 'https://forvo.com/word/hei/#nl', false, false, 1765, 'geography');
-INSERT INTO public.vocabulary VALUES ('vaak', 'often', NULL, 'https://forvo.com/word/vaak/#nl', false, false, 2130, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de grap', 'the joke', NULL, 'https://forvo.com/word/grap/#nl', false, false, 2131, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('laatst', 'last', NULL, 'https://forvo.com/word/laatst/#nl', false, false, 2107, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het wereldkampioenschap (wk)', 'the world cup', NULL, 'https://forvo.com/word/wereldkampioenschap/#nl', false, false, 1628, 'football');
-INSERT INTO public.vocabulary VALUES ('boek', 'book', 'n/a', 'https://forvo.com/word/boek/#nl', false, false, 252, NULL);
-INSERT INTO public.vocabulary VALUES ('geur', 'smell', 'n/a', 'https://forvo.com/word/geur/#nl', false, false, 946, NULL);
-INSERT INTO public.vocabulary VALUES ('ervaring', 'experience', 'n/a', 'https://forvo.com/word/ervaring/#nl', false, false, 926, NULL);
-INSERT INTO public.vocabulary VALUES ('brood', 'bread', 'n/a', 'https://forvo.com/word/brood/#nl', false, false, 870, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('vers', 'fresh', NULL, 'https://forvo.com/word/vers/#nl', false, false, 1850, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('zilver', 'silver', 'n/a', 'https://forvo.com/word/zilver/#nl', false, false, 911, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('vijf over half vier', 'twenty five to four', '', '#', false, false, 1061, 'time');
-INSERT INTO public.vocabulary VALUES ('pittig', 'spicy', NULL, 'https://forvo.com/word/pittig/#nl', false, false, 1835, 'cooking');
-INSERT INTO public.vocabulary VALUES ('wij/we', 'we', NULL, 'https://forvo.com/word/we/#nl', false, false, 1124, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('cel', 'cell', 'n/a', 'https://forvo.com/word/cel/#nl', false, false, 509, NULL);
-INSERT INTO public.vocabulary VALUES ('solliciteren', 'to apply for', NULL, 'https://forvo.com/word/solliciteren/#nl', false, false, 1513, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de sollicitatie', 'the application', NULL, 'https://forvo.com/word/sollicitatie/#nl', false, false, 1514, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de vacature', 'the vacancy', NULL, 'https://forvo.com/word/vacature/#nl', false, false, 1515, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de advertentie', 'the advertisement', NULL, 'https://forvo.com/word/advertentie/#nl', false, false, 1516, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('het werk', 'the work', NULL, 'https://forvo.com/word/werk/#nl', false, false, 1517, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de baan', 'the job', NULL, 'https://forvo.com/word/baan/#nl', false, false, 1518, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('lezen', 'to read', NULL, 'https://forvo.com/word/lezen/#nl', false, false, 1266, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('schrijven', 'to write', NULL, 'https://forvo.com/word/schrijven/#nl', false, false, 1267, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('enige', 'only', NULL, 'https://forvo.com/word/enige/#nl', false, false, 1689, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de jurk', 'the dress', NULL, 'https://forvo.com/word/jurk/#nl', false, false, 1468, 'clothes');
-INSERT INTO public.vocabulary VALUES ('veertig', 'forty', NULL, 'https://forvo.com/word/veertig/#nl', false, false, 1241, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de aap', 'the monkey', NULL, 'https://forvo.com/word/aap/#nl', false, false, 2045, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('iemand', 'somebody', NULL, 'https://forvo.com/word/iemand/#nl', false, false, 2126, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('veertien', 'fourteen', NULL, 'https://forvo.com/word/veertien/#nl', false, false, 1236, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('tekenen', 'draw', 'n/a', 'https://forvo.com/word/tekenen/#nl', false, false, 239, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('pas', 'only', NULL, 'https://forvo.com/word/pas/#nl', false, false, 1946, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('aanwezig', 'present', 'n/a', 'https://forvo.com/word/aanwezig/#nl', false, false, 543, NULL);
-INSERT INTO public.vocabulary VALUES ('de rijst', 'the rice', NULL, 'https://forvo.com/word/rijst/#nl', false, false, 1864, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de peper', 'the pepper', NULL, 'https://forvo.com/word/peper/#nl', false, false, 1865, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('het zout', 'the salt', NULL, 'https://forvo.com/word/zout/#nl', false, false, 1866, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('vermenigvuldigen', 'multiply', 'n/a', 'https://forvo.com/word/vermenigvuldigen/#nl', false, false, 353, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('het ziekenhuis', 'the hospital', NULL, 'https://forvo.com/word/ziekenhuis/#nl', false, false, 1214, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('aanmelden', 'log', 'n/a', 'https://forvo.com/word/aanmelden/#nl', false, false, 896, NULL);
-INSERT INTO public.vocabulary VALUES ('juli', 'July', NULL, 'https://forvo.com/word/juli/#nl', false, false, 1319, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de bruiloft', 'the wedding', NULL, 'https://forvo.com/word/bruiloft/#nl', false, false, 2021, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('het bezoek', 'the visit/visitors', NULL, 'https://forvo.com/word/bezoek/#nl', false, false, 2017, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('de erwt', 'the pea', NULL, 'https://forvo.com/word/erwt/#nl', false, false, 1853, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de spinazie', 'the spinach', NULL, 'https://forvo.com/word/spinazie/#nl', false, false, 1854, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de boerenkool', 'the kale', NULL, 'https://forvo.com/word/boerenkool/#nl', false, false, 1855, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('oppervlak', 'surface', 'n/a', 'https://forvo.com/word/oppervlak/#nl', false, false, 363, NULL);
-INSERT INTO public.vocabulary VALUES ('bezoek', 'visit', 'n/a', 'https://forvo.com/word/bezoek/#nl', false, false, 584, NULL);
-INSERT INTO public.vocabulary VALUES ('vloer', 'floor', 'n/a', 'https://forvo.com/word/vloer/#nl', false, false, 721, NULL);
-INSERT INTO public.vocabulary VALUES ('zon', 'sun', 'n/a', 'https://forvo.com/word/zon/#nl', false, false, 218, 'nature');
-INSERT INTO public.vocabulary VALUES ('stond', 'stood', 'n/a', 'https://forvo.com/word/stond/#nl', false, false, 428, NULL);
-INSERT INTO public.vocabulary VALUES ('betekende', 'meant', 'n/a', 'https://forvo.com/word/betekende/#nl', false, false, 897, NULL);
-INSERT INTO public.vocabulary VALUES ('mooi', 'beautiful', NULL, 'https://forvo.com/word/mooi/#nl', false, false, 1279, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('de tulp', 'the tulip', NULL, 'https://forvo.com/word/tulp/#nl', false, false, 1280, 'dutch symbols');
-INSERT INTO public.vocabulary VALUES ('lelijk', 'ugly', NULL, 'https://forvo.com/word/lelijk/#nl', false, false, 1281, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('melodie', 'melody', 'n/a', 'https://forvo.com/word/melodie/#nl', false, false, 602, NULL);
-INSERT INTO public.vocabulary VALUES ('meer dan', 'over', 'n/a', '#', false, false, 189, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('chief', 'chief', 'n/a', 'https://forvo.com/word/chief/#nl', false, false, 830, NULL);
-INSERT INTO public.vocabulary VALUES ('vraag', 'question', 'n/a', 'https://forvo.com/word/vraag/#nl', false, false, 332, NULL);
-INSERT INTO public.vocabulary VALUES ('woordenboek', 'dictionary', 'n/a', 'https://forvo.com/word/woordenboek/#nl', false, false, 670, 'grammar');
-INSERT INTO public.vocabulary VALUES ('dertig', 'thirty', NULL, 'https://forvo.com/word/dertig/#nl', false, true, 1240, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('spoed', 'urgent', NULL, 'https://forvo.com/word/spoed/#nl', true, false, 1728, 'doctor');
-INSERT INTO public.vocabulary VALUES ('aardig', 'friendly', NULL, 'https://forvo.com/word/aardig/#nl', false, false, 1816, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('slaap', 'sleep', 'n/a', 'https://forvo.com/word/slaap/#nl', false, false, 560, NULL);
-INSERT INTO public.vocabulary VALUES ('paars', 'purple', NULL, 'https://forvo.com/word/paars/#nl', false, false, 1976, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('de slak', 'the snail', NULL, 'https://forvo.com/word/slak/#nl', false, false, 2038, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de dolfijn', 'the dolphin', NULL, 'https://forvo.com/word/dolfijn/#nl', false, false, 2040, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de zeehond', 'the seal', NULL, 'https://forvo.com/word/zeehond/#nl', false, false, 2041, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('pistool', 'gun', 'n/a', 'https://forvo.com/word/pistool/#nl', false, false, 841, NULL);
-INSERT INTO public.vocabulary VALUES ('wandelen', 'to go for a walk', NULL, 'https://forvo.com/word/wandelen/#nl', false, false, 1367, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('centrum', 'center', 'n/a', 'https://forvo.com/word/centrum/#nl', false, false, 487, NULL);
-INSERT INTO public.vocabulary VALUES ('betekenen', 'mean', 'n/a', 'https://forvo.com/word/betekenen/#nl', false, false, 143, NULL);
-INSERT INTO public.vocabulary VALUES ('afvalzak', 'sick bag', 'noun', 'https://forvo.com/word/afvalzak/#nl', false, false, 1025, NULL);
-INSERT INTO public.vocabulary VALUES ('‘s ochtends / ‘s morgens', 'in the morning', '', '#', false, false, 1069, 'time');
-INSERT INTO public.vocabulary VALUES ('Sinterklaas', '(Sinterklaas)', NULL, 'https://forvo.com/word/Sinterklaas/#nl', false, false, 2002, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('wild', 'wild', NULL, 'https://forvo.com/word/wild/#nl', false, false, 2034, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de brandstof', 'the fuel', NULL, 'https://forvo.com/word/brandstof/#nl', false, false, 1926, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de voet', 'the foot', NULL, 'https://forvo.com/word/voet/#nl', false, false, 1450, 'body');
-INSERT INTO public.vocabulary VALUES ('de tijger', 'the tiger', NULL, 'https://forvo.com/word/tijger/#nl', false, false, 2053, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('apart', 'separate', 'n/a', 'https://forvo.com/word/apart/#nl', false, false, 763, NULL);
-INSERT INTO public.vocabulary VALUES ('doei', 'bye', NULL, 'https://forvo.com/word/doei/#nl', false, false, 1102, 'introductory');
-INSERT INTO public.vocabulary VALUES ('klaar', 'ready', NULL, 'https://forvo.com/word/klaar/#nl', false, false, 1708, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de gezondheid', 'the health', NULL, 'https://forvo.com/word/gezondheid/#nl', false, false, 1709, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het vliegveld', 'the airport', NULL, 'https://forvo.com/word/vliegveld/#nl', false, false, 1208, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de haven', 'the port', NULL, 'https://forvo.com/word/haven/#nl', false, false, 1209, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('jaar', 'year', 'n/a', 'https://forvo.com/word/jaar/#nl', false, false, 118, 'time');
-INSERT INTO public.vocabulary VALUES ('bevolken', 'populate', 'n/a', 'https://forvo.com/word/bevolken/#nl', false, false, 881, NULL);
-INSERT INTO public.vocabulary VALUES ('nodig hebben', 'to need', NULL, 'https://forvo.com/word/nodig/#nl', false, false, 1629, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('bell', 'bell', 'n/a', 'https://forvo.com/word/bell/#nl', false, false, 816, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('slaaf', 'slave', 'n/a', 'https://forvo.com/word/slaaf/#nl', false, false, 876, NULL);
-INSERT INTO public.vocabulary VALUES ('vriezen', 'to freeze', NULL, 'https://forvo.com/word/vriezen/#nl', false, false, 1681, 'weather');
-INSERT INTO public.vocabulary VALUES ('sleutel', 'key', 'n/a', 'https://forvo.com/word/sleutel/#nl', false, false, 691, NULL);
-INSERT INTO public.vocabulary VALUES ('reis', 'trip', 'n/a', 'https://forvo.com/word/reis/#nl', false, false, 603, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de rok', 'the skirt', NULL, 'https://forvo.com/word/rok/#nl', false, false, 1467, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de avond', 'the evening', '', 'https://forvo.com/word/avond/#nl', false, false, 1072, 'time');
-INSERT INTO public.vocabulary VALUES ('spreken', 'to speak', NULL, 'https://forvo.com/word/spreken/#nl', false, false, 1268, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('minuut', 'minute', 'n/a', 'https://forvo.com/word/minuut/#nl', false, false, 442, 'time');
-INSERT INTO public.vocabulary VALUES ('waar', 'where', NULL, 'https://forvo.com/word/waar/#nl', false, false, 1181, 'question words');
-INSERT INTO public.vocabulary VALUES ('geopend', 'open', 'n/a', 'https://forvo.com/word/geopend/#nl', false, false, 275, NULL);
-INSERT INTO public.vocabulary VALUES ('blokkeren', 'block', 'n/a', 'https://forvo.com/word/blokkeren/#nl', false, false, 952, NULL);
-INSERT INTO public.vocabulary VALUES ('de mier', 'the ant', NULL, 'https://forvo.com/word/mier/#nl', false, false, 2035, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('zingen', 'to sing', NULL, 'https://forvo.com/word/zingen/#nl', false, false, 1380, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('de muziek', 'the music', NULL, 'https://forvo.com/word/muziek/#nl', false, false, 2134, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het nummer', 'the number / the song', NULL, 'https://forvo.com/word/nummer/#nl', false, false, 2135, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('tuin', 'garden', 'n/a', 'https://forvo.com/word/tuin/#nl', false, false, 639, 'household');
-INSERT INTO public.vocabulary VALUES ('lijken', 'to seem', NULL, 'https://forvo.com/word/lijken/#nl', false, false, 1640, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('meervoud', 'plural', 'n/a', 'https://forvo.com/word/meervoud/#nl', false, false, 998, 'grammar');
-INSERT INTO public.vocabulary VALUES ('het museum', 'the museum', NULL, 'https://forvo.com/word/museum/#nl', false, false, 1391, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het concertgebouw', 'the Concertgebouw', NULL, 'https://forvo.com/word/concertgebouw/#nl', false, false, 1394, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('dinsdag', 'Tuesday', NULL, 'https://forvo.com/word/dinsdag/#nl', false, false, 1305, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('woensdag', 'Wednesday', NULL, 'https://forvo.com/word/woensdag/#nl', false, false, 1306, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('lezing', 'lecture', 'noun', 'https://forvo.com/word/lezing/#nl', false, false, 1010, NULL);
-INSERT INTO public.vocabulary VALUES ('grand', 'grand', 'n/a', 'https://forvo.com/word/grand/#nl', false, false, 536, NULL);
-INSERT INTO public.vocabulary VALUES ('onderstrepen', 'to underline', 'verb', 'https://forvo.com/word/onderstrepen/#nl', false, false, 1014, 'grammar');
-INSERT INTO public.vocabulary VALUES ('middernacht', 'midnight', '', 'https://forvo.com/word/middernacht/#nl', false, false, 1075, 'time');
-INSERT INTO public.vocabulary VALUES ('woord', 'word', 'n/a', 'https://forvo.com/word/woord/#nl', false, false, 21, NULL);
-INSERT INTO public.vocabulary VALUES ('afdrukken', 'print', 'n/a', 'https://forvo.com/word/afdrukken/#nl', false, false, 843, NULL);
-INSERT INTO public.vocabulary VALUES ('zonder', 'without', NULL, 'https://forvo.com/word/zonder/#nl', false, false, 1350, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('kopen', 'to buy', NULL, 'https://forvo.com/word/kopen/#nl', false, false, 1253, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('de gracht', 'the canal', NULL, 'https://forvo.com/word/gracht/#nl', false, false, 1384, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('de auto van de zaak', 'the company car', NULL, '#', false, false, 1534, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('weer', 'again', 'n/a', 'https://forvo.com/word/weer/#nl', false, false, 92, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('bal', 'ball', 'n/a', 'https://forvo.com/word/bal/#nl', false, false, 537, 'football');
-INSERT INTO public.vocabulary VALUES ('doden', 'kill', 'n/a', 'https://forvo.com/word/doden/#nl', false, false, 658, NULL);
-INSERT INTO public.vocabulary VALUES ('geluidsoverlast', 'noise', 'n/a', 'https://forvo.com/word/geluidsoverlast/#nl', false, false, 978, NULL);
-INSERT INTO public.vocabulary VALUES ('aantal', 'number', 'n/a', 'https://forvo.com/word/aantal/#nl', false, false, 183, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('de wijn', 'the wine', NULL, 'https://forvo.com/word/wijn/#nl', false, false, 1162, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('honger hebben', 'to be hungry', NULL, 'https://forvo.com/word/honger/#nl', false, false, 1828, 'cooking');
-INSERT INTO public.vocabulary VALUES ('winkelen', 'to go shopping', NULL, 'https://forvo.com/word/winkelen/#nl', false, false, 1382, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('zitje', 'seat', 'n/a', 'https://forvo.com/word/zitje/#nl', false, false, 950, NULL);
-INSERT INTO public.vocabulary VALUES ('de vergoeding', 'the compensation', NULL, 'https://forvo.com/word/vergoeding/#nl', false, false, 1537, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('de riem', 'the belt', NULL, 'https://forvo.com/word/riem/#nl', false, false, 1473, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de spits', 'the striker', NULL, 'https://forvo.com/word/spits/#nl', false, false, 1602, 'football');
-INSERT INTO public.vocabulary VALUES ('de middenvelder', 'the midfielder', NULL, 'https://forvo.com/word/middenvelder/#nl', false, false, 1603, 'football');
-INSERT INTO public.vocabulary VALUES ('de verdediger', 'the defender', NULL, 'https://forvo.com/word/verdediger/#nl', false, false, 1604, 'football');
-INSERT INTO public.vocabulary VALUES ('de keeper', 'the goalkeeper', NULL, 'https://forvo.com/word/keeper/#nl', false, false, 1605, 'football');
-INSERT INTO public.vocabulary VALUES ('zee', 'sea', 'n/a', 'https://forvo.com/word/zee/#nl', false, true, 238, 'nature');
-INSERT INTO public.vocabulary VALUES ('huilen', 'to cry', NULL, 'https://forvo.com/word/huilen/#nl', true, false, 1892, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('wist', 'knew', 'n/a', 'https://forvo.com/word/wist/#nl', true, false, 345, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('toon', 'tone', 'n/a', 'https://forvo.com/word/toon/#nl', true, false, 617, NULL);
-INSERT INTO public.vocabulary VALUES ('hout', 'wood', 'n/a', 'https://forvo.com/word/hout/#nl', false, false, 273, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('kleding', 'dress', 'n/a', 'https://forvo.com/word/kleding/#nl', false, false, 678, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de haas', 'the hare', NULL, 'https://forvo.com/word/haas/#nl', false, false, 1573, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('emigreren', 'to emigrate', NULL, 'https://forvo.com/word/emigreren/#nl', false, false, 1767, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('komen', 'to come', NULL, 'https://forvo.com/word/komen/#nl', false, false, 1634, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('zoon', 'son', 'n/a', 'https://forvo.com/word/zoon/#nl', false, false, 659, 'family');
-INSERT INTO public.vocabulary VALUES ('betalen', 'to pay', NULL, 'https://forvo.com/word/betalen/#nl', false, false, 1645, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('rijden', 'to drive', NULL, 'https://forvo.com/word/rijden/#nl', false, false, 1257, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('opnemen', 'record', 'n/a', 'https://forvo.com/word/opnemen/#nl', false, false, 371, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('karakter', 'character', 'n/a', 'https://forvo.com/word/karakter/#nl', false, false, 780, NULL);
-INSERT INTO public.vocabulary VALUES ('uur', 'hour', 'n/a', 'https://forvo.com/word/uur/#nl', false, false, 454, 'time');
-INSERT INTO public.vocabulary VALUES ('verhuizing', 'move', 'n/a', 'https://forvo.com/word/verhuizing/#nl', false, false, 145, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('schreef', 'wrote', 'n/a', 'https://forvo.com/word/schreef/#nl', false, false, 615, NULL);
-INSERT INTO public.vocabulary VALUES ('het overhemd', 'the shirt', NULL, 'https://forvo.com/word/overhemd/#nl', false, false, 1476, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de naam', 'the name', NULL, 'https://forvo.com/word/naam/#nl', false, false, 2136, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het boek', 'the book', NULL, 'https://forvo.com/word/boek/#nl', false, false, 2137, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de les', 'the lesson', NULL, 'https://forvo.com/word/les/#nl', false, false, 2138, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de sporthal', 'the sports hall', NULL, 'https://forvo.com/word/sporthal/#nl', false, false, 1217, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('plotseling', 'sudden', 'n/a', 'https://forvo.com/word/plotseling/#nl', false, false, 513, NULL);
-INSERT INTO public.vocabulary VALUES ('de geit', 'the goat', 'noun', 'https://forvo.com/word/geit/#nl', false, false, 1012, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('king', 'king', 'n/a', 'https://forvo.com/word/king/#nl', false, false, 350, NULL);
-INSERT INTO public.vocabulary VALUES ('het hoofdkantoor', 'the head office', NULL, 'https://forvo.com/word/hoofdkantoor/#nl', false, false, 1402, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('de slager', 'the butcher', NULL, 'https://forvo.com/word/slager/#nl', false, false, 1135, 'professions');
-INSERT INTO public.vocabulary VALUES ('spreiding', 'spread', 'n/a', 'https://forvo.com/word/spreiding/#nl', false, false, 968, NULL);
-INSERT INTO public.vocabulary VALUES ('dergelijke', 'such', 'n/a', 'https://forvo.com/word/dergelijke/#nl', false, false, 76, NULL);
-INSERT INTO public.vocabulary VALUES ('halen', 'to pick up', NULL, 'https://forvo.com/word/halen/#nl', false, false, 1491, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('lenen', 'to borrow', NULL, 'https://forvo.com/word/lenen/#nl', false, false, 1492, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('het gebouw', 'the building', NULL, 'https://forvo.com/word/gebouw/#nl', false, false, 1393, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('de zee', 'the sea', NULL, 'https://forvo.com/word/zee/#nl', false, false, 1754, 'geography');
-INSERT INTO public.vocabulary VALUES ('het kind', 'the child', NULL, 'https://forvo.com/word/kind/#nl', false, false, 1554, 'family');
-INSERT INTO public.vocabulary VALUES ('de patiënt', 'the patient', NULL, 'https://forvo.com/word/patiënt/#nl', false, false, 1724, 'doctor');
-INSERT INTO public.vocabulary VALUES ('pad', 'path', 'n/a', 'https://forvo.com/word/pad/#nl', false, false, 894, NULL);
-INSERT INTO public.vocabulary VALUES ('boos', 'angry', NULL, 'https://forvo.com/word/boos/#nl', false, false, 1800, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('wrijven', 'rub', 'n/a', 'https://forvo.com/word/wrijven/#nl', false, false, 819, NULL);
-INSERT INTO public.vocabulary VALUES ('geboren', 'born', 'n/a', 'https://forvo.com/word/geboren/#nl', false, false, 973, NULL);
-INSERT INTO public.vocabulary VALUES ('de schaar', 'the scissors', NULL, 'https://forvo.com/word/schaar/#nl', false, false, 1911, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('knippen', 'to cut (with scissors)', NULL, 'https://forvo.com/word/knippen/#nl', false, false, 1912, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('gedicht', 'poem', 'n/a', 'https://forvo.com/word/gedicht/#nl', false, false, 814, NULL);
-INSERT INTO public.vocabulary VALUES ('quart', 'quart', 'n/a', 'https://forvo.com/word/quart/#nl', false, false, 975, NULL);
-INSERT INTO public.vocabulary VALUES ('een verjaardag vieren', 'to celebrate a birthday', NULL, '#', false, false, 1378, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('onderzijde', 'bottom', 'n/a', 'https://forvo.com/word/onderzijde/#nl', false, false, 690, NULL);
-INSERT INTO public.vocabulary VALUES ('behoorlijk', 'proper', 'n/a', 'https://forvo.com/word/behoorlijk/#nl', false, false, 872, NULL);
-INSERT INTO public.vocabulary VALUES ('proces', 'process', 'n/a', 'https://forvo.com/word/proces/#nl', false, false, 760, NULL);
-INSERT INTO public.vocabulary VALUES ('waarde', 'value', 'n/a', 'https://forvo.com/word/waarde/#nl', false, false, 744, NULL);
-INSERT INTO public.vocabulary VALUES ('zal', 'shall/will', 'n/a', 'https://forvo.com/word/zal/#nl', false, false, 716, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('arm, slechte', 'poor', NULL, 'https://forvo.com/word/arm/#nl', false, false, 1284, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('weten', 'to know (factually)', NULL, 'https://forvo.com/word/weten/#nl', false, false, 1263, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('afdekking', 'cover', 'n/a', 'https://forvo.com/word/afdekking/#nl', false, false, 216, NULL);
-INSERT INTO public.vocabulary VALUES ('de zwaan', 'the swan', NULL, 'https://forvo.com/word/zwaan/#nl', false, false, 1583, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de gans', 'the goose', NULL, 'https://forvo.com/word/gans/#nl', false, false, 1584, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('dromen', 'to dream', NULL, 'https://forvo.com/word/dromen/#nl', false, false, 1890, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('naam', 'name', 'n/a', 'https://forvo.com/word/naam/#nl', false, false, 127, NULL);
-INSERT INTO public.vocabulary VALUES ('trek', 'pull', 'n/a', 'https://forvo.com/word/trek/#nl', false, false, 498, NULL);
-INSERT INTO public.vocabulary VALUES ('om', 'at', NULL, 'https://forvo.com/word/om/#nl', false, false, 1353, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('de sollicitatiebrief', 'the application letter', NULL, 'https://forvo.com/word/sollicitatiebrief/#nl', false, false, 1521, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('mond', 'mouth', 'n/a', 'https://forvo.com/word/mond/#nl', false, false, 607, 'body');
-INSERT INTO public.vocabulary VALUES ('alle', 'all', 'n/a', 'https://forvo.com/word/alle/#nl', false, false, 152, NULL);
-INSERT INTO public.vocabulary VALUES ('omdat', 'because', NULL, 'https://forvo.com/word/omdat/#nl', false, false, 1194, 'question words');
-INSERT INTO public.vocabulary VALUES ('behalve', 'except', NULL, 'https://forvo.com/word/behalve/#nl', false, false, 1196, 'question words');
-INSERT INTO public.vocabulary VALUES ('smal', 'narrow', NULL, 'https://forvo.com/word/smal/#nl', false, false, 1988, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('beide', 'both', NULL, 'https://forvo.com/word/beide/#nl', false, false, 1989, 'common adjectives (3)');
-INSERT INTO public.vocabulary VALUES ('het gezicht', 'the face', NULL, 'https://forvo.com/word/gezicht/#nl', false, false, 1990, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('boom', 'tree', 'n/a', 'https://forvo.com/word/boom/#nl', false, false, 229, 'nature');
-INSERT INTO public.vocabulary VALUES ('portemonnee', 'wallet', NULL, 'https://forvo.com/word/portemonnee/#nl', false, false, 2153, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('het vliegtuig', 'the airplane', NULL, 'https://forvo.com/word/vliegtuig/#nl', false, false, 1207, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('slim', 'clever', NULL, 'https://forvo.com/word/slim/#nl', false, false, 2061, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('vleugel', 'wing', 'n/a', 'https://forvo.com/word/vleugel/#nl', false, false, 805, NULL);
-INSERT INTO public.vocabulary VALUES ('de thee', 'the tea', NULL, 'https://forvo.com/word/thee/#nl', false, false, 1158, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de VVE-bijdrage', 'communal costs', NULL, '#', false, false, 1775, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('ster', 'the star', NULL, 'https://forvo.com/word/ster/#nl', false, false, 2094, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('rekenen', 'charge', 'n/a', 'https://forvo.com/word/rekenen/#nl', true, false, 871, NULL);
-INSERT INTO public.vocabulary VALUES ('oktober', 'October', NULL, 'https://forvo.com/word/oktober/#nl', true, false, 1322, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('ben', 'am', 'n/a', 'https://forvo.com/word/ben/#nl', false, true, 542, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('produceren', 'produce', 'n/a', 'https://forvo.com/word/produceren/#nl', false, true, 449, NULL);
-INSERT INTO public.vocabulary VALUES ('tweede', 'second', 'n/a', 'https://forvo.com/word/tweede/#nl', false, true, 301, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('uitleggen', 'to explain', 'verb', 'https://forvo.com/word/uitleggen/#nl', true, false, 1016, NULL);
-INSERT INTO public.vocabulary VALUES ('klinken', 'sound', 'n/a', 'https://forvo.com/word/klinken/#nl', true, false, 184, NULL);
-INSERT INTO public.vocabulary VALUES ('september', 'September', NULL, 'https://forvo.com/word/september/#nl', false, true, 1321, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de gele kaart', 'the yellow card', NULL, '#', false, false, 1618, 'football');
-INSERT INTO public.vocabulary VALUES ('kan', 'can/may', 'n/a', 'https://forvo.com/word/kan/#nl', false, true, 37, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('de taart', 'the pie', NULL, 'https://forvo.com/word/taart/#nl', false, true, 2023, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('compleet', 'complete', NULL, 'https://forvo.com/word/compleet/#nl', false, true, 2073, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('grafiek', 'chart', 'n/a', 'https://forvo.com/word/grafiek/#nl', false, false, 953, NULL);
-INSERT INTO public.vocabulary VALUES ('liefde', 'love', 'n/a', 'https://forvo.com/word/liefde/#nl', false, false, 488, NULL);
-INSERT INTO public.vocabulary VALUES ('sturen', 'send', 'n/a', 'https://forvo.com/word/sturen/#nl', false, false, 839, NULL);
-INSERT INTO public.vocabulary VALUES ('vaardigheid', 'skill', 'n/a', 'https://forvo.com/word/vaardigheid/#nl', false, false, 906, NULL);
-INSERT INTO public.vocabulary VALUES ('brede', 'broad', 'n/a', 'https://forvo.com/word/brede/#nl', false, false, 994, NULL);
-INSERT INTO public.vocabulary VALUES ('gereedschap', 'tool', 'n/a', 'https://forvo.com/word/gereedschap/#nl', false, false, 943, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('onder', 'below/under, among', NULL, 'https://forvo.com/word/onder/#nl', false, false, 1338, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('de woonkamer', 'the living room', NULL, 'https://forvo.com/word/woonkamer/#nl', false, false, 1421, 'household');
-INSERT INTO public.vocabulary VALUES ('laat', 'late', NULL, 'https://forvo.com/word/laat/#nl', false, false, 1693, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('verscheidene', 'several', 'n/a', 'https://forvo.com/word/verscheidene/#nl', false, false, 479, NULL);
-INSERT INTO public.vocabulary VALUES ('weg', 'gone', 'n/a', 'https://forvo.com/word/weg/#nl', false, false, 600, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('kolom', 'column', 'n/a', 'https://forvo.com/word/column/#nl', false, false, 987, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de vleermuis', 'the bat', 'n/a', 'https://forvo.com/word/vleermuis/#nl', false, false, 809, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de perzik', 'the peach', NULL, 'https://forvo.com/word/perzik/#nl', false, false, 1871, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('gescheiden zijn', 'to be divorced', NULL, 'https://forvo.com/word/gescheiden/#nl', false, false, 1566, 'family');
-INSERT INTO public.vocabulary VALUES ('het dier', 'the animal', NULL, 'https://forvo.com/word/dier/#nl', false, false, 1567, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('west', 'west', NULL, 'https://forvo.com/word/west/#nl', false, false, 2079, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('touw', 'rope', 'n/a', 'https://forvo.com/word/touw/#nl', false, false, 936, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de walvis', 'the whale', NULL, 'https://forvo.com/word/walvis/#nl', false, false, 2042, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('weinig', 'little, few', 'n/a', 'https://forvo.com/word/weinig/#nl', false, false, 114, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('zakenreis', 'business trip', 'noun', 'https://forvo.com/word/zakenreis/#nl', false, false, 1021, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('boerderij', 'farm', 'n/a', 'https://forvo.com/word/boerderij/#nl', false, false, 231, NULL);
-INSERT INTO public.vocabulary VALUES ('elf', 'eleven', NULL, 'https://forvo.com/word/elf/#nl', false, false, 1233, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('misschien', 'maybe/perhaps', NULL, 'https://forvo.com/word/misschien/#nl', false, false, 1113, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('het oog', 'the eye', NULL, 'https://forvo.com/word/oog/#nl', false, false, 1439, 'body');
-INSERT INTO public.vocabulary VALUES ('de haai', 'the shark', NULL, 'https://forvo.com/word/haai/#nl', false, false, 2043, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('plannen', 'plan', 'n/a', 'https://forvo.com/word/plannen/#nl', false, false, 415, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('rechts', 'right', NULL, 'https://forvo.com/word/rechts/#nl', false, false, 1115, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('de boon', 'the bean', NULL, 'https://forvo.com/word/boon/#nl', false, false, 1852, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de wind', 'the wind', NULL, 'https://forvo.com/word/wind/#nl', false, false, 1673, 'weather');
-INSERT INTO public.vocabulary VALUES ('spijkerbroek', 'jeans', 'noun', 'https://forvo.com/word/spijkerbroek/#nl', false, false, 1019, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de telefoon', 'the telephone', NULL, 'https://forvo.com/word/telefoon/#nl', false, false, 1920, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de eend', 'the duck', NULL, 'https://forvo.com/word/eend/#nl', false, false, 1582, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('vertegenwoordigen', 'represent', 'n/a', 'https://forvo.com/word/vertegenwoordigen/#nl', false, false, 518, NULL);
-INSERT INTO public.vocabulary VALUES ('omhoog', 'up', 'n/a', 'https://forvo.com/word/omhoog/#nl', false, false, 155, NULL);
-INSERT INTO public.vocabulary VALUES ('beschrijven', 'describe', 'n/a', 'https://forvo.com/word/beschrijven/#nl', false, false, 719, NULL);
-INSERT INTO public.vocabulary VALUES ('het glas', 'the glass', NULL, 'https://forvo.com/word/glas/#nl', false, false, 1845, 'cooking');
-INSERT INTO public.vocabulary VALUES ('het kopje', 'the cup', NULL, 'https://forvo.com/word/kopje/#nl', false, false, 1846, 'cooking');
-INSERT INTO public.vocabulary VALUES ('‘s middags', 'in the afternoon', '', '#', false, false, 1071, 'time');
-INSERT INTO public.vocabulary VALUES ('ander', 'other', NULL, 'https://forvo.com/word/ander/#nl', false, false, 1683, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('de schouder', 'the shoulder', NULL, 'https://forvo.com/word/schouder/#nl', false, false, 1454, 'body');
-INSERT INTO public.vocabulary VALUES ('nek', 'neck', 'n/a', 'https://forvo.com/word/nek/#nl', false, false, 901, 'body');
-INSERT INTO public.vocabulary VALUES ('stropdas', 'tie', 'n/a', 'https://forvo.com/word/stropdas/#nl', false, false, 834, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('blijven', 'to stay/continue', NULL, 'https://forvo.com/word/blijven/#nl', false, false, 1654, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('alsjeblieft', 'here you are, please', NULL, 'https://forvo.com/word/alsjeblieft/#nl', false, false, 1103, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('menselijk', 'human', 'n/a', 'https://forvo.com/word/menselijk/#nl', false, false, 788, NULL);
-INSERT INTO public.vocabulary VALUES ('koken', 'to cook', NULL, 'https://forvo.com/word/koken/#nl', false, false, 1825, 'cooking');
-INSERT INTO public.vocabulary VALUES ('mengen', 'mix', 'n/a', 'https://forvo.com/word/mengen/#nl', false, false, 632, NULL);
-INSERT INTO public.vocabulary VALUES ('de citroen', 'the lemon', NULL, 'https://forvo.com/word/citroen/#nl', false, false, 1875, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('het gereedschap', 'the tools', NULL, 'https://forvo.com/word/gereedschap/#nl', false, false, 1909, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('niets', 'nothing', NULL, 'https://forvo.com/word/niets/#nl', false, false, 1939, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('tak', 'branch', 'n/a', 'https://forvo.com/word/tak/#nl', false, false, 913, NULL);
-INSERT INTO public.vocabulary VALUES ('lichaam', 'body', 'n/a', 'https://forvo.com/word/lichaam/#nl', false, false, 317, 'body');
-INSERT INTO public.vocabulary VALUES ('inschrijven', 'to subscribe', NULL, 'https://forvo.com/word/inschrijven/#nl', false, false, 1778, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de winkel', 'the shop', NULL, 'https://forvo.com/word/winkel/#nl', false, false, 1212, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('het doel', 'the goal', NULL, 'https://forvo.com/word/doel/#nl', false, false, 1597, 'football');
-INSERT INTO public.vocabulary VALUES ('verkopen', 'to sell', NULL, 'https://forvo.com/word/verkopen/#nl', false, false, 1898, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('happy', 'happy', 'n/a', 'https://forvo.com/word/happy/#nl', false, false, 595, NULL);
-INSERT INTO public.vocabulary VALUES ('de woning', 'the house', NULL, 'https://forvo.com/word/woning/#nl', false, false, 1407, 'household');
-INSERT INTO public.vocabulary VALUES ('goud', 'gold', 'n/a', 'https://forvo.com/word/goud/#nl', false, false, 374, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('reden', 'reason', 'n/a', 'https://forvo.com/word/reden/#nl', false, false, 516, NULL);
-INSERT INTO public.vocabulary VALUES ('zondag', 'Sunday', NULL, 'https://forvo.com/word/zondag/#nl', false, false, 1310, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('viel', 'fell', 'n/a', 'https://forvo.com/word/viel/#nl', false, false, 643, NULL);
-INSERT INTO public.vocabulary VALUES ('eenheid', 'unit', 'n/a', 'https://forvo.com/word/eenheid/#nl', false, false, 402, NULL);
-INSERT INTO public.vocabulary VALUES ('rente', 'interest', 'n/a', 'https://forvo.com/word/rente/#nl', false, false, 466, NULL);
-INSERT INTO public.vocabulary VALUES ('duizelig', 'dizzy', NULL, 'https://forvo.com/word/duizelig/#nl', false, false, 1718, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de groente', 'the vegetables', NULL, 'https://forvo.com/word/groente/#nl', false, false, 1149, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('de kikker', 'the frog', NULL, 'https://forvo.com/word/kikker/#nl', false, true, 2037, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('het station', 'the railway station', NULL, 'https://forvo.com/word/station/#nl', true, false, 1210, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('dat', 'that', NULL, 'https://forvo.com/word/dat/#nl', true, false, 1176, 'question words');
-INSERT INTO public.vocabulary VALUES ('verkeerd/mis', 'wrong', NULL, 'https://forvo.com/word/verkeerd/#nl', true, false, 1706, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('hagelen', 'to hail', NULL, 'https://forvo.com/word/hagelen/#nl', true, false, 1672, 'weather');
-INSERT INTO public.vocabulary VALUES ('vlakte', 'plain', 'n/a', 'https://forvo.com/word/vlakte/#nl', false, false, 303, NULL);
-INSERT INTO public.vocabulary VALUES ('onduidelijk', 'unclear', NULL, 'https://forvo.com/word/onduidelijk/#nl', false, false, 1701, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('zwemmen', 'swim', 'n/a', 'https://forvo.com/word/zwemmen/#nl', false, false, 962, NULL);
-INSERT INTO public.vocabulary VALUES ('stil', 'quiet/silent', NULL, 'https://forvo.com/word/stil/#nl', false, false, 2067, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('de meloen', 'the melon', NULL, 'https://forvo.com/word/meloen/#nl', false, false, 1877, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('een taal leren', 'to learn a language', NULL, '#', false, false, 1364, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('op', 'at, on top', NULL, 'https://forvo.com/word/op/#nl', false, false, 1339, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('die', 'that, those, which, who', NULL, 'https://forvo.com/word/die/#nl', false, false, 1180, 'question words');
-INSERT INTO public.vocabulary VALUES ('nog', 'still/yet', NULL, 'https://forvo.com/word/nog/#nl', false, false, 1947, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('elektrische', 'electric', 'n/a', 'https://forvo.com/word/elektrische/#nl', false, false, 791, 'nature');
-INSERT INTO public.vocabulary VALUES ('zaag', 'saw', 'n/a', 'https://forvo.com/word/zaag/#nl', false, false, 236, NULL);
-INSERT INTO public.vocabulary VALUES ('gas', 'gas', 'n/a', 'https://forvo.com/word/gas/#nl', false, false, 589, 'nature');
-INSERT INTO public.vocabulary VALUES ('de kat', 'the cat', NULL, 'https://forvo.com/word/kat/#nl', false, false, 1570, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('bijna', 'almost', NULL, 'https://forvo.com/word/bijna/#nl', false, false, 1955, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('zoet', 'sweet', NULL, 'https://forvo.com/word/zoet/#nl', false, false, 1831, 'cooking');
-INSERT INTO public.vocabulary VALUES ('zuur', 'acid', NULL, 'https://forvo.com/word/zuur/#nl', false, false, 1833, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de computer', 'the computer', NULL, 'https://forvo.com/word/computer/#nl', false, false, 1916, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('bliksem', 'lightning', 'noun', 'https://forvo.com/word/bliksem/#nl', false, false, 1011, 'nature');
-INSERT INTO public.vocabulary VALUES ('(enkel)voudige', 'single', NULL, 'https://forvo.com/word/enkel/#nl', false, false, 1690, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('dorst hebben', 'to be thirsty', NULL, 'https://forvo.com/word/dorst/#nl', false, false, 1829, 'cooking');
-INSERT INTO public.vocabulary VALUES ('het voetbal', 'football (soccer)', NULL, 'https://forvo.com/word/voetbal/#nl', false, false, 1596, 'football');
-INSERT INTO public.vocabulary VALUES ('weer', 'weather', 'n/a', 'https://forvo.com/word/weer/#nl', false, false, 590, 'weather');
-INSERT INTO public.vocabulary VALUES ('zeven', 'seven', NULL, 'https://forvo.com/word/zeven/#nl', false, false, 1229, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('blij', 'happy/glad', NULL, 'https://forvo.com/word/blij/#nl', false, false, 1806, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('het gras', 'the grass', NULL, 'https://forvo.com/word/gras/#nl', false, false, 2110, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('noot', 'note', 'n/a', 'https://forvo.com/word/noot/#nl', false, false, 413, NULL);
-INSERT INTO public.vocabulary VALUES ('rots', 'rock', 'n/a', 'https://forvo.com/word/rots/#nl', false, false, 338, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('vijf', 'five', NULL, 'https://forvo.com/word/vijf/#nl', false, false, 1227, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('zes', 'six', NULL, 'https://forvo.com/word/zes/#nl', false, false, 1228, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('deed', 'did', 'n/a', 'https://forvo.com/word/deed/#nl', false, false, 182, NULL);
-INSERT INTO public.vocabulary VALUES ('periode', 'period', 'n/a', 'https://forvo.com/word/periode/#nl', false, false, 783, 'time');
-INSERT INTO public.vocabulary VALUES ('de deur', 'the door', NULL, 'https://forvo.com/word/deur/#nl', false, false, 1408, 'household');
-INSERT INTO public.vocabulary VALUES ('de kroket', 'Dutch fried ragout bar', NULL, 'https://forvo.com/word/kroket/#nl', false, false, 1169, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('helft', 'half', 'n/a', 'https://forvo.com/word/helft/#nl', false, false, 337, NULL);
-INSERT INTO public.vocabulary VALUES ('het fruit', 'the fruits', NULL, 'https://forvo.com/word/fruit/#nl', false, false, 1150, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('eeuw', 'century', 'n/a', 'https://forvo.com/word/eeuw/#nl', false, false, 728, 'time');
-INSERT INTO public.vocabulary VALUES ('praktijk', 'practice', 'n/a', 'https://forvo.com/word/praktijk/#nl', false, false, 762, NULL);
-INSERT INTO public.vocabulary VALUES ('de hoekschop', 'the corner kick', NULL, 'https://forvo.com/word/hoekschop/#nl', false, false, 1622, 'football');
-INSERT INTO public.vocabulary VALUES ('snelheid', 'speed', 'n/a', 'https://forvo.com/word/snelheid/#nl', false, false, 672, NULL);
-INSERT INTO public.vocabulary VALUES ('vloeistof', 'liquid', 'n/a', 'https://forvo.com/word/vloeistof/#nl', false, false, 895, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('besparen', 'save', 'n/a', 'https://forvo.com/word/besparen/#nl', false, false, 649, NULL);
-INSERT INTO public.vocabulary VALUES ('de kers', 'the cherry', NULL, 'https://forvo.com/word/kers/#nl', false, false, 1880, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('de aardbei', 'the strawberry', NULL, 'https://forvo.com/word/aardbei/#nl', false, false, 1881, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('lachen', 'to laugh', NULL, 'https://forvo.com/word/lachen/#nl', false, false, 1882, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('suggereren', 'suggest', 'n/a', 'https://forvo.com/word/suggereren/#nl', false, false, 619, NULL);
-INSERT INTO public.vocabulary VALUES ('vooral', 'especially', 'n/a', 'https://forvo.com/word/vooral/#nl', false, false, 916, NULL);
-INSERT INTO public.vocabulary VALUES ('verbranden', 'burn', 'n/a', 'https://forvo.com/word/verbranden/#nl', false, false, 724, NULL);
-INSERT INTO public.vocabulary VALUES ('de cirkel', 'the circle', NULL, 'https://forvo.com/word/cirkel/#nl', false, false, 1970, 'colors/shapes');
-INSERT INTO public.vocabulary VALUES ('regelen', 'arrange', 'n/a', 'https://forvo.com/word/regelen/#nl', false, false, 969, NULL);
-INSERT INTO public.vocabulary VALUES ('bloem', 'flower', 'n/a', 'https://forvo.com/word/bloem/#nl', false, false, 597, 'nature');
-INSERT INTO public.vocabulary VALUES ('sluiten', 'to close', NULL, 'https://forvo.com/word/sluiten/#nl', false, false, 1495, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('ruziemaken', 'to argue', 'verb', 'https://forvo.com/word/ruziemaken/#nl', false, false, 1030, NULL);
-INSERT INTO public.vocabulary VALUES ('steen', 'stone', 'n/a', 'https://forvo.com/word/steen/#nl', false, false, 682, NULL);
-INSERT INTO public.vocabulary VALUES ('de dijk', 'the dike', NULL, 'https://forvo.com/word/dijk/#nl', false, false, 1760, 'geography');
-INSERT INTO public.vocabulary VALUES ('rivier', 'river', 'n/a', 'https://forvo.com/word/rivier/#nl', false, false, 297, 'nature');
-INSERT INTO public.vocabulary VALUES ('de oorlog', 'the war', NULL, 'https://forvo.com/word/oorlog/#nl', false, false, 2084, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de rug', 'the spine', NULL, 'https://forvo.com/word/rug/#nl', false, false, 1452, 'body');
-INSERT INTO public.vocabulary VALUES ('het bedrijf', 'the company', NULL, 'https://forvo.com/word/bedrijf/#nl', false, false, 1527, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('vergeten', 'to forget', NULL, 'https://forvo.com/word/vergeten/#nl', false, false, 1258, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('stuk', 'piece', 'n/a', 'https://forvo.com/word/stuk/#nl', false, false, 343, NULL);
-INSERT INTO public.vocabulary VALUES ('ware', 'TRUE', 'n/a', 'https://forvo.com/word/ware/#nl', false, false, 456, NULL);
-INSERT INTO public.vocabulary VALUES ('evenement', 'event', 'n/a', 'https://forvo.com/word/evenement/#nl', false, false, 959, NULL);
-INSERT INTO public.vocabulary VALUES ('massa', 'mass', 'n/a', 'https://forvo.com/word/massa/#nl', false, false, 933, NULL);
-INSERT INTO public.vocabulary VALUES ('oefening', 'exercise', 'n/a', 'https://forvo.com/word/oefening/#nl', false, false, 564, NULL);
-INSERT INTO public.vocabulary VALUES ('stop', 'stop', 'n/a', 'https://forvo.com/word/stop/#nl', false, false, 263, NULL);
-INSERT INTO public.vocabulary VALUES ('de bibliotheek', 'the library', NULL, 'https://forvo.com/word/bibliotheek/#nl', false, false, 1219, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('de school', 'the school', NULL, 'https://forvo.com/word/school/#nl', false, false, 1220, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('temperatuur', 'temperature', 'n/a', 'https://forvo.com/word/temperatuur/#nl', false, false, 741, 'weather');
-INSERT INTO public.vocabulary VALUES ('mama', 'mom', NULL, 'https://forvo.com/word/mama/#nl', false, false, 1545, 'family');
-INSERT INTO public.vocabulary VALUES ('ras', 'race', 'n/a', 'https://forvo.com/word/ras/#nl', false, false, 555, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de pijn', 'the ache', NULL, 'https://forvo.com/word/pijn/#nl', false, false, 1720, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de inburgering', 'the assimilation (formal)', NULL, 'https://forvo.com/word/inburgering/#nl', false, false, 1787, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('ofwel', 'either', 'n/a', 'https://forvo.com/word/ofwel/#nl', false, false, 722, NULL);
-INSERT INTO public.vocabulary VALUES ('zitten', 'to sit', NULL, 'https://forvo.com/word/zitten/#nl', false, true, 1643, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('kunnen', 'to can', NULL, 'https://forvo.com/word/kunnen/#nl', true, false, 1494, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('de buik', 'the belly, the stomach', NULL, 'https://forvo.com/word/buik/#nl', true, false, 1453, 'body');
-INSERT INTO public.vocabulary VALUES ('de kerstboom', 'the Christmas tree', NULL, 'https://forvo.com/word/kerstboom/#nl', true, false, 2006, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('ontdekken', 'to discover', NULL, 'https://forvo.com/word/ontdekken/#nl', false, true, 1893, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('zetten', 'to put', NULL, 'https://forvo.com/word/zetten/#nl', false, true, 2097, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('de maan', 'the moon', NULL, 'https://forvo.com/word/maan/#nl', false, false, 1312, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('het legitimatiebewijs', 'the id', NULL, 'https://forvo.com/word/legitimatiebewijs/#nl', false, false, 1780, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('de boekhouder', 'the accountant', NULL, 'https://forvo.com/word/boekhouder/#nl', false, false, 1145, 'professions');
-INSERT INTO public.vocabulary VALUES ('de mus', 'the sparrow', NULL, 'https://forvo.com/word/mus/#nl', false, false, 1586, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('zich legitimeren', 'to identify oneself', NULL, 'https://forvo.com/word/legitimeren/#nl', false, false, 1781, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('alles', 'everything', NULL, 'https://forvo.com/word/alles/#nl', false, false, 1940, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('februari', 'February', NULL, 'https://forvo.com/word/februari/#nl', false, false, 1314, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('de vergiftiging', 'the poisoning', NULL, 'https://forvo.com/word/vergiftiging/#nl', false, false, 1719, 'doctor');
-INSERT INTO public.vocabulary VALUES ('de goudvis', 'the goldfish', NULL, 'https://forvo.com/word/goudvis/#nl', false, false, 2030, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('bieden', 'provide', 'n/a', 'https://forvo.com/word/bieden/#nl', false, false, 796, NULL);
-INSERT INTO public.vocabulary VALUES ('lui', 'lazy', NULL, 'https://forvo.com/word/lui/#nl', false, false, 2066, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('groot', 'big', NULL, 'https://forvo.com/word/groot/#nl', false, false, 1274, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('lekker', 'tasty', NULL, 'https://forvo.com/word/lekker/#nl', false, false, 1276, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('zo', 'like this', NULL, 'https://forvo.com/word/zo/#nl', false, false, 1189, 'question words');
-INSERT INTO public.vocabulary VALUES ('patroon', 'pattern', 'n/a', 'https://forvo.com/word/patroon/#nl', false, false, 485, NULL);
-INSERT INTO public.vocabulary VALUES ('de bus', 'the bus', NULL, 'https://forvo.com/word/bus/#nl', false, false, 1201, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('eigen', 'own', NULL, 'https://forvo.com/word/eigen/#nl', false, false, 2112, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('mijn', 'my', NULL, 'https://forvo.com/word/mijn/#nl', false, false, 2113, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de dierentuin', 'the zoo', NULL, 'https://forvo.com/word/dierentuin/#nl', false, false, 2044, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('de woonboot', 'the house boat', NULL, 'https://forvo.com/word/woonboot/#nl', false, false, 1386, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('schommelstoel', 'rocking chair', 'noun', 'https://forvo.com/word/schommelstoel/#nl', false, false, 1018, 'household');
-INSERT INTO public.vocabulary VALUES ('partituur', 'score', 'n/a', 'https://forvo.com/word/partituur/#nl', false, false, 927, NULL);
-INSERT INTO public.vocabulary VALUES ('wimper', 'eyelash', NULL, 'https://forvo.com/word/wimper/#nl', false, false, 2140, 'body');
-INSERT INTO public.vocabulary VALUES ('aansluiten', 'connect', 'n/a', 'https://forvo.com/word/aansluiten/#nl', false, false, 860, NULL);
-INSERT INTO public.vocabulary VALUES ('Nieuwjaar', 'New year', NULL, 'https://forvo.com/word/Nieuwjaar/#nl', false, false, 2010, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('leerling', 'student', 'n/a', 'https://forvo.com/word/leerling/#nl', false, false, 773, NULL);
-INSERT INTO public.vocabulary VALUES ('wolk', 'cloud', 'n/a', 'https://forvo.com/word/wolk/#nl', false, false, 679, 'nature');
-INSERT INTO public.vocabulary VALUES ('kaart', 'card, map', 'n/a', 'https://forvo.com/word/kaart/#nl', false, false, 934, 'geography');
-INSERT INTO public.vocabulary VALUES ('wind', 'wind', 'n/a', 'https://forvo.com/word/wind/#nl', false, false, 331, 'nature');
-INSERT INTO public.vocabulary VALUES ('want', 'because', NULL, 'https://forvo.com/word/want/#nl', false, false, 1193, 'question words');
-INSERT INTO public.vocabulary VALUES ('de zus', 'the sister', NULL, 'https://forvo.com/word/zus/#nl', false, false, 1547, 'family');
-INSERT INTO public.vocabulary VALUES ('de slaapkamer', 'the sleeping room', NULL, 'https://forvo.com/word/slaapkamer/#nl', false, false, 1423, 'household');
-INSERT INTO public.vocabulary VALUES ('de weg', 'the road', NULL, 'https://forvo.com/word/weg/#nl', false, false, 1198, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('afhangen', 'depend', 'n/a', 'https://forvo.com/word/afhangen/#nl', false, false, 817, NULL);
-INSERT INTO public.vocabulary VALUES ('punt', 'point', 'n/a', 'https://forvo.com/word/punt/#nl', false, false, 94, NULL);
-INSERT INTO public.vocabulary VALUES ('de vrije dag', 'the day off', NULL, '#', false, false, 2000, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('controleren', 'check', 'n/a', 'https://forvo.com/word/controleren/#nl', false, false, 384, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('de berg', 'the mountain', NULL, 'https://forvo.com/word/berg/#nl', false, false, 1763, 'geography');
-INSERT INTO public.vocabulary VALUES ('object', 'object', 'n/a', 'https://forvo.com/word/object/#nl', false, false, 361, NULL);
-INSERT INTO public.vocabulary VALUES ('het avondeten', 'the dinner', NULL, 'https://forvo.com/word/avondeten/#nl', false, false, 1824, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de spijkerbroek', 'the jeans', NULL, 'https://forvo.com/word/spijkerbroek/#nl', false, false, 1464, 'clothes');
-INSERT INTO public.vocabulary VALUES ('de trui', 'the sweater', NULL, 'https://forvo.com/word/trui/#nl', false, false, 1465, 'clothes');
-INSERT INTO public.vocabulary VALUES ('tien over zes', 'ten past six', '', '#', false, false, 1058, 'time');
-INSERT INTO public.vocabulary VALUES ('brengen', 'to bring', NULL, 'https://forvo.com/word/brengen/#nl', false, false, 1490, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('geest', 'mind', 'n/a', 'https://forvo.com/word/geest/#nl', false, false, 445, NULL);
-INSERT INTO public.vocabulary VALUES ('herhaal', 'repeat', 'n/a', 'https://forvo.com/word/herhaal/#nl', false, false, 992, NULL);
-INSERT INTO public.vocabulary VALUES ('sterven', 'die', 'n/a', 'https://forvo.com/word/sterven/#nl', false, false, 610, NULL);
-INSERT INTO public.vocabulary VALUES ('wet', 'law', 'n/a', 'https://forvo.com/word/wet/#nl', false, false, 731, NULL);
-INSERT INTO public.vocabulary VALUES ('base', 'base', 'n/a', 'https://forvo.com/word/base/#nl', false, false, 265, NULL);
-INSERT INTO public.vocabulary VALUES ('kledinghanger', 'coat hanger', 'noun', 'https://forvo.com/word/kledinghanger/#nl', false, false, 1015, 'household');
-INSERT INTO public.vocabulary VALUES ('gewas', 'crop', 'n/a', 'https://forvo.com/word/gewas/#nl', false, false, 769, 'nature');
-INSERT INTO public.vocabulary VALUES ('olie', 'oil', 'n/a', 'https://forvo.com/word/olie/#nl', false, false, 627, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('stijgen', 'rise', 'n/a', 'https://forvo.com/word/stijgen/#nl', false, false, 624, NULL);
-INSERT INTO public.vocabulary VALUES ('‘s nachts', 'at night', '', '#', false, false, 1067, 'time');
-INSERT INTO public.vocabulary VALUES ('de mijne', 'mine', 'n/a', '#', false, false, 833, 'professions');
-INSERT INTO public.vocabulary VALUES ('symbool', 'symbol', 'n/a', 'https://forvo.com/word/symbool/#nl', false, false, 609, 'dutch symbols');
-INSERT INTO public.vocabulary VALUES ('kleden', 'clothe', 'n/a', 'https://forvo.com/word/kleden/#nl', false, false, 598, 'clothes');
-INSERT INTO public.vocabulary VALUES ('scheiden', 'to divorce', NULL, 'https://forvo.com/word/scheiden/#nl', false, false, 1565, 'family');
-INSERT INTO public.vocabulary VALUES ('tien', 'ten', NULL, 'https://forvo.com/word/tien/#nl', false, false, 1232, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('het water', 'the water', NULL, 'https://forvo.com/word/water/#nl', false, false, 1163, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('grote', 'major/big/great/large', 'n/a', 'https://forvo.com/word/grote/#nl', false, false, 836, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('beetje', 'bit', 'n/a', 'https://forvo.com/word/beetje/#nl', false, false, 732, NULL);
-INSERT INTO public.vocabulary VALUES ('de kapper', 'the hairdresser', NULL, 'https://forvo.com/word/kapper/#nl', false, false, 1143, 'professions');
-INSERT INTO public.vocabulary VALUES ('negen', 'nine', NULL, 'https://forvo.com/word/negen/#nl', false, false, 1231, 'numbers/counting');
-INSERT INTO public.vocabulary VALUES ('dicht', 'close', 'n/a', 'https://forvo.com/word/dicht/#nl', false, false, 246, NULL);
-INSERT INTO public.vocabulary VALUES ('de muis', 'the mouse', NULL, 'https://forvo.com/word/muis/#nl', false, false, 1571, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de tandarts', 'the dentist', NULL, 'https://forvo.com/word/tandarts/#nl', false, false, 1734, 'doctor');
-INSERT INTO public.vocabulary VALUES ('week', 'week', NULL, 'https://forvo.com/word/week/#nl', false, false, 1301, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('het konijn', 'the rabbit', NULL, 'https://forvo.com/word/konijn/#nl', false, false, 1572, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('kamp', 'camp', 'n/a', 'https://forvo.com/word/kamp/#nl', false, false, 970, NULL);
-INSERT INTO public.vocabulary VALUES ('regenen', 'to rain', NULL, 'https://forvo.com/word/regenen/#nl', false, false, 1670, 'weather');
-INSERT INTO public.vocabulary VALUES ('roken', 'to smoke', NULL, 'https://forvo.com/word/roken/#nl', false, false, 1111, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('bracht', 'brought', 'n/a', 'https://forvo.com/word/bracht/#nl', false, false, 390, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('anders', 'else', 'n/a', 'https://forvo.com/word/anders/#nl', true, false, 653, NULL);
-INSERT INTO public.vocabulary VALUES ('poort', 'port', 'n/a', 'https://forvo.com/word/poort/#nl', true, false, 66, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('het lichaam, het lijf', 'the body', NULL, 'https://forvo.com/word/lichaam/#nl', true, false, 1432, 'body');
-INSERT INTO public.vocabulary VALUES ('klein', 'small', NULL, 'https://forvo.com/word/klein/#nl', false, true, 1275, 'common adjectives (1)');
-INSERT INTO public.vocabulary VALUES ('stad', 'town/city', 'n/a', 'https://forvo.com/word/stad/#nl', true, false, 404, 'geography');
-INSERT INTO public.vocabulary VALUES ('de baas', 'the boss', NULL, 'https://forvo.com/word/baas/#nl', true, false, 1133, 'professions');
-INSERT INTO public.vocabulary VALUES ('sporten', 'to exercise', NULL, 'https://forvo.com/word/sporten/#nl', false, false, 1365, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('de heuvel', 'the hill', NULL, 'https://forvo.com/word/heuvel/#nl', false, false, 1764, 'geography');
-INSERT INTO public.vocabulary VALUES ('akkoord', 'chord', 'n/a', 'https://forvo.com/word/akkoord/#nl', false, false, 863, NULL);
-INSERT INTO public.vocabulary VALUES ('geluk', 'the happiness', NULL, 'https://forvo.com/word/geluk/#nl', false, false, 2106, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('teken', 'sign', 'n/a', 'https://forvo.com/word/teken/#nl', false, false, 583, NULL);
-INSERT INTO public.vocabulary VALUES ('de neus', 'the nose', NULL, 'https://forvo.com/word/neus/#nl', false, false, 1442, 'body');
-INSERT INTO public.vocabulary VALUES ('brand', 'fire', 'n/a', 'https://forvo.com/word/brand/#nl', false, false, 340, NULL);
-INSERT INTO public.vocabulary VALUES ('kindje', 'baby', 'n/a', 'https://forvo.com/word/kindje/#nl', false, false, 702, 'family');
-INSERT INTO public.vocabulary VALUES ('de boerderij', 'the farm', NULL, 'https://forvo.com/word/boerderij/#nl', false, false, 1574, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('het kuiken', 'the chick', 'n/a', 'https://forvo.com/word/kuiken/#nl', false, false, 882, 'animals (2)');
-INSERT INTO public.vocabulary VALUES ('hem', 'him', 'n/a', 'https://forvo.com/word/hem/#nl', false, false, 173, NULL);
-INSERT INTO public.vocabulary VALUES ('eenvoudig', 'simple', 'n/a', 'https://forvo.com/word/eenvoudig/#nl', false, false, 478, NULL);
-INSERT INTO public.vocabulary VALUES ('verzamelen', 'to collect/gather', 'n/a', 'https://forvo.com/word/verzamelen/#nl', false, false, 648, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('het potlood', 'the pencil', NULL, 'https://forvo.com/word/potlood/#nl', false, false, 1921, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de pen', 'the pen', NULL, 'https://forvo.com/word/pen/#nl', false, false, 1922, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de olie', 'the oil', NULL, 'https://forvo.com/word/olie/#nl', false, false, 1924, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('draad', 'wire', 'n/a', 'https://forvo.com/word/draad/#nl', false, false, 634, NULL);
-INSERT INTO public.vocabulary VALUES ('drop', 'liquorice', NULL, 'https://forvo.com/word/drop/#nl', false, false, 1172, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('gevangen', 'caught', 'n/a', 'https://forvo.com/word/gevangen/#nl', false, false, 782, NULL);
-INSERT INTO public.vocabulary VALUES ('kracht', 'force/power', 'n/a', 'https://forvo.com/word/kracht/#nl', false, false, 359, 'misc. words (1)');
-INSERT INTO public.vocabulary VALUES ('ziek', 'ill', NULL, 'https://forvo.com/word/ziek/#nl', false, false, 1711, 'doctor');
-INSERT INTO public.vocabulary VALUES ('bouwen', 'to build', NULL, 'https://forvo.com/word/bouwen/#nl', false, false, 1653, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('raamstoel', 'window seat', NULL, 'https://forvo.com/word/raamstoel/#nl', false, false, 2147, 'household');
-INSERT INTO public.vocabulary VALUES ('overwegen', 'to consider', NULL, 'https://forvo.com/word/overwegen/#nl', false, false, 1652, 'common verbs (3)');
-INSERT INTO public.vocabulary VALUES ('creëren', 'create', 'n/a', 'https://forvo.com/word/creëren/#nl', false, false, 806, NULL);
-INSERT INTO public.vocabulary VALUES ('de mandarijn', 'the mandarin', NULL, 'https://forvo.com/word/mandarijn/#nl', false, false, 1874, 'fruits/veggies');
-INSERT INTO public.vocabulary VALUES ('vrouwen', 'women', 'n/a', 'https://forvo.com/word/vrouwen/#nl', false, false, 907, 'family');
-INSERT INTO public.vocabulary VALUES ('voor', 'for/before/in front of', NULL, 'https://forvo.com/word/voor/#nl', false, false, 1333, 'prepositions');
-INSERT INTO public.vocabulary VALUES ('ons', 'us', 'n/a', 'https://forvo.com/word/ons/#nl', false, false, 91, NULL);
-INSERT INTO public.vocabulary VALUES ('verhaal', 'story', 'n/a', 'https://forvo.com/word/verhaal/#nl', false, false, 235, NULL);
-INSERT INTO public.vocabulary VALUES ('de pannenkoek', 'the pancake', NULL, 'https://forvo.com/word/pannenkoek/#nl', false, false, 1170, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('vreemd', 'strange', 'n/a', 'https://forvo.com/word/vreemd/#nl', false, false, 599, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('eenzaam', 'lonely', NULL, 'https://forvo.com/word/eenzaam/#nl', false, false, 2072, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('bewijzen', 'prove', 'n/a', 'https://forvo.com/word/bewijzen/#nl', false, false, 561, NULL);
-INSERT INTO public.vocabulary VALUES ('gat', 'hole', 'n/a', 'https://forvo.com/word/gat/#nl', false, false, 700, NULL);
-INSERT INTO public.vocabulary VALUES ('gewicht', 'weight', 'n/a', 'https://forvo.com/word/gewicht/#nl', false, false, 526, NULL);
-INSERT INTO public.vocabulary VALUES ('de kaas', 'the cheese', NULL, 'https://forvo.com/word/kaas/#nl', false, false, 1153, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('dorp', 'village', 'n/a', 'https://forvo.com/word/dorp/#nl', false, false, 704, 'geography');
-INSERT INTO public.vocabulary VALUES ('woestijn', 'desert', 'n/a', 'https://forvo.com/word/woestijn/#nl', false, false, 846, 'nature');
-INSERT INTO public.vocabulary VALUES ('het adres', 'the address', NULL, 'https://forvo.com/word/adres/#nl', false, false, 1776, 'moving/immigration');
-INSERT INTO public.vocabulary VALUES ('het brood', 'the bread', NULL, 'https://forvo.com/word/brood/#nl', false, false, 1151, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('excite', 'excite', 'n/a', 'https://forvo.com/word/excite/#nl', false, false, 748, NULL);
-INSERT INTO public.vocabulary VALUES ('spell', 'spell', 'n/a', 'https://forvo.com/word/spell/#nl', false, false, 68, NULL);
-INSERT INTO public.vocabulary VALUES ('vrachtwagen', 'truck', 'n/a', 'https://forvo.com/word/vrachtwagen/#nl', false, false, 977, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('oh', 'oh', 'n/a', 'https://forvo.com/word/oh/#nl', false, false, 436, NULL);
-INSERT INTO public.vocabulary VALUES ('de ontsteking', 'the inflammation', NULL, 'https://forvo.com/word/ontsteking/#nl', false, false, 1716, 'doctor');
-INSERT INTO public.vocabulary VALUES ('misselijk', 'nauseous', NULL, 'https://forvo.com/word/misselijk/#nl', false, false, 1717, 'doctor');
-INSERT INTO public.vocabulary VALUES ('het plein', 'the square', NULL, 'https://forvo.com/word/plein/#nl', false, false, 1395, 'Amsterdam');
-INSERT INTO public.vocabulary VALUES ('leuk vinden', 'to like', NULL, '#', false, false, 1508, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('de vlieg', 'the fly', NULL, 'https://forvo.com/word/vlieg/#nl', false, false, 1591, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('het vuur', 'the fire', NULL, 'https://forvo.com/word/vuur/#nl', false, false, 1838, 'cooking');
-INSERT INTO public.vocabulary VALUES ('de jas', 'the coat', NULL, 'https://forvo.com/word/jas/#nl', false, false, 1466, 'clothes');
-INSERT INTO public.vocabulary VALUES ('leeftijd', 'age', 'n/a', 'https://forvo.com/word/leeftijd/#nl', false, false, 676, 'time');
-INSERT INTO public.vocabulary VALUES ('lokaliseren', 'locate', 'n/a', 'https://forvo.com/word/lokaliseren/#nl', false, false, 778, 'common verbs (4)');
-INSERT INTO public.vocabulary VALUES ('aankomen', 'arrive', 'n/a', 'https://forvo.com/word/aankomen/#nl', false, false, 851, NULL);
-INSERT INTO public.vocabulary VALUES ('begeleiden', 'guide', 'n/a', 'https://forvo.com/word/begeleiden/#nl', false, false, 925, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('heerlijk', 'delicious', 'adjective', 'https://forvo.com/word/heerlijk/#nl', false, false, 1007, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('gemak', 'ease', 'n/a', 'https://forvo.com/word/gemak/#nl', false, false, 285, NULL);
-INSERT INTO public.vocabulary VALUES ('mogelijk', 'possible', NULL, 'https://forvo.com/word/mogelijk/#nl', false, false, 1704, 'common adjectives (2)');
-INSERT INTO public.vocabulary VALUES ('staart', 'tail', 'n/a', 'https://forvo.com/word/staart/#nl', false, false, 448, NULL);
-INSERT INTO public.vocabulary VALUES ('de eerste helft', 'the first half', NULL, '#', true, false, 1610, 'football');
-INSERT INTO public.vocabulary VALUES ('de koe', 'the cow', NULL, 'https://forvo.com/word/koe/#nl', false, false, 1575, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('denken', 'to think', NULL, 'https://forvo.com/word/denken/#nl', true, false, 1271, 'common verbs (1)');
-INSERT INTO public.vocabulary VALUES ('klap', 'blow', 'n/a', 'https://forvo.com/word/klap/#nl', false, false, 626, NULL);
-INSERT INTO public.vocabulary VALUES ('de teen', 'the toe', NULL, 'https://forvo.com/word/teen/#nl', false, false, 1451, 'body');
-INSERT INTO public.vocabulary VALUES ('probleem', 'problem', 'n/a', 'https://forvo.com/word/probleem/#nl', false, true, 342, NULL);
-INSERT INTO public.vocabulary VALUES ('algemeen', 'general', NULL, 'https://forvo.com/word/algemeen/#nl', true, false, 2057, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('leggen', 'lay', 'n/a', 'https://forvo.com/word/leggen/#nl', true, false, 483, NULL);
-INSERT INTO public.vocabulary VALUES ('dom', 'stupid', NULL, 'https://forvo.com/word/dom/#nl', false, false, 2060, 'common adjectives (4)');
-INSERT INTO public.vocabulary VALUES ('hoe laat is het?', 'what time is it?', 'question', '#', false, false, 1047, 'time');
-INSERT INTO public.vocabulary VALUES ('energie', 'energy', 'n/a', 'https://forvo.com/word/energie/#nl', false, false, 502, 'nature');
-INSERT INTO public.vocabulary VALUES ('de vos', 'the fox', NULL, 'https://forvo.com/word/vos/#nl', false, false, 2033, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de sleutel', 'the key', NULL, 'https://forvo.com/word/sleutel/#nl', false, false, 1918, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('de premier', 'the prime minister', NULL, 'https://forvo.com/word/premier/#nl', false, false, 1130, 'professions');
-INSERT INTO public.vocabulary VALUES ('de vriend', 'the (boy) friend', NULL, 'https://forvo.com/word/vriend/#nl', false, false, 1556, 'family');
-INSERT INTO public.vocabulary VALUES ('een beetje', 'a bit', NULL, 'https://forvo.com/word/beetje/#nl', false, false, 1941, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('altijd', 'always', NULL, 'https://forvo.com/word/altijd/#nl', false, true, 1951, 'adverbs');
-INSERT INTO public.vocabulary VALUES ('is', 'is', 'n/a', 'https://forvo.com/word/is/#nl', false, false, 25, NULL);
-INSERT INTO public.vocabulary VALUES ('het zilver', 'the silver', NULL, 'https://forvo.com/word/zilver/#nl', false, false, 1928, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('pond', 'pound', 'n/a', 'https://forvo.com/word/pond/#nl', false, false, 424, NULL);
-INSERT INTO public.vocabulary VALUES ('a.u.b.', 'please', NULL, 'https://forvo.com/word/a.u.b./#nl', false, false, 1106, 'pronouns/thanking');
-INSERT INTO public.vocabulary VALUES ('klimmen', 'climb', 'n/a', 'https://forvo.com/word/klimmen/#nl', false, false, 684, NULL);
-INSERT INTO public.vocabulary VALUES ('de rook', 'the smoke', NULL, 'https://forvo.com/word/rook/#nl', true, false, 1839, 'cooking');
-INSERT INTO public.vocabulary VALUES ('moe', 'tired', NULL, 'https://forvo.com/word/moe/#nl', false, false, 1795, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('gevaar', 'danger', 'n/a', 'https://forvo.com/word/gevaar/#nl', false, false, 755, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('Koningsdag', 'King’s Day', NULL, 'https://forvo.com/word/Koningsdag/#nl', false, false, 2001, 'celebrations/holidays');
-INSERT INTO public.vocabulary VALUES ('tijdperk', 'era', 'noun', 'https://forvo.com/word/tijdperk/#nl', false, false, 1045, 'time');
-INSERT INTO public.vocabulary VALUES ('brief', 'letter', 'n/a', 'https://forvo.com/word/brief/#nl', false, false, 294, NULL);
-INSERT INTO public.vocabulary VALUES ('atoom', 'atom', 'n/a', 'https://forvo.com/word/atoom/#nl', false, false, 787, 'nature');
-INSERT INTO public.vocabulary VALUES ('vreugde', 'joy', 'n/a', 'https://forvo.com/word/vreugde/#nl', false, false, 571, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('ondersteuning', 'support', 'n/a', 'https://forvo.com/word/ondersteuning/#nl', false, false, 888, NULL);
-INSERT INTO public.vocabulary VALUES ('pyjama', 'pajamas', NULL, 'https://forvo.com/word/pyjama/#nl', false, false, 2150, 'clothes');
-INSERT INTO public.vocabulary VALUES ('instrument', 'instrument', 'n/a', 'https://forvo.com/word/instrument/#nl', false, false, 576, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('bellen', 'to call', NULL, 'https://forvo.com/word/bellen/#nl', false, false, 1493, 'common verbs (2)');
-INSERT INTO public.vocabulary VALUES ('water', 'water', 'n/a', 'https://forvo.com/word/water/#nl', false, false, 191, 'nature');
-INSERT INTO public.vocabulary VALUES ('openen', 'to open', NULL, 'https://forvo.com/word/openen/#nl', false, false, 1919, 'tools/materials');
-INSERT INTO public.vocabulary VALUES ('antwoord', 'answer', 'n/a', 'https://forvo.com/word/antwoord/#nl', false, false, 209, NULL);
-INSERT INTO public.vocabulary VALUES ('koele', 'cool', 'n/a', 'https://forvo.com/word/koele/#nl', false, false, 685, NULL);
-INSERT INTO public.vocabulary VALUES ('de auto', 'the car', NULL, 'https://forvo.com/word/auto/#nl', true, false, 1200, 'traffic/buildings');
-INSERT INTO public.vocabulary VALUES ('juni', 'June', NULL, 'https://forvo.com/word/juni/#nl', false, false, 1318, 'weekdays/months/seasons');
-INSERT INTO public.vocabulary VALUES ('borrelen', 'to have a drink', NULL, 'https://forvo.com/word/borrelen/#nl', false, false, 1370, 'hobbies');
-INSERT INTO public.vocabulary VALUES ('scherpe', 'sharp', 'n/a', 'https://forvo.com/word/scherpe/#nl', false, false, 804, NULL);
-INSERT INTO public.vocabulary VALUES ('chagrijnig', 'grumpy', NULL, 'https://forvo.com/word/chagrijnig/#nl', false, false, 1794, 'moods/emotions');
-INSERT INTO public.vocabulary VALUES ('handel', 'trade', 'n/a', 'https://forvo.com/word/handel/#nl', false, false, 601, 'job hunting/business');
-INSERT INTO public.vocabulary VALUES ('lift', 'lift', 'n/a', 'https://forvo.com/word/lift/#nl', false, false, 849, NULL);
-INSERT INTO public.vocabulary VALUES ('buitenspel', 'offside', NULL, 'https://forvo.com/word/buitenspel/#nl', false, false, 1623, 'football');
-INSERT INTO public.vocabulary VALUES ('de directeur', 'the (company) director', NULL, 'https://forvo.com/word/directeur/#nl', false, false, 1144, 'professions');
-INSERT INTO public.vocabulary VALUES ('het bier', 'the beer', NULL, 'https://forvo.com/word/bier/#nl', false, false, 1161, 'food/drink');
-INSERT INTO public.vocabulary VALUES ('puistje', 'pimple', 'noun', 'https://forvo.com/word/puistje/#nl', false, false, 1024, 'body');
-INSERT INTO public.vocabulary VALUES ('thuis', 'home', NULL, 'https://forvo.com/word/thuis/#nl', false, false, 2109, 'misc. words (2)');
-INSERT INTO public.vocabulary VALUES ('de schildpad', 'the turtle', NULL, 'https://forvo.com/word/schildpad/#nl', false, false, 2028, 'animals (1)');
-INSERT INTO public.vocabulary VALUES ('de straat', 'the street', NULL, 'https://forvo.com/word/straat/#nl', false, false, 1197, 'traffic/buildings');
+COPY public.vocabulary (dutch, english, notes, pronunciationlink, seen, mastered, id, set_name, created_date, de_het) FROM stdin;
+bang	afraid	\N	https://forvo.com/word/bang/#nl	f	t	1804	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+vroeg	early	\N	https://forvo.com/word/vroeg/#nl	t	f	1692	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+welke dag (van de week)?	which day of the week	\N	#	f	t	1303	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de kampioen	the champion	\N	https://forvo.com/word/kampioen/#nl	t	f	1624	football	2023-09-27 14:59:57.873874+01	\N
+rit	ride	n/a	https://forvo.com/word/rit/#nl	t	f	508	\N	2023-09-27 14:59:57.873874+01	\N
+jullie	you (all)	\N	https://forvo.com/word/jullie/#nl	f	t	1125	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+ontwikkelen	to develop	\N	https://forvo.com/word/ontwikkelen/#nl	t	f	1894	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+januari	January	\N	https://forvo.com/word/januari/#nl	f	t	1313	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+bodem	soil	n/a	https://forvo.com/word/bodem/#nl	t	f	739	nature	2023-09-27 14:59:57.873874+01	\N
+serveren	to serve	verb	https://forvo.com/word/serveren/#nl	t	f	1005	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de buren	the neighbours	\N	https://forvo.com/word/buren/#nl	t	f	1777	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+de politieman/de agent	the police officer	\N	https://forvo.com/word/politieman/#nl	t	f	1141	professions	2023-09-27 14:59:57.873874+01	\N
+vies	dirty, disgusting	\N	https://forvo.com/word/vies/#nl	f	t	1277	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+hij	he	\N	https://forvo.com/word/hij/#nl	f	t	1120	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+de voetballer	the football player	\N	https://forvo.com/word/voetballer/#nl	f	t	1129	professions	2023-09-27 14:59:57.873874+01	\N
+dik	thick, fat	\N	https://forvo.com/word/dik/#nl	f	f	1985	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+set	set	n/a	https://forvo.com/word/set/#nl	f	t	53	\N	2023-09-27 14:59:57.873874+01	\N
+de trein	the train	\N	https://forvo.com/word/trein/#nl	f	f	1202	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+het politiebureau	the police station	\N	https://forvo.com/word/politiebureau/#nl	f	t	1218	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de provincie	the province	\N	https://forvo.com/word/provincie/#nl	f	f	1741	geography	2023-09-27 14:59:57.873874+01	\N
+welkom	welcome	\N	https://forvo.com/word/welkom/#nl	f	t	2108	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het concert	the concert	\N	https://forvo.com/word/concert/#nl	f	f	1392	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+het schaap	the sheep	\N	https://forvo.com/word/schaap/#nl	f	f	2031	animals (1)	2023-09-27 14:59:57.873874+01	\N
+noord	north	\N	https://forvo.com/word/noord/#nl	f	f	2076	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+hoed	hat	n/a	https://forvo.com/word/hoed/#nl	f	f	954	\N	2023-09-27 14:59:57.873874+01	\N
+exacte	exact	n/a	https://forvo.com/word/exacte/#nl	f	t	608	\N	2023-09-27 14:59:57.873874+01	\N
+naast	next to	\N	https://forvo.com/word/naast/#nl	f	f	1335	prepositions	2023-09-27 14:59:57.873874+01	\N
+de boom	the tree	\N	https://forvo.com/word/boom/#nl	f	f	2111	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het park	the park	\N	https://forvo.com/word/park/#nl	f	f	1405	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+rood	red	\N	https://forvo.com/word/rood/#nl	f	f	1968	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+heel	whole, very, quite	\N	https://forvo.com/word/heel/#nl	f	f	1695	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+soldaat	soldier	n/a	https://forvo.com/word/soldaat/#nl	f	t	759	\N	2023-09-27 14:59:57.873874+01	\N
+de oliebol	Dutch fritter with raisins	\N	https://forvo.com/word/oliebol/#nl	f	t	2009	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+werelddeel	continent	n/a	https://forvo.com/word/werelddeel/#nl	t	f	1001	geography	2023-09-27 14:59:57.873874+01	\N
+de koelkast	the fridge	\N	https://forvo.com/word/koelkast/#nl	f	t	1419	household	2023-09-27 14:59:57.873874+01	\N
+overschakelen	to switch over		https://forvo.com/word/overschakelen/#nl	f	f	2209		2023-09-27 14:59:57.873874+01	\N
+best	best	\N	https://forvo.com/word/best/#nl	f	t	1688	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+nul	zero	\N	https://forvo.com/word/nul/#nl	f	t	1222	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+ronde	round	n/a	https://forvo.com/word/ronde/#nl	f	t	116	\N	2023-09-27 14:59:57.873874+01	\N
+zeggen	to say	\N	https://forvo.com/word/zeggen/#nl	f	t	1270	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+zes	six	\N	https://forvo.com/word/zes/#nl	f	t	1228	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+genoeg	enough	\N	https://forvo.com/word/genoeg/#nl	f	t	1954	adverbs	2023-09-27 14:59:57.873874+01	\N
+de sok	the sock (short)	\N	https://forvo.com/word/sok/#nl	f	t	1469	clothes	2023-09-27 14:59:57.873874+01	\N
+de borst	the chest, the breast	\N	https://forvo.com/word/borst/#nl	f	t	1456	body	2023-09-27 14:59:57.873874+01	\N
+de coffeeshop	bar where soft drugs is sold	\N	https://forvo.com/word/coffeeshop/#nl	f	t	1400	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+in orde	fine / alright	"ben je in orde?"		f	f	2266	phrase	2023-11-30 15:13:14.177227+00	\N
+het einde	the end	\N	https://forvo.com/word/einde/#nl	f	t	2092	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+het europees kampioenschap (ek)	the european championship	\N	#	t	f	1626	football	2023-09-27 14:59:57.873874+01	\N
+het uur	the hour		https://forvo.com/word/uur/#nl	f	t	1050	time	2023-09-27 14:59:57.873874+01	\N
+serieus	serious	\N	https://forvo.com/word/serieus/#nl	f	t	1819	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+het water	the water	\N	https://forvo.com/word/water/#nl	f	t	1163	food/drink	2023-09-27 14:59:57.873874+01	\N
+droog	dry	\N	https://forvo.com/word/droog/#nl	f	t	2056	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+papier	paper	n/a	https://forvo.com/word/papier/#nl	f	t	286	tools/materials	2023-09-27 14:59:57.873874+01	\N
+slim	clever	\N	https://forvo.com/word/slim/#nl	f	t	2061	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+schoon	clean	\N	https://forvo.com/word/schoon/#nl	f	t	1278	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de	the	\N	https://forvo.com/word/de/#nl	f	t	1082	introductory	2023-09-27 14:59:57.873874+01	\N
+snel	fast/quick	\N	https://forvo.com/word/snel/#nl	f	t	1291	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+snelheid	speed	n/a	https://forvo.com/word/snelheid/#nl	f	t	672	\N	2023-09-27 14:59:57.873874+01	\N
+het concertgebouw	the Concertgebouw	\N	https://forvo.com/word/concertgebouw/#nl	f	t	1394	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+toevoegen	add	n/a	https://forvo.com/word/toevoegen/#nl	f	t	69	\N	2023-09-27 14:59:57.873874+01	\N
+zijn	his/are/be	\N	https://forvo.com/word/zijn/#nl	f	t	2116	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de hagelslag	the chocolate sprinkles	\N	https://forvo.com/word/hagelslag/#nl	f	t	1154	food/drink	2023-09-27 14:59:57.873874+01	\N
+week	week	\N	https://forvo.com/word/week/#nl	f	t	1301	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+(het)zelfde	same	\N	https://forvo.com/word/zelfde/#nl	t	t	1993	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+de worst	the sausage	\N	https://forvo.com/word/worst/#nl	f	t	1856	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het gras	the grass	\N	https://forvo.com/word/gras/#nl	f	t	2110	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+spoed	urgent	\N	https://forvo.com/word/spoed/#nl	t	t	1728	doctor	2023-09-27 14:59:57.873874+01	\N
+douchen	to share	n/a	https://forvo.com/word/douchen/#nl	f	f	2155	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+stofzuigen	to vacuum	n/a	https://forvo.com/word/stofzuigen/#nl	f	f	2156	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+spons	sponge	n/a	https://forvo.com/word/spons/#nl	f	f	2157	household	2023-09-27 14:59:57.873874+01	\N
+nerveus	anxious	n/a	https://forvo.com/word/nerveus/#nl	f	f	2158	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+vliegtuig	plane	n/a	https://forvo.com/word/vliegtuig/#nl	f	f	376	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+diep	deep	n/a	https://forvo.com/word/diep/#nl	f	f	2159	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+wachtkamer	waiting room	n/a	https://forvo.com/word/wachtkamer/#nl	f	f	2160	doctor	2023-09-27 14:59:57.873874+01	\N
+duizend	thousand	\N	https://forvo.com/word/duizend/#nl	f	f	1245	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+april	April	\N	https://forvo.com/word/april/#nl	f	f	1316	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+tapijt	carpet	n/a	https://forvo.com/word/tapijt/#nl	f	f	2162	household	2023-09-27 14:59:57.873874+01	\N
+vuil	dirty	n/a	https://forvo.com/word/vuil/#nl	f	f	2163	household	2023-09-27 14:59:57.873874+01	\N
+kok	cook	n/a	https://forvo.com/word/kok/#nl	f	f	720	cooking	2023-09-27 14:59:57.873874+01	\N
+meer	more/lake	n/a	https://forvo.com/word/meer/#nl	f	f	1963	adverbs	2023-09-27 14:59:57.873874+01	\N
+grillen	to grill	n/a	https://forvo.com/word/grillen/#nl	f	f	2165	cooking	2023-09-27 14:59:57.873874+01	\N
+enkel	ankle	n/a	https://forvo.com/word/enkel/#nl	f	f	2167	body	2023-09-27 14:59:57.873874+01	\N
+haan	rooster	n/a	https://forvo.com/word/haan/#nl	f	f	2168	animals (2)	2023-09-27 14:59:57.873874+01	\N
+afstandsbediening	remote control	n/a	https://forvo.com/word/afstandsbediening/#nl	f	f	2169	household	2023-09-27 14:59:57.873874+01	\N
+benzene	gas/petrol	n/a	https://forvo.com/word/benzene/#nl	t	t	2164	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+zien	to see	\N	https://forvo.com/word/zien/#nl	t	t	1261	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+baden	to bathe	n/a	https://forvo.com/word/baden/#nl	f	t	2161	household	2023-09-27 14:59:57.873874+01	\N
+zich	them/her/his/itself	reflexive pronoun	https://forvo.com/word/zich/	f	f	2210		2023-09-27 14:59:57.873874+01	\N
+bekend	famous		#	f	f	2267		2023-11-30 15:14:17.709082+00	\N
+beloven	to promise	UvA A2 Course		f	f	2270	UvA A2 Course	2024-03-11 17:23:54.567243+00	\N
+voetpad	sidewalk	n/a	https://forvo.com/word/voetpad/#nl	f	t	2166	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+hoog	high, tall	\N	https://forvo.com/word/hoog/#nl	f	t	1298	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+deur	door	n/a	https://forvo.com/word/deur/#nl	t	f	325	household	2023-09-27 14:59:57.873874+01	\N
+toch	(loosely) though/anyway/afterall		https://forvo.com/word/toch/	f	f	2211		2023-09-27 14:59:57.873874+01	\N
+scheidbaar werkwoord	separable verb		#	f	f	2268	grammar	2023-11-30 15:15:12.089177+00	\N
+afspreken	to meet/schedule		#	f	f	2269		2023-11-30 15:15:41.47022+00	\N
+de ring	the ring, the ring road	\N	https://forvo.com/word/ring/#nl	f	t	1399	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+de huisarts	the general practitioner	\N	https://forvo.com/word/huisarts/#nl	t	t	1723	doctor	2023-09-27 14:59:57.873874+01	\N
+stel	imagine/propose/suggest	n/a	https://forvo.com/word/stel/#nl	f	f	795	\N	2023-09-27 14:59:57.873874+01	\N
+openbaar	public	UvA A2 Course		f	f	2272	UvA A2 Course	2024-03-11 17:25:36.883822+00	\N
+vervoer	transport	UvA A2 Course		f	f	2273	UvA A2 Course	2024-03-11 17:25:59.699391+00	\N
+nogal	rather/quite	UvA A2 Course		f	f	2275	UvA A2 Course	2024-03-11 17:26:48.545675+00	\N
+afvallen	to lose weight	UvA A2 Course		f	f	2276	UvA A2 Course	2024-03-11 17:27:13.110626+00	\N
+gewicht verliezen	to lose weight (weight loss)	UvA A2 Course		f	f	2277	UvA A2 Course	2024-03-11 17:27:41.415102+00	\N
+opgetreden	occurred	UvA A2 Course		f	f	2278	UvA A2 Course	2024-03-11 17:28:10.560948+00	\N
+voorstel	to propose, introduce	UvA A2 Course		f	f	2271	UvA A2 Course	2024-03-11 17:25:11.838923+00	\N
+ervaren	experienced / to experience	UvA A2 Course also		f	f	2274	UvA B1A Course CH4	2024-03-11 17:26:25.632092+00	\N
+zal niet	won’t	n/a	#	f	t	753	\N	2023-09-27 14:59:57.873874+01	\N
+vervolgens	next/then/subsequently		https://forvo.com/word/vervolgens/	f	f	2212		2023-09-27 14:59:57.873874+01	\N
+de komkommer	the cucumber	\N	https://forvo.com/word/komkommer/#nl	t	t	1859	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+beterschap	get better	UvA A2 Course		f	f	2279	UvA A2 Course	2024-03-11 17:28:45.023393+00	\N
+groeien	to grow	\N	https://forvo.com/word/groeien/#nl	f	f	1649	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+regenachtig	rainy	UvA A2 Course		f	f	2280	UvA A2 Course	2024-03-11 17:29:04.998362+00	\N
+zich inschrijven	to enroll	UvA A2 Course		f	f	2281	UvA A2 Course	2024-03-11 17:29:34.97065+00	\N
+het bedrag	the amount	UvA A2 Course		f	f	2283	UvA A2 Course	2024-03-11 17:30:13.959401+00	\N
+onbeperkt	unlimited	UvA A2 Course		f	f	2284	UvA A2 Course	2024-03-11 17:30:29.8609+00	\N
+de aanbieding	the offer	UvA A2 Course		f	f	2285	UvA A2 Course	2024-03-11 17:30:56.471355+00	\N
+verbeteren	to improve	UvA A2 Course		f	f	2286	UvA A2 Course	2024-03-11 17:31:46.301505+00	\N
+de spieren	the muscles	UvA A2 Course		f	f	2287	UvA A2 Course	2024-03-11 17:32:04.131032+00	\N
+versterken	to strengthen	UvA A2 Course		f	f	2288	UvA A2 Course	2024-03-11 17:32:19.82872+00	\N
+verliezen	to lose	UvA A2 Course	https://forvo.com/word/verliezen/#nl	f	f	1510	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+van plan zijn	to intend to	UvA A2 Course		f	f	2289	UvA A2 Course	2024-03-11 17:33:03.229932+00	\N
+derde	third	n/a	https://forvo.com/word/derde/#nl	f	t	715	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+coat	coat	n/a	https://forvo.com/word/coat/#nl	f	t	932	clothes	2023-09-27 14:59:57.873874+01	\N
+hield	held	UvA A2 Course		f	f	2375		2024-03-28 18:35:40.947187+00	\N
+geschreven	written	n/a	https://forvo.com/word/geschreven/#nl	f	t	574	\N	2023-09-27 14:59:57.873874+01	\N
+de pyjama	the pyjamas	\N	https://forvo.com/word/pyjama/#nl	f	t	1482	clothes	2023-09-27 14:59:57.873874+01	\N
+een hekel hebben aan	cannot stand/to dislike or hate		#	f	f	2380	UvA B1A Course CH1	2024-06-28 20:21:09.472412+01	\N
+benieuwd naar	curious about		#	f	f	2381	UvA B1A Course CH1	2024-06-28 20:21:31.024812+01	\N
+sturen naar / aan	to send to		#	f	f	2382	UvA B1A Course CH1	2024-06-28 20:21:55.1321+01	\N
+onderzoek doen naar	to do research on		#	f	f	2383	UvA B1A Course CH1	2024-06-28 20:22:25.165857+01	\N
+zich ergeren aan	to get annoyed by		#	f	f	2384	UvA B1A Course CH1	2024-06-28 20:22:42.689318+01	\N
+stilstaan bij	to stop to think about/stand still		#	f	f	2385	UvA B1A Course CH1	2024-06-28 20:23:03.959078+01	\N
+meekrijgen	to be given (as a gift)		#	f	f	2386	UvA B1A Course CH1	2024-06-28 20:23:24.046777+01	\N
+verwerking in	to showcase in/to process or use in		#	f	f	2387	UvA B1A Course CH1	2024-06-28 20:23:41.253588+01	\N
+verwarren	to confuse	verb	#	f	f	2388	UvA B1A Course CH1	2024-06-28 20:24:04.935732+01	\N
+draaien om	to revolve around			f	f	2477	UvA B1A Course CH2	2024-07-12 20:41:38.208033+01	\N
+de band	tire, band, connection	UvA A2 Course	https://forvo.com/word/band/#nl	f	t	393	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+plaatsvinden	to take place			f	f	2478	UvA B1A Course CH2	2024-07-12 20:42:37.579034+01	\N
+het kwade	the bad			f	f	2479	UvA B1A Course CH3	2024-07-12 20:42:57.261673+01	\N
+overwinnen	to overcome/triumph			f	f	2480	UvA B1A Course CH3	2024-07-12 20:43:17.183091+01	\N
+afsteken	to let off			f	f	2481	UvA B1A Course CH3	2024-07-12 20:43:31.168096+01	\N
+opzeggen	to cancel, to read out/recite	UvA A2 Course		f	f	2282	UvA A2 Course	2024-03-11 17:29:51.808477+00	\N
+trekken door	to push/travel			f	f	2519	UvA B1A Course CH4	2024-07-13 12:09:32.346826+01	\N
+beleven	to experience			f	f	2520	UvA B1A Course CH4	2024-07-13 13:31:18.116998+01	\N
+aanspreken	to appeal			f	f	2521	UvA B1A Course CH4	2024-07-13 13:31:30.306859+01	\N
+vanzelfsprekend	obvious			f	f	2522	UvA B1A Course CH4	2024-07-13 13:32:32.242257+01	\N
+ontbreken (aan)	to miss/lack			f	f	2523	UvA B1A Course CH4	2024-07-13 13:32:46.733187+01	\N
+fijne	fine	n/a	https://forvo.com/word/fijne/#nl	t	f	405	\N	2023-09-27 14:59:57.873874+01	\N
+roeren	to stir		https://forvo.com/word/roeren/	f	f	2213		2023-09-27 14:59:57.873874+01	\N
+kwalijk	malicious/ill/evil		https://forvo.com/word/kwalijk/	f	f	2214		2023-09-27 14:59:57.873874+01	\N
+ontzettend	very/extremely/incredibly		https://forvo.com/word/ontzettend/	f	f	2215		2023-09-27 14:59:57.873874+01	\N
+aantrekkelijk	attractive	UvA A2 Course		f	f	2290	UvA A2 Course	2024-03-11 17:33:33.379299+00	\N
+krachttraining	weight training	UvA A2 Course		f	f	2291	UvA A2 Course	2024-03-11 17:33:49.245863+00	\N
+de manier	the way/manner/method	UvA A2 Course	https://forvo.com/word/manier/#nl	f	f	158	\N	2023-09-27 14:59:57.873874+01	\N
+tussen	between	\N	https://forvo.com/word/tussen/#nl	f	t	1340	prepositions	2023-09-27 14:59:57.873874+01	\N
+medereizegers	fellow travelers	UvA A2 Course		f	f	2376		2024-03-28 18:36:29.945721+00	\N
+spontaan	spontaneous	UvA A2 Course		f	f	2377		2024-03-28 18:36:54.980229+00	\N
+tekenen	to draw	verb		f	f	2389	UvA B1A Course CH1	2024-06-28 20:25:07.031363+01	\N
+schilderen	to paint	verb		f	f	2390	UvA B1A Course CH1	2024-06-28 20:25:53.112944+01	\N
+schreeuwen	to shout	verb		f	f	2391	UvA B1A Course CH1	2024-06-28 20:26:12.177109+01	\N
+fluisteren	to whisper	verb		f	f	2392	UvA B1A Course CH1	2024-06-28 20:26:25.506038+01	\N
+uitkomen	to come true/to reveal or end up at	verb		f	f	2393	UvA B1A Course CH1	2024-06-28 20:27:47.257397+01	\N
+bewaren	to keep	verb		f	f	2394	UvA B1A Course CH1	2024-06-28 20:28:00.965358+01	\N
+afsteken	to let off			f	f	2482	UvA B1A Course CH3	2024-07-12 20:43:46.445426+01	\N
+versieren	to decorate			f	f	2483	UvA B1A Course CH3	2024-07-12 20:43:59.419321+01	\N
+de stoep	the pavement			f	f	2484	UvA B1A Course CH3	2024-07-12 20:44:17.73237+01	\N
+het optreden	the performance			f	f	2485	UvA B1A Course CH3	2024-07-12 20:45:06.135186+01	\N
+markeren	to mark			f	f	2486	UvA B1A Course CH3	2024-07-12 20:45:33.738854+01	\N
+de overvloed	the abundance			f	f	2487	UvA B1A Course CH3	2024-07-12 20:45:46.571148+01	\N
+de gelegenheid	the opportunity			f	f	2488	UvA B1A Course CH3	2024-07-12 20:46:02.265197+01	\N
+de bloemenkrans	flower garland			f	f	2489	UvA B1A Course CH3	2024-07-12 20:46:20.958177+01	\N
+de meiboom	the may pole			f	f	2490	UvA B1A Course CH3	2024-07-12 20:46:32.132624+01	\N
+knapperig	crunchy			f	f	2491	UvA B1A Course CH3	2024-07-12 20:46:44.370856+01	\N
+plaatselijk	local			f	f	2492	UvA B1A Course CH3	2024-07-12 20:46:56.620641+01	\N
+pekelen	to pickle			f	f	2493	UvA B1A Course CH3	2024-07-12 20:47:08.718338+01	\N
+terechtkunnen	to stay at			f	f	2494	UvA B1A Course CH3	2024-07-12 20:47:33.853679+01	\N
+met z'n dertigen	with 30 of us	phrase		f	f	2495	UvA B1A Course CH3	2024-07-12 20:47:51.364023+01	\N
+allerleukste	the best thing/nicest/best			f	f	2496	UvA B1A Course CH3	2024-07-12 20:48:09.719315+01	\N
+het beginsel	the principle (value)			f	f	2497	UvA B1A Course CH3	2024-07-12 20:48:47.283653+01	\N
+de kom	the bowl			f	f	2498	UvA B1A Course CH3	2024-07-12 20:49:00.429274+01	\N
+verven	to paint			f	f	2499	UvA B1A Course CH3	2024-07-12 20:49:11.101987+01	\N
+uitkijken naar	to look forward to			f	f	2500	UvA B1A Course CH3	2024-07-12 20:49:25.893841+01	\N
+voornamelijk	mainly			f	f	2501	UvA B1A Course CH3	2024-07-12 20:50:22.860174+01	\N
+het familielied	the family relative			f	f	2502	UvA B1A Course CH3	2024-07-12 20:50:41.039305+01	\N
+de bedrijfskunde	business administration			f	f	2503	UvA B1A Course CH3	2024-07-12 20:50:58.943001+01	\N
+uitschelden	to call names/scold/tell off			f	f	2504	UvA B1A Course CH3	2024-07-12 20:51:20.558824+01	\N
+verplichten	to oblige			f	f	2505	UvA B1A Course CH3	2024-07-12 20:51:31.665221+01	\N
+doorbrengen	to spend (time)			f	f	2506	UvA B1A Course CH3	2024-07-12 20:51:45.924677+01	\N
+uitgebreid	elaborate/extensive			f	f	2507	UvA B1A Course CH3	2024-07-12 20:52:07.932535+01	\N
+ervan	of it/them			f	f	2508	UvA B1A Course CH3	2024-07-12 20:52:49.386857+01	\N
+voortkomen uit	to originate from			f	f	2509	UvA B1A Course CH3	2024-07-12 20:53:03.083309+01	\N
+waarin	in which			f	f	2510	UvA B1A Course CH3	2024-07-12 20:53:16.429513+01	\N
+het voorhoofd	the forehead			f	f	2511	UvA B1A Course CH3	2024-07-12 20:53:48.507481+01	\N
+rijgen	to thread			f	f	2512	UvA B1A Course CH3	2024-07-12 20:54:17.310511+01	\N
+de bestemming	destination			f	f	2524	UvA B1A Course CH4	2024-07-13 14:19:32.520954+01	\N
+zwerven	to wander			f	f	2525	UvA B1A Course CH4	2024-07-13 14:19:56.260736+01	\N
+zelden	rarely			f	f	2526	UvA B1A Course CH4	2024-07-13 14:20:11.83628+01	\N
+zeer	ache (noun), very (adv.), painful (adj.)	\N	https://forvo.com/word/zeer/#nl	f	f	1721	doctor	2023-09-27 14:59:57.873874+01	\N
+regelmatig	regular/ly	UvA A2 Course		f	f	2292	UvA A2 Course	2024-03-11 17:35:48.652975+00	\N
+wat stom	how stupid	UvA A2 Course		f	f	2378		2024-03-28 18:45:37.174899+00	\N
+ernstig	seriously			f	f	2395	UvA B1A Course CH1	2024-06-28 20:30:33.116476+01	\N
+vrolijk	cheerful/happy			f	f	2396	UvA B1A Course CH1	2024-06-28 20:30:57.214514+01	\N
+vooral	especially			f	f	2397	UvA B1A Course CH1	2024-06-28 20:31:42.405575+01	\N
+zelfs	even	adverb	https://forvo.com/word/zelfs/#nl	f	f	2398	UvA B1A Course CH1	2024-06-28 20:32:18.327721+01	\N
+bescheiden	modest			f	f	2399	UvA B1A Course CH1	2024-06-28 20:32:30.733975+01	\N
+voorlopig	for now			f	f	2400	UvA B1A Course CH1	2024-06-28 20:33:21.180692+01	\N
+dierbaar	beloved (items), (items) held dear			f	f	2401	UvA B1A Course CH1	2024-06-28 20:33:40.15198+01	\N
+dierbaar	beloved (items), (items) held dear			f	f	2402	UvA B1A Course CH1	2024-06-28 20:33:55.968961+01	\N
+daarvan	of this			f	f	2403	UvA B1A Course CH1	2024-06-28 20:34:09.547508+01	\N
+beleefd	polite			f	f	2404	UvA B1A Course CH1	2024-06-28 20:34:24.501641+01	\N
+merken van	as you can see/to notice			f	f	2405	UvA B1A Course CH1	2024-06-28 20:34:45.068652+01	\N
+trots op	proud of			f	f	2406	UvA B1A Course CH1	2024-06-28 20:34:57.570755+01	\N
+zorgen voor	to take care of/to care for			f	f	2407	UvA B1A Course CH1	2024-06-28 20:35:08.956317+01	\N
+de held	the hero			f	f	2408	UvA B1A Course CH1	2024-06-28 20:35:22.212943+01	\N
+de oplossing	the solution			f	f	2409	UvA B1A Course CH1	2024-06-28 20:36:00.893409+01	\N
+de draad	the thread/wire/string			f	f	2513	UvA B1A Course CH3	2024-07-12 20:55:52.727142+01	\N
+het hoofdkussen	the pillow			f	f	2514	UvA B1A Course CH3	2024-07-12 20:56:18.930509+01	\N
+de jongeren	the young people			f	f	2515	UvA B1A Course CH3	2024-07-12 20:56:35.698277+01	\N
+langskomen	to come over/pass by			f	f	2516	UvA B1A Course CH3	2024-07-12 20:56:55.281981+01	\N
+besluiten	to decide			f	f	2517	UvA B1A Course CH3	2024-07-12 20:57:05.694492+01	\N
+kletsmomentje	chit-chat			f	f	2518	UvA B1A Course CH3	2024-07-12 20:57:21.956739+01	\N
+eindigen (met)	to end (with)			f	f	2527	UvA B1A Course CH4	2024-07-13 14:20:47.325414+01	\N
+de heide	heather/heath			f	f	2528	UvA B1A Course CH4	2024-07-13 14:21:02.686333+01	\N
+bloeien	to bloom			f	f	2529	UvA B1A Course CH4	2024-07-13 14:21:20.507563+01	\N
+dankbaar	thankful/grateful		https://forvo.com/word/dankbaar/	f	f	2217		2023-09-27 14:59:57.873874+01	\N
+orde (in)	fine/alright			f	f	2218		2023-09-27 14:59:57.873874+01	\N
+ingaan	to enter	UvA A2 Course		f	f	2293	UvA A2 Course	2024-03-11 17:36:19.325351+00	\N
+het muntgeld	the cash	UvA A2 Course		f	f	2294	UvA A2 Course	2024-03-11 17:36:39.034226+00	\N
+laden	to load	UvA A2 Course		f	f	2295	UvA A2 Course	2024-03-11 17:36:51.603736+00	\N
+zo'n	"such a", "about"	UvA A2 Course		f	f	2296	UvA A2 Course	2024-03-11 17:37:11.444404+00	\N
+jeuk	itch	UvA A2 Course		f	f	2297	UvA A2 Course	2024-03-11 17:37:53.467517+00	\N
+schuur	shed	UvA A2 Course		f	f	2298	UvA A2 Course	2024-03-11 17:38:07.715633+00	\N
+de bult	the bump	UvA A2 Course		f	f	2299	UvA A2 Course	2024-03-11 17:38:27.750871+00	\N
+de beurt	the turn/move (your)	UvA A2 Course		f	f	2300	UvA A2 Course	2024-03-11 17:38:48.411236+00	\N
+de keel	the throat	UvA A2 Course		f	f	2301	UvA A2 Course	2024-03-11 17:39:07.587013+00	\N
+afgesproken	agreed (ment)	UvA A2 Course		f	f	2303	UvA A2 Course	2024-03-11 17:40:18.201196+00	\N
+het vuilnis	the trash	UvA A2 Course		f	f	2304	UvA A2 Course	2024-03-11 17:40:32.705759+00	\N
+fris(se)	fresh	UvA A2 Course		f	f	2305	UvA A2 Course	2024-03-11 17:40:50.334282+00	\N
+in verband met	in relation to	UvA A2 Course		f	f	2306	UvA A2 Course	2024-03-11 17:41:25.223812+00	\N
+verband	link	UvA A2 Course		f	f	2307	UvA A2 Course	2024-03-11 17:41:37.958158+00	\N
+staking	strike (labor)	UvA A2 Course		f	f	2308	UvA A2 Course	2024-03-11 17:41:54.8171+00	\N
+storing	failure/malfunction	UvA A2 Course		f	f	2309	UvA A2 Course	2024-03-11 17:42:14.23641+00	\N
+kijkwijzer	ratings	UvA A2 Course		f	f	2379		2024-03-28 19:19:58.541968+00	\N
+klinkt goed	sounds good		#	f	t	2219		2023-09-27 14:59:57.873874+01	\N
+indrukwekkend	impressive	UvA A2 Course, UvA B1A Course CH1		f	f	2302	UvA A2 Course	2024-03-11 17:39:51.874269+00	\N
+de tekening	the drawing			f	f	2411	UvA B1A Course CH1	2024-06-28 20:36:36.20422+01	\N
+de spullen	the things			f	f	2412	UvA B1A Course CH1	2024-06-28 20:36:48.154955+01	\N
+de eigenschap	the characteristic			f	f	2413	UvA B1A Course CH1	2024-06-28 20:37:01.889836+01	\N
+de herinnering aan	memory of			f	f	2414	UvA B1A Course CH1	2024-06-28 20:37:19.25724+01	\N
+de rammelaar	the rattle			f	f	2415	UvA B1A Course CH1	2024-06-28 20:37:31.314966+01	\N
+de schijf	the disk			f	f	2416	UvA B1A Course CH1	2024-06-28 20:37:43.541888+01	\N
+het horloge	the watch			f	f	2417	UvA B1A Course CH1	2024-06-28 20:37:56.481779+01	\N
+het tijdschrijft	the magazine			f	f	2418	UvA B1A Course CH1	2024-06-28 20:38:10.505402+01	\N
+het lawaii	the noise			f	f	2419	UvA B1A Course CH1	2024-06-28 20:38:23.241193+01	\N
+het bezit	the possession			f	f	2420	UvA B1A Course CH1	2024-06-28 20:38:36.745886+01	\N
+zich aanmelden voor	to sign up for			f	f	2421	UvA B1A Course CH2	2024-06-28 20:39:57.319898+01	\N
+zich houden aan	to stick to			f	f	2422	UvA B1A Course CH2	2024-06-28 20:40:10.189552+01	\N
+twijfelen (aan/over/tussen)	to be unsure/have doubts about			f	f	2423	UvA B1A Course CH2	2024-06-28 20:40:34.787369+01	\N
+verwennen	to spoil	verb		f	f	2425	UvA B1A Course CH2	2024-06-28 20:41:05.397156+01	\N
+opleveren	to count for, to produce or yield	verb		f	f	2424	UvA B1A Course CH2	2024-06-28 20:40:52.509037+01	\N
+afhangen van	to depend upon	het hangt er ... van		f	f	2426	UvA B1A Course CH2	2024-06-28 20:41:51.422976+01	\N
+bewegen	to exercise/move	verb		f	f	2427	UvA B1A Course CH2	2024-06-28 20:42:24.608466+01	\N
+verbranden	to burn	verb		f	f	2428	UvA B1A Course CH2	2024-06-28 20:43:03.331156+01	\N
+kauwen op	to chew on	verb		f	f	2429	UvA B1A Course CH2	2024-06-28 20:43:14.027939+01	\N
+gillen	to scream/yell	verb		f	f	2430	UvA B1A Course CH2	2024-06-28 20:43:26.416313+01	\N
+blijken uit	something shows that...			f	f	2431	UvA B1A Course CH2	2024-06-28 20:43:43.724273+01	\N
+noemen	to call/name			f	f	2432	UvA B1A Course CH2	2024-06-28 20:43:56.510687+01	\N
+pakken	to grab	verb		f	f	2433	UvA B1A Course CH2	2024-06-28 20:44:07.539895+01	\N
+voorverpakt	pre-packaged			f	f	2434	UvA B1A Course CH2	2024-06-28 20:44:24.736932+01	\N
+schelen	to save/to differ			f	f	2435	UvA B1A Course CH2	2024-06-28 20:44:38.505936+01	\N
+smaken naar	to taste of			f	f	2436	UvA B1A Course CH2	2024-06-28 20:44:51.202406+01	\N
+het verzoekt	the request			f	f	2437	UvA B1A Course CH2	2024-06-28 20:45:08.574181+01	\N
+het onderwerp	the subject/topic			f	f	2438	UvA B1A Course CH2	2024-06-28 20:45:26.457974+01	\N
+het geslacht	the sex			f	f	2439	UvA B1A Course CH2	2024-06-28 20:45:46.797419+01	\N
+het kenmerk	the characteristic			f	f	2440	UvA B1A Course CH2	2024-06-28 20:45:59.89373+01	\N
+het schap	the shelf			f	f	2441	UvA B1A Course CH2	2024-06-28 20:46:13.674604+01	\N
+de levenstijl	the lifestyle			f	f	2442	UvA B1A Course CH2	2024-06-28 20:46:30.19654+01	\N
+de voeding	nutrition			f	f	2443	UvA B1A Course CH2	2024-06-28 20:46:40.762131+01	\N
+de geneeskundestudent	medical student			f	f	2444	UvA B1A Course CH2	2024-06-28 20:46:56.207523+01	\N
+de voedingsdeskundige	the nutritionist			f	f	2445	UvA B1A Course CH2	2024-06-28 20:47:13.077392+01	\N
+de sportliefhebber	the sports enthusiast			f	f	2446	UvA B1A Course CH2	2024-06-28 20:47:36.649286+01	\N
+de kennis	the acquiatance, knowledge/expertise			f	f	2447	UvA B1A Course CH2	2024-06-28 20:48:09.493014+01	\N
+de volwassene	the adult			f	f	2448	UvA B1A Course CH2	2024-06-28 20:48:25.201905+01	\N
+de tegenslag	setback			f	f	2530	UvA B1A Course CH4	2024-07-13 14:22:20.102796+01	\N
+de tocht	the trip/tour			f	f	2531	UvA B1A Course CH4	2024-07-13 14:22:37.961064+01	\N
+sowieso	anyways/in any case			f	f	2532	UvA B1A Course CH4	2024-07-13 14:22:54.849307+01	\N
+opvangen	to deal with (iets)			f	f	2533	UvA B1A Course CH4	2024-07-13 14:23:11.216014+01	\N
+schuilen (voor)	to shelter (from)			f	f	2534	UvA B1A Course CH4	2024-07-13 14:23:44.087564+01	\N
+druipen	to be soaked			f	f	2535	UvA B1A Course CH4	2024-07-13 14:23:58.606784+01	\N
+het gaat erom	what matters			f	f	2536	UvA B1A Course CH4	2024-07-13 14:24:18.381367+01	\N
+de duisternis	the darkness			f	f	2537	UvA B1A Course CH4	2024-07-13 14:25:18.238605+01	\N
+de kanotocht	the canoe trip			f	f	2538	UvA B1A Course CH4	2024-07-13 14:25:54.225916+01	\N
+waarbij	in which			f	f	2539	UvA B1A Course CH4	2024-07-13 14:26:08.475531+01	\N
+optillen	to lift / pick up		https://forvo.com/word/optillen/	f	f	2220		2023-09-27 14:59:57.873874+01	\N
+je hoeft niet	you don't have to	phrase	#	f	f	2221	phrases	2023-09-27 14:59:57.873874+01	\N
+treurig	sad		https://forvo.com/word/treurig/	f	f	2223		2023-09-27 14:59:57.873874+01	\N
+schulden	debts		https://forvo.com/word/schulden/	f	f	2224		2023-09-27 14:59:57.873874+01	\N
+werkzaamheden	(active) work	UvA A2 Course		f	f	2310	UvA A2 Course	2024-03-11 17:42:47.683731+00	\N
+vertaging	delay	UvA A2 Course		f	f	2311	UvA A2 Course	2024-03-11 17:43:03.318288+00	\N
+de richtlijn	the guideline			f	f	2449	UvA B1A Course CH2	2024-06-28 20:49:17.0514+01	\N
+de aandacht	the attention			f	f	2450	UvA B1A Course CH2	2024-06-28 20:49:29.746021+01	\N
+de tentamenweek	the exam week			f	f	2451	UvA B1A Course CH2	2024-06-28 20:49:44.814067+01	\N
+gemiddeld	on average			f	f	2452	UvA B1A Course CH2	2024-06-28 20:49:56.745829+01	\N
+ten minste	at least			f	f	2453	UvA B1A Course CH2	2024-06-28 20:50:14.237113+01	\N
+matig	moderate/medium			f	f	2454	UvA B1A Course CH2	2024-06-28 20:50:37.679453+01	\N
+af en toe	every now and then			f	f	2455	UvA B1A Course CH2	2024-06-28 20:50:50.89713+01	\N
+tegenwoordig	nowadays			f	f	2456	UvA B1A Course CH2	2024-06-28 20:51:10.566798+01	\N
+stevig	at a fast pace, solid			f	f	2457	UvA B1A Course CH2	2024-06-28 20:51:24.877378+01	\N
+luidruchtig	noisy			f	f	2458	UvA B1A Course CH2	2024-06-28 20:51:36.463864+01	\N
+steeds (minder)	less and less			f	f	2459	UvA B1A Course CH2	2024-06-28 20:51:47.263903+01	\N
+elders	elsewhere			f	f	2460	UvA B1A Course CH2	2024-06-28 20:51:56.881426+01	\N
+anderhalf	1 and a half (1.5)			f	f	2461	UvA B1A Course CH2	2024-06-28 20:52:14.701132+01	\N
+uitwisselingprogramma	exchange program			f	f	2462	UvA B1A Course CH3	2024-06-28 20:52:32.236309+01	\N
+verwachten	to expect	\N	https://forvo.com/word/verwachten/#nl	f	f	1901	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+voordeel	advantage			f	f	2540	UvA B1A Course CH4	2024-07-13 14:29:26.256985+01	\N
+de bekende	the acquaintance (noun), recognised/famous (adj.)	\N	https://forvo.com/word/bekende/#nl	f	f	1559	family	2023-09-27 14:59:57.873874+01	\N
+de musicus	the musician		https://forvo.com/word/musicus/	f	f	2225		2023-09-27 14:59:57.873874+01	\N
+de componist	the composer		https://forvo.com/word/componist	f	f	2226		2023-09-27 14:59:57.873874+01	\N
+uitgeroepen	proclaimed/exclaimed		https://forvo.com/word/uitgeroepen/	f	f	2227		2023-09-27 14:59:57.873874+01	\N
+verdiende	to earn/deserve		https://forvo.com/word/verdiende	f	f	2228		2023-09-27 14:59:57.873874+01	\N
+het verkeer	the traffic	UvA A2 Course		f	f	2312	UvA A2 Course	2024-03-11 17:43:38.256135+00	\N
+tochtig	drafty	UvA A2 Course		f	f	2313	UvA A2 Course	2024-03-11 17:44:09.994566+00	\N
+de mening	the opinion	UvA A2 Course		f	f	2314	UvA A2 Course	2024-03-11 17:44:27.023431+00	\N
+behoorlijk	proper/quite/fairly			f	f	2463	UvA B1A Course CH3	2024-06-28 20:53:13.717048+01	\N
+levendig	lively			f	f	2464	UvA B1A Course CH3	2024-06-28 20:53:26.30321+01	\N
+snikheet	boiling hot			f	f	2465	UvA B1A Course CH3	2024-06-28 20:53:36.298643+01	\N
+tegelijkertijd	at the same time			f	f	2466	UvA B1A Course CH3	2024-06-28 20:53:49.523185+01	\N
+afstandelijk	distant/aloof			f	f	2467	UvA B1A Course CH3	2024-06-28 20:54:00.905107+01	\N
+verderop	further down			f	f	2468	UvA B1A Course CH3	2024-06-28 20:54:10.153894+01	\N
+zomaar	just like that			f	f	2469	UvA B1A Course CH3	2024-06-28 20:54:18.836447+01	\N
+kussen	to kiss	verb		f	f	2470	UvA B1A Course CH3	2024-06-28 20:54:29.414896+01	\N
+omkeren	to reverse	verb		f	f	2471	UvA B1A Course CH3	2024-06-28 20:54:41.16886+01	\N
+de afstand	the distance			f	f	2472	UvA B1A Course CH3	2024-06-28 20:54:52.582146+01	\N
+de heimwee	homesickness			f	f	2473	UvA B1A Course CH3	2024-06-28 20:55:09.013483+01	\N
+de omstandigheid	the circumstance			f	f	2474	UvA B1A Course CH3	2024-06-28 20:55:25.62838+01	\N
+de onbekende	the stranger			f	f	2475	UvA B1A Course CH3	2024-06-28 20:55:38.66206+01	\N
+de kroeg	the pub			f	f	2476	UvA B1A Course CH3	2024-06-28 20:55:49.599908+01	\N
+scheidbaar	separable		https://forvo.com/word/scheidbaar	f	f	2229		2023-09-27 14:59:57.873874+01	\N
+klagen	to complain	UvA A2 Course		f	f	2315	UvA A2 Course	2024-03-11 17:45:12.97204+00	\N
+zeuren	to whine	UvA A2 Course		f	f	2316	UvA A2 Course	2024-03-11 17:45:33.843505+00	\N
+steunen	to support		https://forvo.com/word/steunen	f	f	2230		2023-09-27 14:59:57.873874+01	\N
+uitdagen	to challenge	UvA A2 Course		f	f	2317	UvA A2 Course	2024-03-11 17:47:00.801112+00	\N
+Bijvoeglijk Naamwoord	adjective	grammar	#	f	f	2232		2023-09-27 14:59:57.873874+01	\N
+de richting	the direction (of)	UvA A2 Course		f	f	2318	UvA A2 Course	2024-03-11 17:47:35.485622+00	\N
+gebaar	gesture		https://forvo.com/word/gebaar	f	f	2233		2023-09-27 14:59:57.873874+01	\N
+ongeveer	roughly		https://forvo.com/word/ongeveer	f	f	2234		2023-09-27 14:59:57.873874+01	\N
+prachtig	lovely/wonderful/beautiful/amazing		https://forvo.com/word/prachtig	f	f	2235		2023-09-27 14:59:57.873874+01	\N
+de afslag	the exit	UvA A2 Course		f	f	2319	UvA A2 Course	2024-03-11 17:48:17.228311+00	\N
+de rotonde	the roundabout	UvA A2 Course		f	f	2320	UvA A2 Course	2024-03-11 17:48:40.94939+00	\N
+alvast	already/in advance		https://forvo.com/word/alvast	f	f	2236		2023-09-27 14:59:57.873874+01	\N
+de verdieping	story/floor (building)	UvA A2 Course		f	f	2321	UvA A2 Course	2024-03-11 17:49:21.979635+00	\N
+bezig	busy		https://forvo.com/word/bezig	f	f	2237		2023-09-27 14:59:57.873874+01	\N
+goed bezig	good job	phrase	#	f	f	2238	phrases	2023-09-27 14:59:57.873874+01	\N
+ophalen	to pick up		https://forvo.com/word/ophalen	f	f	2239		2023-09-27 14:59:57.873874+01	\N
+het is goed zo	it is good to go	phrase for tipping	#	f	f	2242	phrases	2023-09-27 14:59:57.873874+01	\N
+laat de rest maar zitten	nevermind the rest	phrase for tipping	#	f	f	2241	phrases	2023-09-27 14:59:57.873874+01	\N
+Maak er maar € ... van	Let's make it ... €	phrase for tipping	#	f	f	2243	phrases	2023-09-27 14:59:57.873874+01	\N
+De soort	A kind of		#	f	f	2244		2023-09-27 14:59:57.873874+01	\N
+de beoordelen	review/opinion		https://forvo.com/word/beoordelen/	f	f	2246		2023-09-27 14:59:57.873874+01	\N
+de gangen	the courses (food)		https://forvo.com/word/gangen	f	f	2247		2023-09-27 14:59:57.873874+01	\N
+het strookje	the strip		https://forvo.com/word/strookje	f	f	2248		2023-09-27 14:59:57.873874+01	\N
+de fooi	the tip		https://forvo.com/word/fooi	f	t	2245		2023-09-27 14:59:57.873874+01	\N
+de trap	the stairs	UvA A2 Course		f	f	2322	UvA A2 Course	2024-03-11 17:49:52.607589+00	\N
+wijzen	to indicate/point out	UvA A2 Course		f	f	2323	UvA A2 Course	2024-03-11 17:50:10.652894+00	\N
+het toetje	dessert		https://forvo.com/word/toetje	f	f	2240		2023-09-27 14:59:57.873874+01	\N
+daarop	there-on		https://forvo.com/word/daarop	f	f	2249		2023-09-27 14:59:57.873874+01	\N
+passend	appropriate		https://forvo.com/word/passend	f	f	2250		2023-09-27 14:59:57.873874+01	\N
+de plattegrond	the map	UvA A2 Course		f	f	2324	UvA A2 Course	2024-03-11 17:50:57.213331+00	\N
+dapper	brave	UvA A2 Course		f	f	2325	UvA A2 Course	2024-03-11 17:51:14.993632+00	\N
+moedig	brave	UvA A2 Course		f	f	2326	UvA A2 Course	2024-03-11 17:51:22.54657+00	\N
+woedend	furious	UvA A2 Course		f	f	2327	UvA A2 Course	2024-03-11 17:51:39.345577+00	\N
+energiek	energetic	UvA A2 Course		f	f	2328	UvA A2 Course	2024-03-11 17:51:57.234522+00	\N
+tentoonstelling	exhibition	UvA A2 Course		f	f	2329	UvA A2 Course	2024-03-11 17:52:14.902077+00	\N
+aanbevelen	to recommend	UvA A2 Course		f	f	2330	UvA A2 Course	2024-03-11 17:52:43.125942+00	\N
+niets bijzonders	nothing special	UvA A2 Course		f	f	2331	UvA A2 Course	2024-03-11 17:52:59.926248+00	\N
+de portier	the doorman	UvA A2 Course		f	f	2332	UvA A2 Course	2024-03-11 17:53:19.830776+00	\N
+wat voor	what kind of	phrase	#	f	f	2252	phrases	2023-09-27 14:59:57.873874+01	\N
+het model	the style		https://forvo.com/word/model	f	f	2253		2023-09-27 14:59:57.873874+01	\N
+allebei	both		https://forvo.com/word/allebei	f	f	2255		2023-09-27 14:59:57.873874+01	\N
+herkennen	to recognize	UvA A2 Course		f	f	2333	UvA A2 Course	2024-03-11 17:54:18.049153+00	\N
+toevallig	coincidence	UvA A2 Course		f	f	2334	UvA A2 Course	2024-03-11 17:54:44.10743+00	\N
+bijbaantje	side job	UvA A2 Course		f	f	2335	UvA A2 Course	2024-03-11 17:55:09.855724+00	\N
+logopedie	speech therapy	UvA A2 Course		f	f	2336	UvA A2 Course	2024-03-11 17:55:28.161884+00	\N
+stelde	stated (posited)	UvA A2 Course		f	f	2337	UvA A2 Course	2024-03-11 17:56:08.979607+00	\N
+het merk	the brand	UvA A2 Course	https://forvo.com/word/merk	f	f	2254		2023-09-27 14:59:57.873874+01	\N
+de maat	the size		https://forvo.com/word/maat	f	t	2251		2023-09-27 14:59:57.873874+01	\N
+wijd	wide		https://forvo.com/word/wijd	f	f	2256		2023-09-27 14:59:57.873874+01	\N
+eventueel	if necessary		https://forvo.com/word/eventueel	f	f	2257		2023-09-27 14:59:57.873874+01	\N
+ruilen	to exchange		https://forvo.com/word/ruilen	f	f	2258		2023-09-27 14:59:57.873874+01	\N
+staat me het beste	suits me best	phrase	#	f	f	2259	phrases	2023-09-27 14:59:57.873874+01	\N
+blaft	barks	UvA A2 Course		f	f	2338	UvA A2 Course	2024-03-11 17:56:47.968224+00	\N
+schattig	cute	UvA A2 Course		f	f	2339	UvA A2 Course	2024-03-11 17:57:07.102926+00	\N
+onderwijs	education	UvA A2 Course		f	f	2340	UvA A2 Course	2024-03-11 17:57:25.562894+00	\N
+benieuwd	curious	UvA A2 Course		f	f	2341	UvA A2 Course	2024-03-11 17:57:38.592239+00	\N
+nieuwsgierig	curious/nosy	UvA A2 Course		f	f	2342	UvA A2 Course	2024-03-11 17:57:59.096274+00	\N
+geduld	patience	UvA A2 Course		f	f	2343	UvA A2 Course	2024-03-11 17:58:17.783411+00	\N
+waarderen	to appreciate/value	UvA A2 Course also 		f	f	2344	UvA B1A Course CH4	2024-03-11 17:58:35.07826+00	\N
+vervolg	continuation		https://forvo.com/word/vervolg	f	f	2260		2023-09-27 14:59:57.873874+01	\N
+effen	solid colored		https://forvo.com/word/effen	f	f	2261		2023-09-27 14:59:57.873874+01	\N
+geruit	checkered		https://forvo.com/word/geruit	f	f	2262		2023-09-27 14:59:57.873874+01	\N
+gebloemd	flowered		https://forvo.com/word/gebloemd	f	f	2263		2023-09-27 14:59:57.873874+01	\N
+gestreept	striped		https://forvo.com/word/gestreept	f	t	2264		2023-09-27 14:59:57.873874+01	\N
+hoeven	to need to/have to	UvA A2 Course		f	f	2345	UvA A2 Course	2024-03-11 17:59:05.219482+00	\N
+lijken	to seem/appear	UvA A2 Course	https://forvo.com/word/lijken/#nl	f	t	1640	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+regende	rained	UvA A2 Course		f	f	2346	UvA A2 Course	2024-03-11 17:59:53.560867+00	\N
+wegglijden	to slip	UvA A2 Course		f	f	2347	UvA A2 Course	2024-03-11 18:00:35.042576+00	\N
+de mankeren	the limp	UvA A2 Course		f	f	2348	UvA A2 Course	2024-03-11 18:01:06.762474+00	\N
+het stuur	the handlebar	UvA A2 Course		f	f	2349	UvA A2 Course	2024-03-11 18:01:38.502773+00	\N
+het zadel	the saddle	UvA A2 Course		f	f	2350	UvA A2 Course	2024-03-11 18:01:47.754919+00	\N
+scheef	crooked (broken)	UvA A2 Course		f	f	2351	UvA A2 Course	2024-03-11 18:02:06.515186+00	\N
+de trapper	the pedal	UvA A2 Course		f	f	2352	UvA A2 Course	2024-03-11 18:02:19.788527+00	\N
+verstaan	to understand	UvA A2 Course		f	f	2353	UvA A2 Course	2024-03-11 18:02:50.322888+00	\N
+de rem	the brake	UvA A2 Course		f	f	2354	UvA A2 Course	2024-03-11 18:03:04.006019+00	\N
+uitdrukkingen	the expressions/phrases	UvA A2 Course		f	f	2355	UvA A2 Course	2024-03-11 18:03:31.586913+00	\N
+krabben	to scratch	UvA A2 Course		f	f	2356	UvA A2 Course	2024-03-11 18:03:49.80047+00	\N
+zalf	salve/ointment	UvA A2 Course		f	f	2357	UvA A2 Course	2024-03-11 18:04:00.083721+00	\N
+de emmer	the bucket	UvA A2 Course		f	f	2358	UvA A2 Course	2024-03-11 18:04:13.402183+00	\N
+verschrijkkelijk	outrageous	UvA A2 Course		f	f	2359	UvA A2 Course	2024-03-11 18:04:28.514525+00	\N
+het wiel	the wheel	UvA A2 Course	https://forvo.com/word/wiel/#nl	f	t	357	\N	2023-09-27 14:59:57.873874+01	\N
+mogelijkheden	possibilities	UvA A2 Course		f	f	2360	UvA A2 Course	2024-03-11 18:05:16.42622+00	\N
+raden	to recommend	UvA A2 Course		f	f	2361	UvA A2 Course	2024-03-11 18:05:53.578093+00	\N
+wissel	to change/swap/exchange	UvA A2 Course		f	f	2362	UvA A2 Course	2024-03-11 18:08:30.763161+00	\N
+de sperzieboon	the green bean	UvA A2 Course		f	f	2363	UvA A2 Course	2024-03-11 18:08:43.540817+00	\N
+prettig	enjoyable/pleasant/nice	UvA A2 Course		f	f	2364	UvA A2 Course	2024-03-11 18:09:09.862913+00	\N
+doe de groeten aan	give my regards to	UvA A2 Course		f	f	2365	UvA A2 Course	2024-03-11 18:10:06.093073+00	\N
+hartstikke	very/heartily	UvA A2 Course		f	f	2366	UvA A2 Course	2024-03-11 18:10:43.822418+00	\N
+rangtelwoorden	ordinal numbers	UvA A2 Course		f	f	2367	UvA A2 Course	2024-03-11 18:11:09.06595+00	\N
+overmorgen	the day after tomorrow	UvA A2 Course		f	f	2368	UvA A2 Course	2024-03-11 18:11:39.372127+00	\N
+eergisteren	the day before yesterday	UvA A2 Course		f	f	2369	UvA A2 Course	2024-03-11 18:11:51.04037+00	\N
+de zwager	the brother in law	UvA A2 Course		f	f	2370	UvA A2 Course	2024-03-11 18:12:20.512155+00	\N
+de schoonzus	the sister in law	UvA A2 Course		f	f	2371	UvA A2 Course	2024-03-11 18:12:34.666932+00	\N
+de afscheid	the farewell/goodbye	UvA A2 Course		f	f	2372	UvA A2 Course	2024-03-11 18:12:55.712581+00	\N
+begroeten	to greet	UvA A2 Course		f	f	2373	UvA A2 Course	2024-03-11 18:13:19.663238+00	\N
+vorige	previous	UvA A2 Course		f	t	2374	UvA A2 Course	2024-03-11 18:13:39.167985+00	\N
+bewolkt	cloudy	\N	https://forvo.com/word/bewolkt/#nl	f	t	1680	weather	2023-09-27 14:59:57.873874+01	\N
+kwart over drie	quarter past three		#	t	f	1055	time	2023-09-27 14:59:57.873874+01	\N
+één	one	n/a	https://forvo.com/word/een/#nl	f	t	15	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+veranderen	to change	\N	https://forvo.com/word/veranderen/#nl	f	t	1519	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+zou	would/might	n/a	https://forvo.com/word/zou/#nl	f	f	164	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+beneden	down, downstairs	\N	https://forvo.com/word/beneden/#nl	f	f	1336	prepositions	2023-09-27 14:59:57.873874+01	\N
+de haan	the cockerel	\N	https://forvo.com/word/haan/#nl	f	f	1580	animals (1)	2023-09-27 14:59:57.873874+01	\N
+het ontbijt	the breakfast	\N	https://forvo.com/word/ontbijt/#nl	f	f	1821	cooking	2023-09-27 14:59:57.873874+01	\N
+tegengesteld	opposite	n/a	https://forvo.com/word/tegengesteld/#nl	t	f	964	\N	2023-09-27 14:59:57.873874+01	\N
+zicht	sight	n/a	https://forvo.com/word/zicht/#nl	f	t	825	\N	2023-09-27 14:59:57.873874+01	\N
+houden van	to love	\N	#	f	t	1505	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de neef	the cousin, the nephew	\N	https://forvo.com/word/neef/#nl	f	f	1552	family	2023-09-27 14:59:57.873874+01	\N
+tolk	interpreter	noun	https://forvo.com/word/tolk/#nl	f	f	1006	\N	2023-09-27 14:59:57.873874+01	\N
+laten vallen	drop	n/a	#	f	f	540	\N	2023-09-27 14:59:57.873874+01	\N
+zeil	sail	n/a	https://forvo.com/word/zeil/#nl	f	f	550	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+doet	does	n/a	https://forvo.com/word/doet/#nl	f	f	52	\N	2023-09-27 14:59:57.873874+01	\N
+kinderen	children	n/a	https://forvo.com/word/kinderen/#nl	f	t	280	family	2023-09-27 14:59:57.873874+01	\N
+druk	busy/crowded	\N	https://forvo.com/word/druk/#nl	f	f	2062	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+pers	press	n/a	https://forvo.com/word/pers/#nl	f	f	245	\N	2023-09-27 14:59:57.873874+01	\N
+verhogen	raise	n/a	https://forvo.com/word/verhogen/#nl	f	f	708	\N	2023-09-27 14:59:57.873874+01	\N
+hopen	hope	n/a	https://forvo.com/word/hopen/#nl	f	t	596	\N	2023-09-27 14:59:57.873874+01	\N
+twee uur	two o’clock		#	f	t	1049	time	2023-09-27 14:59:57.873874+01	\N
+het bed	the bed	\N	https://forvo.com/word/bed/#nl	t	f	1424	household	2023-09-27 14:59:57.873874+01	\N
+zoutig	salty	\N	https://forvo.com/word/zout/#nl	f	f	1832	cooking	2023-09-27 14:59:57.873874+01	\N
+jullie / uw (plural)	your	\N	https://forvo.com/word/jullie/#nl	f	f	2118	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+winnen	to win	\N	https://forvo.com/word/winnen/#nl	f	f	1511	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+maken	to make	\N	https://forvo.com/word/maken/#nl	f	f	1512	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+tennissen	to play tennis	\N	https://forvo.com/word/tennissen/#nl	f	f	1368	hobbies	2023-09-27 14:59:57.873874+01	\N
+de scheidsrechter	the referee	\N	https://forvo.com/word/scheidsrechter/#nl	f	f	1607	football	2023-09-27 14:59:57.873874+01	\N
+trompet	trumpet	\N	https://forvo.com/word/trompet/#nl	f	f	2154	hobbies	2023-09-27 14:59:57.873874+01	\N
+wave	wave	n/a	https://forvo.com/word/wave/#nl	t	f	539	\N	2023-09-27 14:59:57.873874+01	\N
+had	had	n/a	https://forvo.com/word/had/#nl	f	t	29	\N	2023-09-27 14:59:57.873874+01	\N
+de vogel	the bird	\N	https://forvo.com/word/vogel/#nl	f	f	1581	animals (1)	2023-09-27 14:59:57.873874+01	\N
+onderdeel	element	n/a	https://forvo.com/word/onderdeel/#nl	f	f	771	\N	2023-09-27 14:59:57.873874+01	\N
+ijsvrij	a day off for skating	\N	https://forvo.com/word/ijsvrij/#nl	f	f	2015	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+vier	four	\N	https://forvo.com/word/vier/#nl	f	f	1226	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+het bos	the forest	\N	https://forvo.com/word/bos/#nl	f	f	1406	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+uit eten gaan	to go out for dinner	\N	#	f	f	1371	hobbies	2023-09-27 14:59:57.873874+01	\N
+koud	cold	\N	https://forvo.com/word/koud/#nl	f	f	1294	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+warm	warm	\N	https://forvo.com/word/warm/#nl	f	f	1295	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+haast	hurry	n/a	https://forvo.com/word/haast/#nl	f	f	829	\N	2023-09-27 14:59:57.873874+01	\N
+rol	roll	n/a	https://forvo.com/word/rol/#nl	f	f	740	\N	2023-09-27 14:59:57.873874+01	\N
+vrij	free, pretty	\N	https://forvo.com/word/vrij/#nl	f	f	1694	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+de pruim	the plum	\N	https://forvo.com/word/pruim/#nl	f	f	1876	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+saai	boring	\N	https://forvo.com/word/saai/#nl	f	t	1283	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+vijftig	fifty	\N	https://forvo.com/word/vijftig/#nl	f	t	1242	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+november	November	\N	https://forvo.com/word/november/#nl	f	t	1323	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+Oud en Nieuw	New year’s eve and New year’s day	\N	#	f	t	2011	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+rijk	rich	\N	https://forvo.com/word/rijk/#nl	f	t	1285	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de kleren	the clothes	\N	https://forvo.com/word/kleren/#nl	f	f	1460	clothes	2023-09-27 14:59:57.873874+01	\N
+bespreken	discuss	n/a	https://forvo.com/word/bespreken/#nl	f	f	922	\N	2023-09-27 14:59:57.873874+01	\N
+de vork	the fork	\N	https://forvo.com/word/vork/#nl	f	f	1841	cooking	2023-09-27 14:59:57.873874+01	\N
+interessant	interesting	\N	https://forvo.com/word/interessant/#nl	f	f	1282	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+vriendelijk	friendly	\N	https://forvo.com/word/vriendelijk/#nl	f	f	1815	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+zij/ze	she/they	\N	https://forvo.com/word/zij/#nl	f	f	1121	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+depressief	depressive	\N	https://forvo.com/word/depressief/#nl	f	f	1802	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+kant	side	n/a	https://forvo.com/word/kant/#nl	f	f	198	\N	2023-09-27 14:59:57.873874+01	\N
+het bestek	the cutlery	\N	https://forvo.com/word/bestek/#nl	f	f	1840	cooking	2023-09-27 14:59:57.873874+01	\N
+net	just	\N	https://forvo.com/word/net/#nl	f	f	1945	adverbs	2023-09-27 14:59:57.873874+01	\N
+augustus	august	\N	https://forvo.com/word/augustus/#nl	f	f	1320	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+klok	clock	n/a	https://forvo.com/word/klok/#nl	f	f	832	time	2023-09-27 14:59:57.873874+01	\N
+de garage	the garage	\N	https://forvo.com/word/garage/#nl	f	t	1429	household	2023-09-27 14:59:57.873874+01	\N
+de koorts	the fever	\N	https://forvo.com/word/koorts/#nl	f	t	1715	doctor	2023-09-27 14:59:57.873874+01	\N
+vervelend	annoying	UvA A2 Course	https://forvo.com/word/vervelend/#nl	f	f	1797	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+het vakantiegeld	the vacation bonus	\N	https://forvo.com/word/vakantiegeld/#nl	f	t	1533	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+het gevoel	the feeling	\N	https://forvo.com/word/gevoelens/#nl	f	f	1793	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+feit	fact	n/a	https://forvo.com/word/feit/#nl	f	f	450	\N	2023-09-27 14:59:57.873874+01	\N
+graden	degrees	\N	https://forvo.com/word/graden/#nl	f	f	1665	weather	2023-09-27 14:59:57.873874+01	\N
+de tram	the tram	\N	https://forvo.com/word/tram/#nl	f	f	1203	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+wanneer	when	\N	https://forvo.com/word/wanneer/#nl	f	f	1184	question words	2023-09-27 14:59:57.873874+01	\N
+de, het snoep	the sweets	\N	https://forvo.com/word/snoep/#nl	f	f	1173	food/drink	2023-09-27 14:59:57.873874+01	\N
+kamer	room	n/a	https://forvo.com/word/kamer/#nl	f	f	257	household	2023-09-27 14:59:57.873874+01	\N
+‘s avonds	in the evening		#	f	f	1073	time	2023-09-27 14:59:57.873874+01	\N
+teleurgesteld	disappointed	\N	https://forvo.com/word/teleurgesteld/#nl	f	f	1796	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+huren	to rent	\N	https://forvo.com/word/huren/#nl	f	f	1770	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+verkouden zijn	to have a cold	\N	https://forvo.com/word/verkouden/#nl	f	f	1714	doctor	2023-09-27 14:59:57.873874+01	\N
+de tuin	the garden	\N	https://forvo.com/word/tuin/#nl	f	f	1430	household	2023-09-27 14:59:57.873874+01	\N
+de zolder	the attic	\N	https://forvo.com/word/zolder/#nl	f	f	1431	household	2023-09-27 14:59:57.873874+01	\N
+meest	most	\N	https://forvo.com/word/meest/#nl	f	f	2075	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+de duin	the dune	\N	https://forvo.com/word/duin/#nl	f	f	1761	geography	2023-09-27 14:59:57.873874+01	\N
+de tunnel	the tunnel	\N	https://forvo.com/word/tunnel/#nl	f	f	1762	geography	2023-09-27 14:59:57.873874+01	\N
+lied	song	n/a	https://forvo.com/word/lied/#nl	f	f	323	\N	2023-09-27 14:59:57.873874+01	\N
+de das	the scarf	\N	https://forvo.com/word/das/#nl	f	f	1486	clothes	2023-09-27 14:59:57.873874+01	\N
+het kleinkind	the grandchild	\N	https://forvo.com/word/kleinkind/#nl	f	f	1555	family	2023-09-27 14:59:57.873874+01	\N
+kwaad	furious	\N	https://forvo.com/word/kwaad/#nl	f	f	1801	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+muziek	music	n/a	https://forvo.com/word/muziek/#nl	f	f	289	\N	2023-09-27 14:59:57.873874+01	\N
+inch	inch	n/a	https://forvo.com/word/inch/#nl	f	f	352	\N	2023-09-27 14:59:57.873874+01	\N
+alleen	alone	\N	https://forvo.com/word/alleen/#nl	f	f	1950	adverbs	2023-09-27 14:59:57.873874+01	\N
+strijd	fight	n/a	https://forvo.com/word/strijd/#nl	t	f	745	\N	2023-09-27 14:59:57.873874+01	\N
+acht	eight	\N	https://forvo.com/word/acht/#nl	f	t	1230	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+verzonden	sent	n/a	https://forvo.com/word/verzonden/#nl	f	t	641	\N	2023-09-27 14:59:57.873874+01	\N
+industrie	industry	n/a	https://forvo.com/word/industrie/#nl	f	t	743	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+ook	also, too	\N	https://forvo.com/word/ook/#nl	t	t	1962	adverbs	2023-09-27 14:59:57.873874+01	\N
+nooit	never	\N	https://forvo.com/word/nooit/#nl	f	t	1958	adverbs	2023-09-27 14:59:57.873874+01	\N
+square	square	n/a	https://forvo.com/word/square/#nl	f	t	515	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+de natuur	the nature	\N	https://forvo.com/word/natuur/#nl	f	t	1758	geography	2023-09-27 14:59:57.873874+01	\N
+opgewekt	cheerful	\N	https://forvo.com/word/opgewekt/#nl	f	f	1808	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+stem	voice	n/a	https://forvo.com/word/stem/#nl	f	f	501	\N	2023-09-27 14:59:57.873874+01	\N
+orgel	organ	n/a	https://forvo.com/word/orgel/#nl	f	f	674	body	2023-09-27 14:59:57.873874+01	\N
+seizoen	season	n/a	https://forvo.com/word/seizoen/#nl	f	f	908	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+tellen	count	n/a	https://forvo.com/word/tellen/#nl	f	f	514	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de ober	the waiter	\N	https://forvo.com/word/ober/#nl	f	f	1140	professions	2023-09-27 14:59:57.873874+01	\N
+orde	order	n/a	https://forvo.com/word/orde/#nl	f	f	339	\N	2023-09-27 14:59:57.873874+01	\N
+door	through/by	\N	https://forvo.com/word/door/#nl	f	f	1952	adverbs	2023-09-27 14:59:57.873874+01	\N
+uitnodigen	to invite	\N	https://forvo.com/word/uitnodigen/#nl	f	f	2016	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+het kanaal	the channel	\N	https://forvo.com/word/kanaal/#nl	f	f	1756	geography	2023-09-27 14:59:57.873874+01	\N
+besteden	spend	n/a	https://forvo.com/word/besteden/#nl	f	f	862	\N	2023-09-27 14:59:57.873874+01	\N
+ontvangen	to receive	\N	https://forvo.com/word/ontvangen/#nl	f	f	2019	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+de geboorte	the birth	\N	https://forvo.com/word/geboorte/#nl	f	f	2020	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+moderne	modern	n/a	https://forvo.com/word/moderne/#nl	f	f	770	\N	2023-09-27 14:59:57.873874+01	\N
+nu	now	\N	https://forvo.com/word/nu/#nl	f	f	1960	adverbs	2023-09-27 14:59:57.873874+01	\N
+soms	sometimes	\N	https://forvo.com/word/soms/#nl	f	f	1961	adverbs	2023-09-27 14:59:57.873874+01	\N
+voeten	feet	n/a	https://forvo.com/word/voeten/#nl	f	f	299	body	2023-09-27 14:59:57.873874+01	\N
+mooi weer	nice weather	\N	#	f	f	1661	weather	2023-09-27 14:59:57.873874+01	\N
+de vrije trap	the free kick	\N	#	t	f	1620	football	2023-09-27 14:59:57.873874+01	\N
+taal	language	n/a	https://forvo.com/word/taal/#nl	f	f	400	grammar	2023-09-27 14:59:57.873874+01	\N
+en	and	\N	https://forvo.com/word/en/#nl	f	f	1117	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+het T-shirt	the T-shirt	\N	#	f	t	1474	clothes	2023-09-27 14:59:57.873874+01	\N
+in de richting van	toward	n/a	#	f	f	481	\N	2023-09-27 14:59:57.873874+01	\N
+hit	hit	n/a	https://forvo.com/word/hit/#nl	f	f	772	\N	2023-09-27 14:59:57.873874+01	\N
+de reiskosten	the travel expenses	\N	https://forvo.com/word/reiskosten/#nl	f	f	1536	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de gemeente	the municipality	\N	https://forvo.com/word/gemeente/#nl	f	f	1747	geography	2023-09-27 14:59:57.873874+01	\N
+de kakkerlak	the cockroach	noun, insect	https://forvo.com/word/kakkerlak/#nl	f	f	1002	animals (2)	2023-09-27 14:59:57.873874+01	\N
+mensen	people	n/a	https://forvo.com/word/mensen/#nl	f	f	187	\N	2023-09-27 14:59:57.873874+01	\N
+voorzitter	president (position)	noun	https://forvo.com/word/voorzitter/#nl	t	f	1023	\N	2023-09-27 14:59:57.873874+01	\N
+radio In	radio	n/a	#	f	t	785	\N	2023-09-27 14:59:57.873874+01	\N
+het gemeentehuis	the town hall	\N	https://forvo.com/word/gemeentehuis/#nl	f	t	1748	geography	2023-09-27 14:59:57.873874+01	\N
+wie	who	\N	https://forvo.com/word/wie/#nl	f	f	1174	question words	2023-09-27 14:59:57.873874+01	\N
+goedenavond	good evening	\N	https://forvo.com/word/goedenavond/#nl	f	f	1097	introductory	2023-09-27 14:59:57.873874+01	\N
+bank	bank	n/a	https://forvo.com/word/bank/#nl	f	f	647	\N	2023-09-27 14:59:57.873874+01	\N
+aanbod	offer	n/a	https://forvo.com/word/aanbod/#nl	f	f	874	\N	2023-09-27 14:59:57.873874+01	\N
+zelfstandig naamwoord	noun	n/a	https://forvo.com/word/zelfstandig/#nl	f	f	419	grammar	2023-09-27 14:59:57.873874+01	\N
+klinker	vowel	n/a	https://forvo.com/word/klinker/#nl	f	f	480	grammar	2023-09-27 14:59:57.873874+01	\N
+waren	were	n/a	https://forvo.com/word/waren/#nl	f	f	40	\N	2023-09-27 14:59:57.873874+01	\N
+kunst	art	\N	https://forvo.com/word/kunst/#nl	f	f	1376	hobbies	2023-09-27 14:59:57.873874+01	\N
+het mes	the knife	\N	https://forvo.com/word/mes/#nl	f	f	1842	cooking	2023-09-27 14:59:57.873874+01	\N
+de lepel	the spoon	\N	https://forvo.com/word/lepel/#nl	f	f	1843	cooking	2023-09-27 14:59:57.873874+01	\N
+de werkvergunning	the working permit	\N	https://forvo.com/word/werkvergunning/#nl	f	f	1786	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+werking	effect	n/a	https://forvo.com/word/werking/#nl	f	f	790	\N	2023-09-27 14:59:57.873874+01	\N
+noodzakelijk	necessary	n/a	https://forvo.com/word/noodzakelijk/#nl	f	f	803	\N	2023-09-27 14:59:57.873874+01	\N
+ontmoeten	to meet	\N	https://forvo.com/word/ontmoeten/#nl	f	f	1646	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+doorgaan	to continue	\N	https://forvo.com/word/doorgaan/#nl	f	f	1647	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+de pan	the pan	\N	https://forvo.com/word/pan/#nl	f	f	1837	cooking	2023-09-27 14:59:57.873874+01	\N
+verschijnen	appear	n/a	https://forvo.com/word/verschijnen/#nl	f	f	492	\N	2023-09-27 14:59:57.873874+01	\N
+gestegen	rose	n/a	https://forvo.com/word/gestegen/#nl	f	f	850	\N	2023-09-27 14:59:57.873874+01	\N
+gwe	utility bills	\N	https://forvo.com/word/gwe/#nl	f	f	1774	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+de kont	the ass	\N	https://forvo.com/word/kont/#nl	f	f	1455	body	2023-09-27 14:59:57.873874+01	\N
+verschrikkelijk	terrible	\N	https://forvo.com/word/verschrikkelijk/#nl	f	f	2068	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+dal	valley	n/a	https://forvo.com/word/dal/#nl	f	f	947	nature	2023-09-27 14:59:57.873874+01	\N
+dag	day	\N	https://forvo.com/word/dag/#nl	f	f	1098	introductory	2023-09-27 14:59:57.873874+01	\N
+goedendag	good day !	\N	https://forvo.com/word/goedendag/#nl	f	f	1099	introductory	2023-09-27 14:59:57.873874+01	\N
+tot ziens	see you	\N	https://forvo.com/word/ziens/#nl	f	f	1100	introductory	2023-09-27 14:59:57.873874+01	\N
+het goud	the gold	\N	https://forvo.com/word/goud/#nl	f	f	1927	tools/materials	2023-09-27 14:59:57.873874+01	\N
+(twaalf uur ‘s) middags	noon		#	f	f	1076	time	2023-09-27 14:59:57.873874+01	\N
+de hond	the dog	\N	https://forvo.com/word/hond/#nl	f	f	1569	animals (1)	2023-09-27 14:59:57.873874+01	\N
+oorlog	war	n/a	https://forvo.com/word/oorlog/#nl	f	f	482	\N	2023-09-27 14:59:57.873874+01	\N
+dienen	serve	n/a	https://forvo.com/word/dienen/#nl	f	f	491	\N	2023-09-27 14:59:57.873874+01	\N
+kwam	came	n/a	https://forvo.com/word/kwam/#nl	f	f	119	\N	2023-09-27 14:59:57.873874+01	\N
+het duurt drie uur	it takes three hours		#	f	f	1064	time	2023-09-27 14:59:57.873874+01	\N
+dragen	to carry/bear/wear	n/a	https://forvo.com/word/dragen/#nl	f	f	253	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+bevatten	contain	n/a	https://forvo.com/word/bevatten/#nl	f	f	429	\N	2023-09-27 14:59:57.873874+01	\N
+reeks	range	n/a	https://forvo.com/word/reeks/#nl	f	f	891	\N	2023-09-27 14:59:57.873874+01	\N
+lucht	air	n/a	https://forvo.com/word/lucht/#nl	f	f	56	nature	2023-09-27 14:59:57.873874+01	\N
+de vader	the father	\N	https://forvo.com/word/vader/#nl	f	f	1542	family	2023-09-27 14:59:57.873874+01	\N
+aangelegenheid	matter	n/a	https://forvo.com/word/aangelegenheid/#nl	f	f	529	\N	2023-09-27 14:59:57.873874+01	\N
+vreemde valuta	foreign exchange		https://forvo.com/word/valuta/#nl	f	f	1003	\N	2023-09-27 14:59:57.873874+01	\N
+vertellen	to tell	\N	https://forvo.com/word/vertellen/#nl	f	f	1638	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+de duif	the pigeon	\N	https://forvo.com/word/duif/#nl	f	f	1587	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de vis	the fish	\N	https://forvo.com/word/vis/#nl	f	f	1588	animals (1)	2023-09-27 14:59:57.873874+01	\N
+brak	broke	n/a	https://forvo.com/word/brak/#nl	f	f	655	\N	2023-09-27 14:59:57.873874+01	\N
+wakker	awake	\N	https://forvo.com/word/wakker/#nl	f	f	2074	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+experiment	experiment	n/a	https://forvo.com/word/experiment/#nl	f	f	689	\N	2023-09-27 14:59:57.873874+01	\N
+nieuwe	new	n/a	https://forvo.com/word/nieuwe/#nl	f	f	103	\N	2023-09-27 14:59:57.873874+01	\N
+zin	sentence	n/a	https://forvo.com/word/zin/#nl	f	f	132	grammar	2023-09-27 14:59:57.873874+01	\N
+sneeuwen	to snow	\N	https://forvo.com/word/sneeuwen/#nl	f	f	1671	weather	2023-09-27 14:59:57.873874+01	\N
+doos	box	n/a	https://forvo.com/word/doos/#nl	f	f	418	\N	2023-09-27 14:59:57.873874+01	\N
+verhuizen	to move	\N	https://forvo.com/word/verhuizen/#nl	f	f	1769	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+dans	dance	n/a	https://forvo.com/word/dans/#nl	f	f	545	\N	2023-09-27 14:59:57.873874+01	\N
+vrijdag	Friday	\N	https://forvo.com/word/vrijdag/#nl	f	f	1308	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+groen	green	\N	https://forvo.com/word/groen/#nl	f	f	1972	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+elke	every	n/a	https://forvo.com/word/elke/#nl	f	f	121	\N	2023-09-27 14:59:57.873874+01	\N
+normaal	usually	\N	https://forvo.com/word/normaal/#nl	f	f	1957	adverbs	2023-09-27 14:59:57.873874+01	\N
+vader	father	n/a	https://forvo.com/word/vader/#nl	f	f	101	family	2023-09-27 14:59:57.873874+01	\N
+station	station	n/a	https://forvo.com/word/station/#nl	f	f	868	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de leerling	the scholar	\N	https://forvo.com/word/leerling/#nl	f	f	1132	professions	2023-09-27 14:59:57.873874+01	\N
+de broek	the pants	\N	https://forvo.com/word/broek/#nl	f	t	1463	clothes	2023-09-27 14:59:57.873874+01	\N
+kantoor	office	n/a	https://forvo.com/word/kantoor/#nl	f	t	604	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+vijftien	fifteen	\N	https://forvo.com/word/vijftien/#nl	f	t	1237	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+zuurstof	oxygen	n/a	https://forvo.com/word/zuurstof/#nl	t	f	902	tools/materials	2023-09-27 14:59:57.873874+01	\N
+schip	ship	n/a	https://forvo.com/word/schip/#nl	f	t	335	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+hart	heart	n/a	https://forvo.com/word/hart/#nl	f	t	541	\N	2023-09-27 14:59:57.873874+01	\N
+de belasting	the tax	\N	https://forvo.com/word/belasting/#nl	t	f	1532	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+breed	wide	\N	https://forvo.com/word/breed/#nl	t	f	1987	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+dank	thank	n/a	https://forvo.com/word/dank/#nl	f	t	912	\N	2023-09-27 14:59:57.873874+01	\N
+mei	may	\N	https://forvo.com/word/mei/#nl	f	t	1317	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+avond	evening	\N	https://forvo.com/word/avond/#nl	f	t	1096	introductory	2023-09-27 14:59:57.873874+01	\N
+segmenten	segment	n/a	https://forvo.com/word/segmenten/#nl	t	t	875	\N	2023-09-27 14:59:57.873874+01	\N
+jij/je/u	you	\N	https://forvo.com/word/jij/#nl	f	t	1118	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+uit	out	n/a	https://forvo.com/word/uit/#nl	f	t	38	\N	2023-09-27 14:59:57.873874+01	\N
+het insect	the insect	\N	https://forvo.com/word/insect/#nl	f	t	1590	animals (1)	2023-09-27 14:59:57.873874+01	\N
+bos	forest	n/a	https://forvo.com/word/bos/#nl	f	t	553	nature	2023-09-27 14:59:57.873874+01	\N
+slapen	to sleep	\N	https://forvo.com/word/slapen/#nl	f	t	1265	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+paragraaf	paragraph	n/a	https://forvo.com/word/paragraaf/#nl	f	t	714	grammar	2023-09-27 14:59:57.873874+01	\N
+netto	net	\N	https://forvo.com/word/netto/#nl	f	t	1531	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+tot	until	\N	https://forvo.com/word/tot/#nl	f	t	1101	introductory	2023-09-27 14:59:57.873874+01	\N
+het vierkant	the square	\N	https://forvo.com/word/vierkant/#nl	f	f	1969	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+materiaal	material	n/a	https://forvo.com/word/materiaal/#nl	f	f	551	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+maart	march	\N	https://forvo.com/word/maart/#nl	f	f	1315	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+berg	mountain	n/a	https://forvo.com/word/berg/#nl	f	f	262	geography	2023-09-27 14:59:57.873874+01	\N
+omvatten	include	n/a	https://forvo.com/word/omvatten/#nl	f	f	532	\N	2023-09-27 14:59:57.873874+01	\N
+kloof	divide	n/a	https://forvo.com/word/kloof/#nl	f	f	533	\N	2023-09-27 14:59:57.873874+01	\N
+het paard	the horse	\N	https://forvo.com/word/paard/#nl	f	f	1576	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de ambulance	the ambulance	\N	https://forvo.com/word/ambulance/#nl	f	f	1729	doctor	2023-09-27 14:59:57.873874+01	\N
+wortel	root	n/a	https://forvo.com/word/wortel/#nl	f	f	706	nature	2023-09-27 14:59:57.873874+01	\N
+de stroopwafel	the syrup waffle	\N	https://forvo.com/word/stroopwafel/#nl	f	f	1171	food/drink	2023-09-27 14:59:57.873874+01	\N
+de hoofdstad	the capital	\N	https://forvo.com/word/hoofdstad/#nl	f	f	1744	geography	2023-09-27 14:59:57.873874+01	\N
+de elleboog	the elbow	\N	https://forvo.com/word/elleboog/#nl	f	f	1445	body	2023-09-27 14:59:57.873874+01	\N
+het haar	the hair	\N	https://forvo.com/word/haar/#nl	f	f	1443	body	2023-09-27 14:59:57.873874+01	\N
+de kous	the sock (long)	\N	https://forvo.com/word/kous/#nl	f	f	1470	clothes	2023-09-27 14:59:57.873874+01	\N
+de dam	the dam	\N	https://forvo.com/word/dam/#nl	f	f	1759	geography	2023-09-27 14:59:57.873874+01	\N
+twee	two	\N	https://forvo.com/word/twee/#nl	f	f	1224	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de smaak	the taste	\N	https://forvo.com/word/smaak/#nl	f	f	1830	cooking	2023-09-27 14:59:57.873874+01	\N
+de verblijfsvergunning	the residence permit	\N	https://forvo.com/word/verblijfsvergunning/#nl	f	f	1785	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+spoedig	soon	n/a	https://forvo.com/word/spoedig/#nl	f	f	316	\N	2023-09-27 14:59:57.873874+01	\N
+verliefd	in love	\N	https://forvo.com/word/verliefd/#nl	f	f	1562	family	2023-09-27 14:59:57.873874+01	\N
+verstuiken	to sprain	verb	https://forvo.com/word/verstuiken/#nl	f	f	1022	\N	2023-09-27 14:59:57.873874+01	\N
+motor	engine	n/a	https://forvo.com/word/motor/#nl	f	f	546	\N	2023-09-27 14:59:57.873874+01	\N
+huidig	current	\N	https://forvo.com/word/huidig/#nl	f	f	1705	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+vinden	to find, to think (have an opinion)	\N	https://forvo.com/word/vinden/#nl	f	f	1630	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+serveerster	waitress	\N	https://forvo.com/word/serveerster/#nl	f	f	2149	professions	2023-09-27 14:59:57.873874+01	\N
+over	over/about	\N	https://forvo.com/word/over/#nl	f	f	1343	prepositions	2023-09-27 14:59:57.873874+01	\N
+moeten	must / have to / should	\N	https://forvo.com/word/moeten/#nl	f	f	2096	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+venster	window	n/a	https://forvo.com/word/venster/#nl	f	f	556	household	2023-09-27 14:59:57.873874+01	\N
+de arm	the arm	\N	https://forvo.com/word/arm/#nl	f	f	1444	body	2023-09-27 14:59:57.873874+01	\N
+oceaan	ocean	n/a	https://forvo.com/word/oceaan/#nl	f	f	439	nature	2023-09-27 14:59:57.873874+01	\N
+proberen	to try	\N	https://forvo.com/word/proberen/#nl	f	f	1639	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+bruin	brown	\N	https://forvo.com/word/bruin/#nl	f	f	1982	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+het kwartier	the quarter		https://forvo.com/word/kwartier/#nl	f	f	1054	time	2023-09-27 14:59:57.873874+01	\N
+glimlach	smile	n/a	https://forvo.com/word/glimlach/#nl	f	f	698	\N	2023-09-27 14:59:57.873874+01	\N
+de brug	the bridge	\N	https://forvo.com/word/brug/#nl	f	f	1397	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+het papier	the paper	\N	https://forvo.com/word/papier/#nl	f	f	1923	tools/materials	2023-09-27 14:59:57.873874+01	\N
+dubbel	double	\N	https://forvo.com/word/dubbel/#nl	f	f	1691	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+de snor	the moustache	\N	https://forvo.com/word/snor/#nl	f	f	1458	body	2023-09-27 14:59:57.873874+01	\N
+de paashaas	the Easter bunny	\N	https://forvo.com/word/paashaas/#nl	f	f	2013	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+het salaris	the salary	\N	https://forvo.com/word/salaris/#nl	f	f	1529	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de kok	the cook	\N	https://forvo.com/word/kok/#nl	f	f	1826	cooking	2023-09-27 14:59:57.873874+01	\N
+de vesting	the fortress	\N	https://forvo.com/word/vesting/#nl	f	f	1751	geography	2023-09-27 14:59:57.873874+01	\N
+angst	fear	n/a	https://forvo.com/word/angst/#nl	f	f	824	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+view	view	n/a	https://forvo.com/word/view/#nl	f	f	750	\N	2023-09-27 14:59:57.873874+01	\N
+hear	hear	n/a	https://forvo.com/word/hear/#nl	f	f	266	\N	2023-09-27 14:59:57.873874+01	\N
+worden	to become	\N	https://forvo.com/word/worden/#nl	f	f	1249	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+indien	if	n/a	https://forvo.com/word/indien/#nl	f	f	45	\N	2023-09-27 14:59:57.873874+01	\N
+schijnen	to shine	\N	https://forvo.com/word/schijnen/#nl	f	f	1667	weather	2023-09-27 14:59:57.873874+01	\N
+de neerslag	the precipitation	\N	https://forvo.com/word/neerslag/#nl	f	f	1669	weather	2023-09-27 14:59:57.873874+01	\N
+de taal	the language	\N	https://forvo.com/word/taal/#nl	f	f	1363	hobbies	2023-09-27 14:59:57.873874+01	\N
+verrast	surprised	\N	https://forvo.com/word/verrast/#nl	f	f	1811	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+wel	(confirmative)	\N	https://forvo.com/word/wel/#nl	f	f	1112	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+ouder	parent	n/a	https://forvo.com/word/ouder/#nl	f	f	854	family	2023-09-27 14:59:57.873874+01	\N
+pak	suit	n/a	https://forvo.com/word/pak/#nl	f	f	847	clothes	2023-09-27 14:59:57.873874+01	\N
+de apotheek	the pharmacy	\N	https://forvo.com/word/apotheek/#nl	f	f	1215	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+het zwembad	the swimming pool	\N	https://forvo.com/word/zwembad/#nl	f	f	1216	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de mond	the mouth	\N	https://forvo.com/word/mond/#nl	f	f	1436	body	2023-09-27 14:59:57.873874+01	\N
+veld	field	n/a	https://forvo.com/word/veld/#nl	f	f	420	\N	2023-09-27 14:59:57.873874+01	\N
+eerlijk	fair	n/a	https://forvo.com/word/eerlijk/#nl	f	f	646	\N	2023-09-27 14:59:57.873874+01	\N
+stromen	flow	n/a	https://forvo.com/word/stromen/#nl	f	f	645	\N	2023-09-27 14:59:57.873874+01	\N
+de behandeling	the treatment	\N	https://forvo.com/word/behandeling/#nl	f	f	1722	doctor	2023-09-27 14:59:57.873874+01	\N
+de klok	the clock	noun	https://forvo.com/word/klok/#nl	f	f	1048	time	2023-09-27 14:59:57.873874+01	\N
+toen	at that time (past)	\N	https://forvo.com/word/toen/#nl	f	f	1186	question words	2023-09-27 14:59:57.873874+01	\N
+gedaan	done	n/a	https://forvo.com/word/gedaan/#nl	t	f	425	\N	2023-09-27 14:59:57.873874+01	\N
+idee	idea	n/a	https://forvo.com/word/idee/#nl	f	t	260	\N	2023-09-27 14:59:57.873874+01	\N
+de blouse (bloes)	the blouse, the shirt	\N	https://forvo.com/word/blouse/#nl	f	f	1477	clothes	2023-09-27 14:59:57.873874+01	\N
+het visum	the visa	\N	https://forvo.com/word/visum/#nl	t	f	1782	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+wallen	fortified walls	\N	https://forvo.com/word/wallen/#nl	f	t	1752	geography	2023-09-27 14:59:57.873874+01	\N
+de hamster	the hamster	\N	https://forvo.com/word/hamster/#nl	f	t	2029	animals (1)	2023-09-27 14:59:57.873874+01	\N
+lopen	to walk, to run	\N	https://forvo.com/word/lopen/#nl	f	t	1247	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+schoen	shoe	n/a	https://forvo.com/word/schoen/#nl	f	t	966	clothes	2023-09-27 14:59:57.873874+01	\N
+de metro	the metro	\N	https://forvo.com/word/metro/#nl	f	t	1205	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+ver	far	n/a	https://forvo.com/word/ver/#nl	f	t	237	\N	2023-09-27 14:59:57.873874+01	\N
+de pindakaas	the peanut butter	\N	https://forvo.com/word/pindakaas/#nl	f	t	1155	food/drink	2023-09-27 14:59:57.873874+01	\N
+de plaats	place/stead	n/a	https://forvo.com/word/plaats/#nl	f	f	108	geography	2023-09-27 14:59:57.873874+01	\N
+terwijl	while	\N	https://forvo.com/word/terwijl/#nl	f	f	1187	question words	2023-09-27 14:59:57.873874+01	\N
+rond	around	\N	https://forvo.com/word/rond/#nl	f	f	1348	prepositions	2023-09-27 14:59:57.873874+01	\N
+morgen	morning/tomorrow	\N	https://forvo.com/word/morgen/#nl	f	f	1093	introductory	2023-09-27 14:59:57.873874+01	\N
+gedachte	thought	n/a	https://forvo.com/word/gedachte/#nl	f	f	227	\N	2023-09-27 14:59:57.873874+01	\N
+de onderbroek	the undershorts	\N	https://forvo.com/word/onderbroek/#nl	f	f	1483	clothes	2023-09-27 14:59:57.873874+01	\N
+de bh	the bra	\N	https://forvo.com/word/bh/#nl	f	f	1484	clothes	2023-09-27 14:59:57.873874+01	\N
+leven	life	n/a	https://forvo.com/word/leven/#nl	f	f	249	\N	2023-09-27 14:59:57.873874+01	\N
+in staat	able	n/a	#	f	f	423	\N	2023-09-27 14:59:57.873874+01	\N
+vordering	claim	n/a	https://forvo.com/word/vordering/#nl	f	f	1000	\N	2023-09-27 14:59:57.873874+01	\N
+was	was	n/a	https://forvo.com/word/was/#nl	f	f	7	\N	2023-09-27 14:59:57.873874+01	\N
+vergelijken	to compare	\N	https://forvo.com/word/vergelijken/#nl	f	f	1896	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de schoen	the shoe	\N	https://forvo.com/word/schoen/#nl	f	f	1471	clothes	2023-09-27 14:59:57.873874+01	\N
+geval	case	n/a	https://forvo.com/word/geval/#nl	f	f	656	\N	2023-09-27 14:59:57.873874+01	\N
+toetreden tot	join	n/a	https://forvo.com/word/toetreden/#nl	f	f	618	\N	2023-09-27 14:59:57.873874+01	\N
+buis	tube	n/a	https://forvo.com/word/buis/#nl	f	f	820	\N	2023-09-27 14:59:57.873874+01	\N
+gekocht	bought	n/a	https://forvo.com/word/gekocht/#nl	f	f	929	\N	2023-09-27 14:59:57.873874+01	\N
+hier	here	\N	https://forvo.com/word/hier/#nl	f	f	1182	question words	2023-09-27 14:59:57.873874+01	\N
+schoppen	to kick	\N	https://forvo.com/word/schoppen/#nl	f	f	1613	football	2023-09-27 14:59:57.873874+01	\N
+het raam	the window	\N	https://forvo.com/word/raam/#nl	f	f	1409	household	2023-09-27 14:59:57.873874+01	\N
+duidelijk	clear	\N	https://forvo.com/word/duidelijk/#nl	f	f	1700	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+roep	call	n/a	https://forvo.com/word/roep/#nl	f	f	193	\N	2023-09-27 14:59:57.873874+01	\N
+boord	board	n/a	https://forvo.com/word/boord/#nl	f	f	570	\N	2023-09-27 14:59:57.873874+01	\N
+springen	jump	n/a	https://forvo.com/word/springen/#nl	f	f	701	\N	2023-09-27 14:59:57.873874+01	\N
+de ziektekostenverzekering	the health insurance	\N	https://forvo.com/word/ziektekostenverzekering/#nl	f	f	1736	doctor	2023-09-27 14:59:57.873874+01	\N
+sommige	some	n/a	https://forvo.com/word/sommige/#nl	f	f	24	\N	2023-09-27 14:59:57.873874+01	\N
+sterk	strong	\N	https://forvo.com/word/sterk/#nl	f	f	2070	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+het paleis	the palace	\N	https://forvo.com/word/paleis/#nl	f	f	1388	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+pont	the ferry	\N	https://forvo.com/word/pont/#nl	f	f	1389	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+reizen	to travel	\N	https://forvo.com/word/reizen/#nl	f	f	1356	hobbies	2023-09-27 14:59:57.873874+01	\N
+dus	so/thus	\N	https://forvo.com/word/dus/#nl	f	f	1953	adverbs	2023-09-27 14:59:57.873874+01	\N
+bijten	to bite	\N	https://forvo.com/word/bijten/#nl	f	f	1907	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+uitvinden	invent	n/a	https://forvo.com/word/uitvinden/#nl	f	f	971	\N	2023-09-27 14:59:57.873874+01	\N
+bepalen	determine	n/a	https://forvo.com/word/bepalen/#nl	f	f	974	\N	2023-09-27 14:59:57.873874+01	\N
+hij is jarig	it’s his birthday	\N	https://forvo.com/word/jarig/#nl	f	f	1379	hobbies	2023-09-27 14:59:57.873874+01	\N
+eerste	first	n/a	https://forvo.com/word/eerste/#nl	f	f	194	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+verwijzen	to refer	\N	https://forvo.com/word/verwijzen/#nl	f	f	1732	doctor	2023-09-27 14:59:57.873874+01	\N
+het onderzoek	the check-up	\N	https://forvo.com/word/onderzoek/#nl	f	f	1733	doctor	2023-09-27 14:59:57.873874+01	\N
+doen	to do	\N	https://forvo.com/word/doen/#nl	f	f	1487	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+binnen	inside	\N	https://forvo.com/word/binnen/#nl	f	f	1345	prepositions	2023-09-27 14:59:57.873874+01	\N
+sprak	spoke	n/a	https://forvo.com/word/sprak/#nl	f	f	786	\N	2023-09-27 14:59:57.873874+01	\N
+toonhoogte	pitch	n/a	https://forvo.com/word/toonhoogte/#nl	f	f	931	\N	2023-09-27 14:59:57.873874+01	\N
+bereiden	prepare	n/a	https://forvo.com/word/bereiden/#nl	f	f	995	\N	2023-09-27 14:59:57.873874+01	\N
+verleden	past	n/a	https://forvo.com/word/verleden/#nl	f	f	585	\N	2023-09-27 14:59:57.873874+01	\N
+de ezel	the donkey	\N	https://forvo.com/word/ezel/#nl	f	f	1578	animals (1)	2023-09-27 14:59:57.873874+01	\N
+glans	shine	n/a	https://forvo.com/word/glans/#nl	f	f	985	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de verzekering	the insurance	\N	https://forvo.com/word/verzekering/#nl	f	f	1735	doctor	2023-09-27 14:59:57.873874+01	\N
+de douche	the shower	\N	https://forvo.com/word/douche/#nl	f	f	1426	household	2023-09-27 14:59:57.873874+01	\N
+de kaars	the candle	\N	https://forvo.com/word/kaars/#nl	f	f	2024	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+terug	back	\N	https://forvo.com/word/terug/#nl	f	f	1966	adverbs	2023-09-27 14:59:57.873874+01	\N
+donderdag	Thursday	\N	https://forvo.com/word/donderdag/#nl	f	t	1307	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+het middageten/de lunch	the lunch	\N	https://forvo.com/word/middageten/#nl	f	t	1823	cooking	2023-09-27 14:59:57.873874+01	\N
+zelf	self	n/a	https://forvo.com/word/zelf/#nl	f	t	99	\N	2023-09-27 14:59:57.873874+01	\N
+de kip	the chicken	\N	https://forvo.com/word/kip/#nl	f	t	1579	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de feestdag	the public holiday	\N	https://forvo.com/word/feestdag/#nl	f	t	1999	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+totaal	total	n/a	https://forvo.com/word/totaal/#nl	f	t	944	\N	2023-09-27 14:59:57.873874+01	\N
+half een	half past twelve		#	f	t	1053	time	2023-09-27 14:59:57.873874+01	\N
+kijken	to look/to watch	\N	https://forvo.com/word/kijken/#nl	f	t	1262	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+leeg	empty	\N	https://forvo.com/word/leeg/#nl	f	t	1698	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+aanraken	to touch	n/a	https://forvo.com/word/aanraken/#nl	f	f	629	\N	2023-09-27 14:59:57.873874+01	\N
+spel	game	n/a	https://forvo.com/word/spel/#nl	f	t	385	\N	2023-09-27 14:59:57.873874+01	\N
+straight/recht	straight	n/a	https://forvo.com/word/straight/#nl	f	t	667	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+oor	ear	n/a	https://forvo.com/word/oor/#nl	t	t	652	body	2023-09-27 14:59:57.873874+01	\N
+selecteren	select	n/a	https://forvo.com/word/selecteren/#nl	t	t	989	\N	2023-09-27 14:59:57.873874+01	\N
+de soep	the soup	\N	https://forvo.com/word/soep/#nl	f	t	1863	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+klasse	class	n/a	https://forvo.com/word/klasse/#nl	t	f	330	\N	2023-09-27 14:59:57.873874+01	\N
+het feest	the party	\N	https://forvo.com/word/feest/#nl	f	t	1997	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+deal	deal	n/a	https://forvo.com/word/deal/#nl	f	t	961	\N	2023-09-27 14:59:57.873874+01	\N
+de hoed	the hat	\N	https://forvo.com/word/hoed/#nl	f	t	1485	clothes	2023-09-27 14:59:57.873874+01	\N
+Show	show	n/a	https://forvo.com/word/Show/#nl	f	t	120	\N	2023-09-27 14:59:57.873874+01	\N
+beginnen	to begin	\N	https://forvo.com/word/beginnen/#nl	f	t	1488	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+kon	could	n/a	https://forvo.com/word/kon/#nl	f	t	179	\N	2023-09-27 14:59:57.873874+01	\N
+oude	old	n/a	https://forvo.com/word/oude/#nl	f	t	148	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+het medicijn	the medication	\N	https://forvo.com/word/medicijn/#nl	f	t	1737	doctor	2023-09-27 14:59:57.873874+01	\N
+het hoofd	the head	\N	https://forvo.com/word/hoofd/#nl	f	t	1434	body	2023-09-27 14:59:57.873874+01	\N
+bereiken	to reach	UvA A2 Course/UvA B1A Course CH1	https://forvo.com/word/bereiken/#nl	t	f	467	\N	2023-09-27 14:59:57.873874+01	\N
+sympathiek	sympathetic	\N	https://forvo.com/word/sympathiek/#nl	f	f	1817	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+geleid	led	n/a	https://forvo.com/word/geleid/#nl	f	f	930	\N	2023-09-27 14:59:57.873874+01	\N
+de bes	the berry	\N	https://forvo.com/word/bes/#nl	f	f	1879	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het bericht	the message	\N	https://forvo.com/word/bericht/#nl	f	f	1658	weather	2023-09-27 14:59:57.873874+01	\N
+de aardappeleter	the potato-eater	\N	https://forvo.com/word/aardappeleter/#nl	f	f	1160	food/drink	2023-09-27 14:59:57.873874+01	\N
+Overleg	talk	n/a	https://forvo.com/word/Overleg/#nl	f	f	314	\N	2023-09-27 14:59:57.873874+01	\N
+de tand	the tooth	\N	https://forvo.com/word/tand/#nl	f	f	1437	body	2023-09-27 14:59:57.873874+01	\N
+wonen	to live	\N	https://forvo.com/word/wonen/#nl	f	f	1387	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+bij	at, near	\N	https://forvo.com/word/bij/#nl	f	f	1344	prepositions	2023-09-27 14:59:57.873874+01	\N
+volgende	next	\N	https://forvo.com/word/volgende/#nl	f	f	1973	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+blauw	blue	\N	https://forvo.com/word/blauw/#nl	f	f	1974	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+geel	yellow	\N	https://forvo.com/word/geel/#nl	f	f	1975	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+vertrekken	to leave	\N	https://forvo.com/word/vertrekken/#nl	f	f	1899	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+nam	took	n/a	https://forvo.com/word/nam/#nl	f	f	254	\N	2023-09-27 14:59:57.873874+01	\N
+natie	nation	n/a	https://forvo.com/word/natie/#nl	f	f	669	\N	2023-09-27 14:59:57.873874+01	\N
+het rijbewijs	the driving license	\N	https://forvo.com/word/rijbewijs/#nl	f	f	1784	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+Zwarte Piet	(Black Pete)	\N	#	f	f	2003	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+kans	chance	n/a	https://forvo.com/word/kans/#nl	f	f	980	\N	2023-09-27 14:59:57.873874+01	\N
+zijde	silk	noun	https://forvo.com/word/zijde/#nl	f	f	1017	\N	2023-09-27 14:59:57.873874+01	\N
+leugen	lie	n/a	https://forvo.com/word/leugen/#nl	f	f	746	\N	2023-09-27 14:59:57.873874+01	\N
+het slot	the lock	\N	https://forvo.com/word/slot/#nl	f	f	1917	tools/materials	2023-09-27 14:59:57.873874+01	\N
+geheel	whole	n/a	https://forvo.com/word/geheel/#nl	f	f	349	\N	2023-09-27 14:59:57.873874+01	\N
+snijden	to cut	\N	https://forvo.com/word/snijden/#nl	f	f	1496	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+vallen	to fall	\N	https://forvo.com/word/vallen/#nl	f	f	1498	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+bijzonder	special/particular	\N	https://forvo.com/word/bijzonder/#nl	f	f	2058	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+verdrietig	sad	\N	https://forvo.com/word/verdrietig/#nl	f	f	1799	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+het humeur	the mood	\N	https://forvo.com/word/humeur/#nl	f	f	1792	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+wat	what	\N	https://forvo.com/word/wat/#nl	f	f	1175	question words	2023-09-27 14:59:57.873874+01	\N
+het huisdier	the pet	\N	https://forvo.com/word/huisdier/#nl	f	f	1568	animals (1)	2023-09-27 14:59:57.873874+01	\N
+studie	study	n/a	https://forvo.com/word/studie/#nl	f	f	212	\N	2023-09-27 14:59:57.873874+01	\N
+de zonnebril	the sunglasses	\N	https://forvo.com/word/zonnebril/#nl	f	f	1441	body	2023-09-27 14:59:57.873874+01	\N
+belangrijkste	main	n/a	https://forvo.com/word/belangrijkste/#nl	f	f	274	\N	2023-09-27 14:59:57.873874+01	\N
+de ooievaar	the stork	\N	https://forvo.com/word/ooievaar/#nl	f	f	1585	animals (1)	2023-09-27 14:59:57.873874+01	\N
+sinds	since	\N	https://forvo.com/word/sinds/#nl	f	f	1349	prepositions	2023-09-27 14:59:57.873874+01	\N
+de schaduw	the shadow / shade	\N	https://forvo.com/word/schaduw/#nl	f	f	2095	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+uitgeven	to spend	\N	https://forvo.com/word/uitgeven/#nl	f	f	1648	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+integreren	to integrate (in practice)	\N	https://forvo.com/word/integreren/#nl	f	f	1788	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+momenteel	moment	n/a	https://forvo.com/word/momenteel/#nl	f	f	661	\N	2023-09-27 14:59:57.873874+01	\N
+de boterham	the slice of bread	\N	https://forvo.com/word/boterham/#nl	f	f	1152	food/drink	2023-09-27 14:59:57.873874+01	\N
+been	leg	n/a	https://forvo.com/word/been/#nl	f	f	563	body	2023-09-27 14:59:57.873874+01	\N
+problemen	trouble	n/a	https://forvo.com/word/problemen/#nl	f	f	612	\N	2023-09-27 14:59:57.873874+01	\N
+hoe laat?	how late?	question	#	f	f	1046	time	2023-09-27 14:59:57.873874+01	\N
+luisteren	to listen	\N	https://forvo.com/word/luisteren/#nl	f	f	1260	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+uitgeschakeld	off	n/a	https://forvo.com/word/uitgeschakeld/#nl	f	f	86	\N	2023-09-27 14:59:57.873874+01	\N
+pick	pick	n/a	https://forvo.com/word/pick/#nl	f	f	512	\N	2023-09-27 14:59:57.873874+01	\N
+wiens	whose	n/a	https://forvo.com/word/wiens/#nl	f	f	777	\N	2023-09-27 14:59:57.873874+01	\N
+krijgen	to get, to receive	\N	https://forvo.com/word/krijgen/#nl	f	f	1254	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+eten	to eat	\N	https://forvo.com/word/eten/#nl	f	f	1255	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+break	break	n/a	https://forvo.com/word/break/#nl	f	f	621	\N	2023-09-27 14:59:57.873874+01	\N
+de rondvaart	the canal cruise	\N	https://forvo.com/word/rondvaart/#nl	f	f	1390	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+vangst	catch	n/a	https://forvo.com/word/vangst/#nl	f	f	566	\N	2023-09-27 14:59:57.873874+01	\N
+kiezen	to choose	\N	https://forvo.com/word/kiezen/#nl	f	f	1887	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+eet smakelijk / smakelijk eten	enjoy your meal	\N	https://forvo.com/word/smakelijk/#nl	f	f	1849	cooking	2023-09-27 14:59:57.873874+01	\N
+begrijpen	to understand	\N	https://forvo.com/word/begrijpen/#nl	f	f	1888	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+trouwen	to marry	\N	https://forvo.com/word/trouwen/#nl	f	f	1564	family	2023-09-27 14:59:57.873874+01	\N
+rekken	stretch	n/a	https://forvo.com/word/rekken/#nl	f	f	983	\N	2023-09-27 14:59:57.873874+01	\N
+de supermarkt	the supermarket	\N	https://forvo.com/word/supermarkt/#nl	f	f	1213	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+minuscuul	tiny	n/a	https://forvo.com/word/minuscuul/#nl	f	f	683	\N	2023-09-27 14:59:57.873874+01	\N
+moet	must	n/a	https://forvo.com/word/moet/#nl	f	t	73	\N	2023-09-27 14:59:57.873874+01	\N
+licht	light	\N	https://forvo.com/word/licht/#nl	t	f	1287	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de ui	the onion	\N	https://forvo.com/word/ui/#nl	t	f	1861	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+geloven	to believe	\N	https://forvo.com/word/geloven/#nl	t	f	1489	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+enthousiast	enthusiastic	\N	https://forvo.com/word/enthousiast/#nl	t	f	1812	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+het hout	the wood	\N	https://forvo.com/word/hout/#nl	t	f	1929	tools/materials	2023-09-27 14:59:57.873874+01	\N
+vandaag	today	\N	https://forvo.com/word/vandaag/#nl	f	t	1662	weather	2023-09-27 14:59:57.873874+01	\N
+voelen	to feel, to touch	\N	https://forvo.com/word/voelen/#nl	f	t	1499	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+het paspoort	the passport	\N	https://forvo.com/word/paspoort/#nl	f	t	1779	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+molecuul	molecule	n/a	https://forvo.com/word/molecuul/#nl	f	t	988	nature	2023-09-27 14:59:57.873874+01	\N
+vergissen	to be mistaken	UvA A2 Course	https://forvo.com/word/vergissen/#nl	f	f	1897	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+miljoen	million	\N	https://forvo.com/word/miljoen/#nl	f	t	1246	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+drie	three	\N	https://forvo.com/word/drie/#nl	f	t	1225	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de rivier	the river	\N	https://forvo.com/word/rivier/#nl	f	t	1757	geography	2023-09-27 14:59:57.873874+01	\N
+honderd	hundred	\N	https://forvo.com/word/honderd/#nl	f	t	1243	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+ik begrijp het niet	I don’t understand	\N	#	f	t	1889	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+aarde	earth	n/a	https://forvo.com/word/aarde/#nl	f	f	100	nature	2023-09-27 14:59:57.873874+01	\N
+vergadering	meeting	\N	https://forvo.com/word/vergadering/#nl	f	f	2141	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+het stadion	the stadium	\N	https://forvo.com/word/stadion/#nl	f	f	1401	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+het gerecht	the dish	\N	https://forvo.com/word/gerecht/#nl	f	f	1827	cooking	2023-09-27 14:59:57.873874+01	\N
+de oom	the uncle	\N	https://forvo.com/word/oom/#nl	f	f	1551	family	2023-09-27 14:59:57.873874+01	\N
+katoen	cotton	n/a	https://forvo.com/word/katoen/#nl	f	f	972	tools/materials	2023-09-27 14:59:57.873874+01	\N
+gelijkaardige	similar	n/a	https://forvo.com/word/gelijkaardige/#nl	f	f	924	\N	2023-09-27 14:59:57.873874+01	\N
+gezicht	face	n/a	https://forvo.com/word/gezicht/#nl	f	f	272	body	2023-09-27 14:59:57.873874+01	\N
+wetenschap	science	n/a	https://forvo.com/word/wetenschap/#nl	f	f	255	\N	2023-09-27 14:59:57.873874+01	\N
+het hart	the heart	\N	https://forvo.com/word/hart/#nl	f	f	1459	body	2023-09-27 14:59:57.873874+01	\N
+de kleding	the clothing	\N	https://forvo.com/word/kleding/#nl	f	f	1461	clothes	2023-09-27 14:59:57.873874+01	\N
+de kledingwinkel	the clothes shop	\N	https://forvo.com/word/kledingwinkel/#nl	f	f	1462	clothes	2023-09-27 14:59:57.873874+01	\N
+hill	hill	n/a	https://forvo.com/word/hill/#nl	f	f	725	nature	2023-09-27 14:59:57.873874+01	\N
+het ei	the egg	\N	https://forvo.com/word/ei/#nl	f	f	1862	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+begin	start	n/a	https://forvo.com/word/begin/#nl	f	f	233	\N	2023-09-27 14:59:57.873874+01	\N
+neus	nose	n/a	https://forvo.com/word/neus/#nl	f	f	997	body	2023-09-27 14:59:57.873874+01	\N
+arm	arm	n/a	https://forvo.com/word/arm/#nl	f	f	548	body	2023-09-27 14:59:57.873874+01	\N
+speciaal	special	\N	https://forvo.com/word/speciaal/#nl	f	f	1699	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+zwart	black	\N	https://forvo.com/word/zwart/#nl	f	f	1979	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+grijs	grey	\N	https://forvo.com/word/grijs/#nl	f	f	1981	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+gemaakt	made	n/a	https://forvo.com/word/gemaakt/#nl	f	f	109	\N	2023-09-27 14:59:57.873874+01	\N
+arts	doctor	n/a	https://forvo.com/word/arts/#nl	f	f	765	professions	2023-09-27 14:59:57.873874+01	\N
+wensen	wish	n/a	https://forvo.com/word/wensen/#nl	f	f	568	\N	2023-09-27 14:59:57.873874+01	\N
+roze	pink	\N	https://forvo.com/word/roze/#nl	f	f	1983	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+het kantoor	the office	\N	https://forvo.com/word/kantoor/#nl	f	f	1211	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+punaises	thumbtacks	noun	https://forvo.com/word/punaises/#nl	f	f	1027	tools/materials	2023-09-27 14:59:57.873874+01	\N
+jonge	young	n/a	https://forvo.com/word/jonge/#nl	f	f	306	\N	2023-09-27 14:59:57.873874+01	\N
+voorkomen	occur	n/a	https://forvo.com/word/voorkomen/#nl	f	f	887	\N	2023-09-27 14:59:57.873874+01	\N
+diepe	deep	n/a	https://forvo.com/word/diepe/#nl	f	f	364	\N	2023-09-27 14:59:57.873874+01	\N
+het idee	the idea	\N	https://forvo.com/word/idee/#nl	f	f	2132	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+al, reeds	already	\N	https://forvo.com/word/al/#nl	f	f	1944	adverbs	2023-09-27 14:59:57.873874+01	\N
+verloren	lost	n/a	https://forvo.com/word/verloren/#nl	f	f	636	\N	2023-09-27 14:59:57.873874+01	\N
+rustig	quiet	n/a	https://forvo.com/word/rustig/#nl	f	f	681	\N	2023-09-27 14:59:57.873874+01	\N
+zoals	like	n/a	https://forvo.com/word/zoals/#nl	f	f	165	\N	2023-09-27 14:59:57.873874+01	\N
+de identiteitskaart	the identity card	\N	https://forvo.com/word/identiteitskaart/#nl	f	f	1783	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+het bad	the bath tub	\N	https://forvo.com/word/bad/#nl	f	f	1427	household	2023-09-27 14:59:57.873874+01	\N
+levering	supply	n/a	https://forvo.com/word/levering/#nl	f	f	776	\N	2023-09-27 14:59:57.873874+01	\N
+mij	me	n/a	https://forvo.com/word/mij/#nl	f	f	123	\N	2023-09-27 14:59:57.873874+01	\N
+graad	degree	n/a	https://forvo.com/word/graad/#nl	f	f	880	\N	2023-09-27 14:59:57.873874+01	\N
+geven	to give, indicate	\N	https://forvo.com/word/geven/#nl	f	f	1637	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+na	after	\N	https://forvo.com/word/na/#nl	f	f	1352	prepositions	2023-09-27 14:59:57.873874+01	\N
+hoeveel	how much	\N	https://forvo.com/word/hoeveel/#nl	f	f	1190	question words	2023-09-27 14:59:57.873874+01	\N
+het hert	the deer	\N	https://forvo.com/word/hert/#nl	f	f	1589	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de boot	the boat	\N	https://forvo.com/word/boot/#nl	f	f	1206	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de zaak	the company	\N	https://forvo.com/word/zaak/#nl	f	f	1528	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+tafel	table	n/a	https://forvo.com/word/tafel/#nl	f	f	473	household	2023-09-27 14:59:57.873874+01	\N
+afwerking	finish	n/a	https://forvo.com/word/afwerking/#nl	f	f	594	\N	2023-09-27 14:59:57.873874+01	\N
+vorm	shape/form	n/a	https://forvo.com/word/vorm/#nl	f	f	386	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+regel	rule	n/a	https://forvo.com/word/regel/#nl	f	f	496	\N	2023-09-27 14:59:57.873874+01	\N
+het paasei	the Easter egg	\N	https://forvo.com/word/paasei/#nl	f	f	2014	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+het weerbericht	the weather forecast	\N	https://forvo.com/word/weerbericht/#nl	f	f	1657	weather	2023-09-27 14:59:57.873874+01	\N
+lekker weer, hè	nice weather isn’t it?	\N	#	f	f	1659	weather	2023-09-27 14:59:57.873874+01	\N
+tweehonderd	two hundred	\N	https://forvo.com/word/tweehonderd/#nl	f	f	1244	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+zullen	will	\N	https://forvo.com/word/zullen/#nl	f	t	1906	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+Amsterdam	Amsterdam	\N	https://forvo.com/word/Amsterdam/#nl	f	t	1383	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+blad	sheet	n/a	https://forvo.com/word/blad/#nl	t	f	857	\N	2023-09-27 14:59:57.873874+01	\N
+laten zien	to show	\N	https://forvo.com/word/laten/#nl	t	f	1641	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+stoom	steam	n/a	https://forvo.com/word/stoom/#nl	t	t	892	tools/materials	2023-09-27 14:59:57.873874+01	\N
+zeker	(for) sure	\N	https://forvo.com/word/zeker/#nl	f	t	1660	weather	2023-09-27 14:59:57.873874+01	\N
+twaalf	twelve	\N	https://forvo.com/word/twaalf/#nl	t	t	1234	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+schilderij	(a) painting	\N	https://forvo.com/word/schilderij/#nl	t	f	2151	hobbies	2023-09-27 14:59:57.873874+01	\N
+de kameel	the camel	\N	https://forvo.com/word/kameel/#nl	t	f	2052	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de leeftijd	the age	\N	https://forvo.com/word/leeftijd/#nl	f	t	2125	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de verrassing	surprise	noun	https://forvo.com/word/verrassing/#nl	f	f	1029	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+buiten	outside	\N	https://forvo.com/word/buiten/#nl	f	t	1346	prepositions	2023-09-27 14:59:57.873874+01	\N
+het geld	the money	\N	https://forvo.com/word/geld/#nl	f	t	2105	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+luid	loud	n/a	https://forvo.com/word/luid/#nl	f	t	663	\N	2023-09-27 14:59:57.873874+01	\N
+in	in	\N	https://forvo.com/word/in/#nl	f	t	1332	prepositions	2023-09-27 14:59:57.873874+01	\N
+straat	street	n/a	https://forvo.com/word/straat/#nl	f	t	351	\N	2023-09-27 14:59:57.873874+01	\N
+het dorp	the village	\N	https://forvo.com/word/dorp/#nl	f	t	1745	geography	2023-09-27 14:59:57.873874+01	\N
+zachte	gentle/soft	n/a	https://forvo.com/word/zachte/#nl	f	t	799	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+ging	went	n/a	https://forvo.com/word/ging/#nl	t	t	83	\N	2023-09-27 14:59:57.873874+01	\N
+de kamer	the room	\N	https://forvo.com/word/kamer/#nl	f	t	1420	household	2023-09-27 14:59:57.873874+01	\N
+figuur	figure	n/a	https://forvo.com/word/figuur/#nl	f	t	416	\N	2023-09-27 14:59:57.873874+01	\N
+afbeelding	picture/image	n/a	https://forvo.com/word/afbeelding/#nl	f	t	89	\N	2023-09-27 14:59:57.873874+01	\N
+toets	test	n/a	https://forvo.com/word/toets/#nl	f	f	370	\N	2023-09-27 14:59:57.873874+01	\N
+rij	row	n/a	https://forvo.com/word/rij/#nl	f	f	606	\N	2023-09-27 14:59:57.873874+01	\N
+tijdens	during	n/a	https://forvo.com/word/tijdens/#nl	f	f	457	\N	2023-09-27 14:59:57.873874+01	\N
+dun	thin	\N	https://forvo.com/word/dun/#nl	f	f	1986	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+waarnemen	observe	n/a	https://forvo.com/word/waarnemen/#nl	f	f	665	\N	2023-09-27 14:59:57.873874+01	\N
+natuur	nature	n/a	https://forvo.com/word/natuur/#nl	f	f	890	nature	2023-09-27 14:59:57.873874+01	\N
+uitschakelen	to turn off	\N	https://forvo.com/word/uitschakelen/#nl	f	f	2148	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+de kleur	the colour	\N	https://forvo.com/word/kleur/#nl	f	f	1967	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+juist	correct	\N	https://forvo.com/word/juist/#nl	f	f	1707	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+pagina	page	n/a	https://forvo.com/word/pagina/#nl	f	f	205	\N	2023-09-27 14:59:57.873874+01	\N
+regio	region	n/a	https://forvo.com/word/regio/#nl	f	f	521	\N	2023-09-27 14:59:57.873874+01	\N
+de boer	the farmer	\N	https://forvo.com/word/boer/#nl	f	f	1136	professions	2023-09-27 14:59:57.873874+01	\N
+de visser	the fisherman	\N	https://forvo.com/word/visser/#nl	f	f	1137	professions	2023-09-27 14:59:57.873874+01	\N
+de advocaat	the lawyer	\N	https://forvo.com/word/advocaat/#nl	f	f	1138	professions	2023-09-27 14:59:57.873874+01	\N
+de dokter	the doctor	\N	https://forvo.com/word/dokter/#nl	f	f	1139	professions	2023-09-27 14:59:57.873874+01	\N
+vertelde	told	n/a	https://forvo.com/word/vertelde/#nl	f	f	344	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de knoflook	the garlic	\N	https://forvo.com/word/knoflook/#nl	f	f	1857	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de sla	the lettuce	\N	https://forvo.com/word/sla/#nl	f	f	1858	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de sinaasappel	the orange	\N	https://forvo.com/word/sinaasappel/#nl	f	f	1873	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de afspraak	the appointment	\N	https://forvo.com/word/afspraak/#nl	f	f	1730	doctor	2023-09-27 14:59:57.873874+01	\N
+de verwijsbrief	the referral letter	\N	https://forvo.com/word/verwijsbrief/#nl	f	f	1731	doctor	2023-09-27 14:59:57.873874+01	\N
+december	December	\N	https://forvo.com/word/december/#nl	f	f	1324	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+herfst	autumn	\N	https://forvo.com/word/herfst/#nl	f	f	1328	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+naar	to	\N	https://forvo.com/word/naar/#nl	f	f	1331	prepositions	2023-09-27 14:59:57.873874+01	\N
+beschermen	protect	n/a	https://forvo.com/word/beschermen/#nl	f	f	767	\N	2023-09-27 14:59:57.873874+01	\N
+achter	behind	\N	https://forvo.com/word/achter/#nl	f	f	1334	prepositions	2023-09-27 14:59:57.873874+01	\N
+zielig	pathetic	\N	https://forvo.com/word/zielig/#nl	f	f	1818	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+eenzame	lone	n/a	https://forvo.com/word/eenzame/#nl	f	f	562	\N	2023-09-27 14:59:57.873874+01	\N
+schelp	shell	n/a	https://forvo.com/word/schelp/#nl	f	f	900	\N	2023-09-27 14:59:57.873874+01	\N
+van	from/of	\N	https://forvo.com/word/van/#nl	f	f	1330	prepositions	2023-09-27 14:59:57.873874+01	\N
+de opa	the grandfather	\N	https://forvo.com/word/opa/#nl	f	f	1548	family	2023-09-27 14:59:57.873874+01	\N
+het pensioen	the pension	\N	https://forvo.com/word/pensioen/#nl	f	f	1535	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+tijd	time	n/a	https://forvo.com/word/tijd/#nl	f	f	44	time	2023-09-27 14:59:57.873874+01	\N
+de verjaardag	the birthday	\N	https://forvo.com/word/verjaardag/#nl	f	f	2022	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+uitgaan	to go out	\N	https://forvo.com/word/uitgaan/#nl	f	f	1372	hobbies	2023-09-27 14:59:57.873874+01	\N
+beschikbaar	available	\N	https://forvo.com/word/beschikbaar/#nl	f	f	1702	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+waarschijnlijk	probable	\N	https://forvo.com/word/waarschijnlijk/#nl	f	f	1703	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+schaal	scale	n/a	https://forvo.com/word/schaal/#nl	f	f	662	\N	2023-09-27 14:59:57.873874+01	\N
+staal	steel	n/a	https://forvo.com/word/staal/#nl	f	f	921	tools/materials	2023-09-27 14:59:57.873874+01	\N
+langzaam	slow	n/a	https://forvo.com/word/langzaam/#nl	f	f	486	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de vinger	the finger	\N	https://forvo.com/word/vinger/#nl	f	f	1447	body	2023-09-27 14:59:57.873874+01	\N
+de lucht	the air	\N	https://forvo.com/word/lucht/#nl	f	f	1931	tools/materials	2023-09-27 14:59:57.873874+01	\N
+het doelpunt	the goal	\N	https://forvo.com/word/doelpunt/#nl	f	f	1598	football	2023-09-27 14:59:57.873874+01	\N
+de universiteit	the university	\N	https://forvo.com/word/universiteit/#nl	f	f	1221	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de wal	the shore	\N	https://forvo.com/word/wal/#nl	f	f	1753	geography	2023-09-27 14:59:57.873874+01	\N
+de EHBO, de eerste hulp	the first aid	\N	https://forvo.com/word/EHBO/#nl	f	f	1726	doctor	2023-09-27 14:59:57.873874+01	\N
+planten	plant	n/a	https://forvo.com/word/planten/#nl	f	f	215	\N	2023-09-27 14:59:57.873874+01	\N
+antwoorden	to answer/reply	\N	https://forvo.com/word/antwoorden/#nl	f	f	1252	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de kruk	the stool	\N	https://forvo.com/word/kruk/#nl	f	f	1411	household	2023-09-27 14:59:57.873874+01	\N
+voedsel	food	n/a	https://forvo.com/word/voedsel/#nl	f	f	217	food/drink	2023-09-27 14:59:57.873874+01	\N
+alstublieft	here you are	\N	https://forvo.com/word/alstublieft/#nl	f	f	1104	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+de slang	the snake	\N	https://forvo.com/word/slang/#nl	f	f	2050	animals (2)	2023-09-27 14:59:57.873874+01	\N
+het geluid	the sound	\N	https://forvo.com/word/geluid/#nl	f	f	2133	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+trein	train	n/a	https://forvo.com/word/trein/#nl	f	f	559	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de oma	the grandmother	\N	https://forvo.com/word/oma/#nl	f	f	1549	family	2023-09-27 14:59:57.873874+01	\N
+daar, er	there	\N	https://forvo.com/word/daar/#nl	f	f	1183	question words	2023-09-27 14:59:57.873874+01	\N
+de stoel	the chair	\N	https://forvo.com/word/stoel/#nl	f	f	1410	household	2023-09-27 14:59:57.873874+01	\N
+de abrikoos	the apricot	\N	https://forvo.com/word/abrikoos/#nl	f	f	1872	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het cadeau	the present	\N	https://forvo.com/word/cadeau/#nl	f	f	2026	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+verandering	change	n/a	https://forvo.com/word/verandering/#nl	t	f	82	\N	2023-09-27 14:59:57.873874+01	\N
+twintig	twenty	\N	https://forvo.com/word/twintig/#nl	t	f	1238	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+verder	further	\N	https://forvo.com/word/verder/#nl	t	f	1965	adverbs	2023-09-27 14:59:57.873874+01	\N
+veel	lot/much/many	n/a	https://forvo.com/word/veel/#nl	f	t	688	adverbs	2023-09-27 14:59:57.873874+01	\N
+zomer	summer	\N	https://forvo.com/word/zomer/#nl	f	t	1327	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+kort	short	\N	https://forvo.com/word/kort/#nl	f	t	1684	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+met	with	\N	https://forvo.com/word/met/#nl	f	t	1329	prepositions	2023-09-27 14:59:57.873874+01	\N
+het huurcontract	the rental contract	\N	https://forvo.com/word/huurcontract/#nl	f	t	1772	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+donker	dark	\N	https://forvo.com/word/donker/#nl	f	t	1286	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+passen	to fit/to conform/to try on	n/a	https://forvo.com/word/passen/#nl	t	f	644	\N	2023-09-27 14:59:57.873874+01	\N
+tong	tongue	\N	https://forvo.com/word/tong/#nl	t	t	2142	body	2023-09-27 14:59:57.873874+01	\N
+leiden	to lead	\N	https://forvo.com/word/leiden/#nl	f	t	2101	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de klomp	the wooden shoe	\N	https://forvo.com/word/klomp/#nl	f	t	1472	clothes	2023-09-27 14:59:57.873874+01	\N
+baas	boss	\N	https://forvo.com/word/baas/#nl	f	t	2146	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+nat	wet	\N	https://forvo.com/word/nat/#nl	f	f	2055	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+de melk	the milk	\N	https://forvo.com/word/melk/#nl	f	f	1156	food/drink	2023-09-27 14:59:57.873874+01	\N
+de collega	the colleague	\N	https://forvo.com/word/collega/#nl	f	f	1539	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+ontspannen	relaxed	\N	https://forvo.com/word/ontspannen/#nl	f	f	1813	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+zacht	soft, slow	\N	https://forvo.com/word/zacht/#nl	f	f	1290	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+bruto	gross	\N	https://forvo.com/word/bruto/#nl	f	f	1530	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de baard	the beard	\N	https://forvo.com/word/baard/#nl	f	f	1457	body	2023-09-27 14:59:57.873874+01	\N
+stoel	chair	n/a	https://forvo.com/word/stoel/#nl	f	f	754	household	2023-09-27 14:59:57.873874+01	\N
+wereld	world	n/a	https://forvo.com/word/wereld/#nl	f	f	96	\N	2023-09-27 14:59:57.873874+01	\N
+kosten	to cost	\N	https://forvo.com/word/kosten/#nl	f	f	2099	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+groeide	grew	n/a	https://forvo.com/word/groeide/#nl	f	f	630	\N	2023-09-27 14:59:57.873874+01	\N
+beslissen	to decide	\N	https://forvo.com/word/beslissen/#nl	f	f	1497	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+stap	step	n/a	https://forvo.com/word/stap/#nl	f	f	461	\N	2023-09-27 14:59:57.873874+01	\N
+de plank	the plank	\N	https://forvo.com/word/plank/#nl	f	f	1930	tools/materials	2023-09-27 14:59:57.873874+01	\N
+Kerstmis	Christmas	\N	https://forvo.com/word/Kerstmis/#nl	f	f	2005	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+suiker	sugar	n/a	https://forvo.com/word/suiker/#nl	f	f	903	food/drink	2023-09-27 14:59:57.873874+01	\N
+geweest	been	n/a	https://forvo.com/word/geweest/#nl	f	f	199	\N	2023-09-27 14:59:57.873874+01	\N
+gratis	free	n/a	https://forvo.com/word/gratis/#nl	f	f	441	\N	2023-09-27 14:59:57.873874+01	\N
+oog	eye	n/a	https://forvo.com/word/oog/#nl	f	f	223	body	2023-09-27 14:59:57.873874+01	\N
+eten & drinken	food & drinks	\N	#	f	f	1148	food/drink	2023-09-27 14:59:57.873874+01	\N
+jouw / je / uw	your	\N	https://forvo.com/word/jouw/#nl	f	f	2114	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+deas	dollar	n/a	https://forvo.com/word/deas/#nl	f	f	822	\N	2023-09-27 14:59:57.873874+01	\N
+soort	type/kind	n/a	https://forvo.com/word/soort/#nl	f	f	730	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+woede	anger	n/a	https://forvo.com/word/woede/#nl	f	f	999	\N	2023-09-27 14:59:57.873874+01	\N
+vijand	enemy	n/a	https://forvo.com/word/vijand/#nl	f	f	884	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+zat	sat	n/a	https://forvo.com/word/zat/#nl	f	f	573	\N	2023-09-27 14:59:57.873874+01	\N
+eerder	rather	n/a	https://forvo.com/word/eerder/#nl	f	f	810	\N	2023-09-27 14:59:57.873874+01	\N
+achtervoegsel	suffix	n/a	https://forvo.com/word/achtervoegsel/#nl	f	f	915	grammar	2023-09-27 14:59:57.873874+01	\N
+oorzaak	cause	n/a	https://forvo.com/word/oorzaak/#nl	f	f	141	\N	2023-09-27 14:59:57.873874+01	\N
+de benzine	the petrol	\N	https://forvo.com/word/benzine/#nl	f	f	1925	tools/materials	2023-09-27 14:59:57.873874+01	\N
+cijfer	numeral	n/a	https://forvo.com/word/cijfer/#nl	f	f	329	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+het beest	the animal, the beast	\N	https://forvo.com/word/beest/#nl	f	f	2027	animals (2)	2023-09-27 14:59:57.873874+01	\N
+termijn	term	n/a	https://forvo.com/word/termijn/#nl	f	f	963	\N	2023-09-27 14:59:57.873874+01	\N
+team	team	n/a	https://forvo.com/word/team/#nl	f	f	633	\N	2023-09-27 14:59:57.873874+01	\N
+verloofd	to be engaged	\N	https://forvo.com/word/verloofd/#nl	f	f	1563	family	2023-09-27 14:59:57.873874+01	\N
+het, de colbert	the suit jacket	\N	https://forvo.com/word/colbert/#nl	f	f	1479	clothes	2023-09-27 14:59:57.873874+01	\N
+kust	coast	n/a	https://forvo.com/word/kust/#nl	f	f	733	nature	2023-09-27 14:59:57.873874+01	\N
+dood	dead/death	\N	https://forvo.com/word/dood/#nl	f	f	2087	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+beweging	motion	n/a	https://forvo.com/word/beweging/#nl	f	f	893	\N	2023-09-27 14:59:57.873874+01	\N
+de bril	the glasses	\N	https://forvo.com/word/bril/#nl	f	f	1440	body	2023-09-27 14:59:57.873874+01	\N
+zorg	care	n/a	https://forvo.com/word/zorg/#nl	f	f	300	\N	2023-09-27 14:59:57.873874+01	\N
+de appel	the apple	\N	https://forvo.com/word/appel/#nl	f	f	1868	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het ijzer	the iron	\N	https://forvo.com/word/ijzer/#nl	f	f	1932	tools/materials	2023-09-27 14:59:57.873874+01	\N
+het staal	the steel	\N	https://forvo.com/word/staal/#nl	f	f	1933	tools/materials	2023-09-27 14:59:57.873874+01	\N
+zonnen	to sunbathe	\N	https://forvo.com/word/zonnen/#nl	f	f	1360	hobbies	2023-09-27 14:59:57.873874+01	\N
+het pretpark	the theme park	\N	https://forvo.com/word/pretpark/#nl	f	f	1361	hobbies	2023-09-27 14:59:57.873874+01	\N
+tuinieren	gardening	\N	https://forvo.com/word/tuinieren/#nl	f	f	1362	hobbies	2023-09-27 14:59:57.873874+01	\N
+gebruikelijke	usual	n/a	https://forvo.com/word/gebruikelijke/#nl	f	f	305	\N	2023-09-27 14:59:57.873874+01	\N
+romantisch	romantic	\N	https://forvo.com/word/romantisch/#nl	f	f	1814	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+lijst	list	n/a	https://forvo.com/word/lijst/#nl	f	f	311	\N	2023-09-27 14:59:57.873874+01	\N
+dansen	to dance	\N	https://forvo.com/word/dansen/#nl	f	t	1381	hobbies	2023-09-27 14:59:57.873874+01	\N
+het been	the leg	\N	https://forvo.com/word/been/#nl	f	t	1448	body	2023-09-27 14:59:57.873874+01	\N
+de zak	the bag	\N	https://forvo.com/word/zak/#nl	f	t	2004	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+hoe lang?	how long?		#	f	t	1063	time	2023-09-27 14:59:57.873874+01	\N
+het	the, it	\N	https://forvo.com/word/het/#nl	t	f	1083	introductory	2023-09-27 14:59:57.873874+01	\N
+zoeken	to search	\N	https://forvo.com/word/zoeken/#nl	f	t	1905	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de twaalfde man	the fans	\N	#	t	f	1609	football	2023-09-27 14:59:57.873874+01	\N
+noch	nor	n/a	https://forvo.com/word/noch/#nl	t	f	948	\N	2023-09-27 14:59:57.873874+01	\N
+drankje	drink	n/a	https://forvo.com/word/drankje/#nl	f	t	886	food/drink	2023-09-27 14:59:57.873874+01	\N
+staat	state	n/a	https://forvo.com/word/staat/#nl	f	t	221	\N	2023-09-27 14:59:57.873874+01	\N
+positie	position	n/a	https://forvo.com/word/positie/#nl	f	t	547	\N	2023-09-27 14:59:57.873874+01	\N
+ooit	ever	\N	https://forvo.com/word/ooit/#nl	t	t	1959	adverbs	2023-09-27 14:59:57.873874+01	\N
+het land	the country	\N	https://forvo.com/word/land/#nl	f	t	1740	geography	2023-09-27 14:59:57.873874+01	\N
+goedkoop	cheap	\N	https://forvo.com/word/goedkoop/#nl	f	t	1297	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de koffie	the coffee	\N	https://forvo.com/word/koffie/#nl	f	t	1157	food/drink	2023-09-27 14:59:57.873874+01	\N
+mark	mark	n/a	https://forvo.com/word/mark/#nl	f	t	292	\N	2023-09-27 14:59:57.873874+01	\N
+reisbureau	travel agency	noun	https://forvo.com/word/reisbureau/#nl	t	f	1008	\N	2023-09-27 14:59:57.873874+01	\N
+magneet	magnet	n/a	https://forvo.com/word/magneet/#nl	f	t	910	tools/materials	2023-09-27 14:59:57.873874+01	\N
+lijn	line	n/a	https://forvo.com/word/lijn/#nl	f	t	138	\N	2023-09-27 14:59:57.873874+01	\N
+voorbeeld	example	n/a	https://forvo.com/word/voorbeeld/#nl	f	t	284	grammar	2023-09-27 14:59:57.873874+01	\N
+de knie	the knee	\N	https://forvo.com/word/knie/#nl	f	t	1449	body	2023-09-27 14:59:57.873874+01	\N
+éénentwintig	twenty one	\N	https://forvo.com/word/éénentwintig/#nl	f	t	1239	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+end	end	n/a	https://forvo.com/word/end/#nl	f	t	61	\N	2023-09-27 14:59:57.873874+01	\N
+aanbieden	to offer	UvA A2 Course	https://forvo.com/word/aanbieden/#nl	f	f	1650	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+lieve	dear	UvA A2 Course	https://forvo.com/word/lieve/#nl	f	f	883	\N	2023-09-27 14:59:57.873874+01	\N
+draaien	to turn	\N	https://forvo.com/word/draaien/#nl	t	t	2098	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+het bloed	the blood	\N	https://forvo.com/word/bloed/#nl	f	f	2086	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+lang	long	\N	https://forvo.com/word/lang/#nl	f	f	1685	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+half vier	half past three		#	f	f	1052	time	2023-09-27 14:59:57.873874+01	\N
+decennium	decade	noun	https://forvo.com/word/decennium/#nl	f	f	1042	time	2023-09-27 14:59:57.873874+01	\N
+de aardappel	the potato	\N	https://forvo.com/word/aardappel/#nl	f	f	1159	food/drink	2023-09-27 14:59:57.873874+01	\N
+wachten	to wait	\N	https://forvo.com/word/wachten/#nl	f	f	1273	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+op te lossen	solve	n/a	https://forvo.com/word/lossen/#nl	f	f	709	\N	2023-09-27 14:59:57.873874+01	\N
+het platteland	the countryside	\N	https://forvo.com/word/platteland/#nl	f	f	1749	geography	2023-09-27 14:59:57.873874+01	\N
+de huur	the rent	\N	https://forvo.com/word/huur/#nl	f	f	1773	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+cursus	course	n/a	https://forvo.com/word/cursus/#nl	f	f	355	\N	2023-09-27 14:59:57.873874+01	\N
+het sollicitatiegesprek	the job interview	\N	https://forvo.com/word/sollicitatiegesprek/#nl	f	f	1526	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+pose	pose	n/a	https://forvo.com/word/pose/#nl	f	f	321	\N	2023-09-27 14:59:57.873874+01	\N
+heldere	bright	n/a	https://forvo.com/word/heldere/#nl	f	f	588	\N	2023-09-27 14:59:57.873874+01	\N
+de wc	the toilet	\N	https://forvo.com/word/wc/#nl	f	f	1416	household	2023-09-27 14:59:57.873874+01	\N
+het fornuis	the cooker	\N	https://forvo.com/word/fornuis/#nl	f	f	1418	household	2023-09-27 14:59:57.873874+01	\N
+lengte	length	n/a	https://forvo.com/word/lengte/#nl	f	f	517	\N	2023-09-27 14:59:57.873874+01	\N
+ongeduldig	impatient	\N	https://forvo.com/word/ongeduldig/#nl	f	f	1805	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+tevreden	satisfied	\N	https://forvo.com/word/tevreden/#nl	f	f	1809	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+ontevreden	dissatisfied	\N	https://forvo.com/word/ontevreden/#nl	f	f	1810	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+partij	party	n/a	https://forvo.com/word/partij/#nl	f	f	775	\N	2023-09-27 14:59:57.873874+01	\N
+dank je wel	thank you	\N	https://forvo.com/word/dankjewel/#nl	f	f	1107	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+de temperatuur	the temperature	\N	https://forvo.com/word/temperatuur/#nl	f	f	1663	weather	2023-09-27 14:59:57.873874+01	\N
+de thermometer	the thermometer	\N	https://forvo.com/word/thermometer/#nl	f	f	1664	weather	2023-09-27 14:59:57.873874+01	\N
+quotiënt	quotient	n/a	https://forvo.com/word/quotiënt/#nl	f	f	898	\N	2023-09-27 14:59:57.873874+01	\N
+dan	then/than	\N	https://forvo.com/word/dan/#nl	f	f	1185	question words	2023-09-27 14:59:57.873874+01	\N
+het recept	the prescription	\N	https://forvo.com/word/recept/#nl	f	f	1738	doctor	2023-09-27 14:59:57.873874+01	\N
+het bord	the plate	\N	https://forvo.com/word/bord/#nl	f	f	1844	cooking	2023-09-27 14:59:57.873874+01	\N
+finale	final	n/a	https://forvo.com/word/finale/#nl	f	f	433	\N	2023-09-27 14:59:57.873874+01	\N
+regen	rain	n/a	https://forvo.com/word/regen/#nl	f	f	495	weather	2023-09-27 14:59:57.873874+01	\N
+de driehoek	the triangle	\N	https://forvo.com/word/driehoek/#nl	f	f	1971	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+de tafel	the table	\N	https://forvo.com/word/tafel/#nl	f	f	1412	household	2023-09-27 14:59:57.873874+01	\N
+onthouden	remember	n/a	https://forvo.com/word/onthouden/#nl	f	f	460	\N	2023-09-27 14:59:57.873874+01	\N
+verschillen	differ	n/a	https://forvo.com/word/verschillen/#nl	f	f	139	\N	2023-09-27 14:59:57.873874+01	\N
+schoonheid	beauty	n/a	https://forvo.com/word/schoonheid/#nl	f	f	426	\N	2023-09-27 14:59:57.873874+01	\N
+het n2-examen	the exam for Dutch as a second language	\N	https://forvo.com/word/n2-examen/#nl	f	f	1789	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+ons / onze	our	\N	https://forvo.com/word/onze/#nl	f	f	2117	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+heet	hot	\N	https://forvo.com/word/heet/#nl	f	f	2103	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de markt	the market	\N	https://forvo.com/word/markt/#nl	f	f	2104	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+bril	glasses	\N	https://forvo.com/word/bril/#nl	f	f	2144	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+dronken zijn	being drunk	\N	https://forvo.com/word/dronken/#nl	f	f	1374	hobbies	2023-09-27 14:59:57.873874+01	\N
+bijvoorbeeld	for example	\N	https://forvo.com/word/bijvoorbeeld/#nl	f	f	1956	adverbs	2023-09-27 14:59:57.873874+01	\N
+de hand	the hand	\N	https://forvo.com/word/hand/#nl	f	f	1446	body	2023-09-27 14:59:57.873874+01	\N
+gebied	area	n/a	https://forvo.com/word/gebied/#nl	f	f	336	\N	2023-09-27 14:59:57.873874+01	\N
+de winter	winter	\N	https://forvo.com/word/winter/#nl	f	f	1325	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de tomaat	the tomato	\N	https://forvo.com/word/tomaat/#nl	f	f	1860	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+gunst	favor	n/a	https://forvo.com/word/gunst/#nl	f	f	859	\N	2023-09-27 14:59:57.873874+01	\N
+het leger	the army	\N	https://forvo.com/word/leger/#nl	f	f	2082	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de oefening	the exercise	\N	https://forvo.com/word/oefening/#nl	f	f	2083	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+metalen	metal	n/a	https://forvo.com/word/metalen/#nl	f	f	710	tools/materials	2023-09-27 14:59:57.873874+01	\N
+verre	distant	n/a	https://forvo.com/word/verre/#nl	f	f	396	\N	2023-09-27 14:59:57.873874+01	\N
+vouw	crease	n/a	https://forvo.com/word/vouw/#nl	f	f	699	\N	2023-09-27 14:59:57.873874+01	\N
+de rode kaart	the red card	\N	#	f	f	1619	football	2023-09-27 14:59:57.873874+01	\N
+spoor	rail/track	n/a	https://forvo.com/word/spoor/#nl	f	f	794	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de suiker	the sugar	\N	https://forvo.com/word/suiker/#nl	f	f	1867	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de badkamer	the bathroom	\N	https://forvo.com/word/badkamer/#nl	f	f	1425	household	2023-09-27 14:59:57.873874+01	\N
+ja	yes	\N	https://forvo.com/word/ja/#nl	f	f	1108	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+de geur	the smell	\N	https://forvo.com/word/geur/#nl	f	f	1836	cooking	2023-09-27 14:59:57.873874+01	\N
+kookplaten	ring	n/a	https://forvo.com/word/kookplaten/#nl	f	f	779	\N	2023-09-27 14:59:57.873874+01	\N
+het midden	the middle	\N	https://forvo.com/word/midden/#nl	t	f	1341	prepositions	2023-09-27 14:59:57.873874+01	\N
+nee	no	\N	https://forvo.com/word/nee/#nl	f	t	1109	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+werk	job/work	n/a	https://forvo.com/word/werk/#nl	f	t	581	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+drukke	busy	n/a	https://forvo.com/word/drukke/#nl	f	t	369	\N	2023-09-27 14:59:57.873874+01	\N
+(zich) ziek melden	to report oneself ill	\N	#	t	f	1712	doctor	2023-09-27 14:59:57.873874+01	\N
+ran	ran	n/a	https://forvo.com/word/ran/#nl	f	t	383	\N	2023-09-27 14:59:57.873874+01	\N
+de bakker	the baker	\N	https://forvo.com/word/bakker/#nl	f	t	1134	professions	2023-09-27 14:59:57.873874+01	\N
+de polder	the polder	\N	https://forvo.com/word/polder/#nl	f	t	1750	geography	2023-09-27 14:59:57.873874+01	\N
+willen	to want	\N	https://forvo.com/word/willen/#nl	f	t	1635	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+spraak	speech	n/a	https://forvo.com/word/spraak/#nl	t	t	889	\N	2023-09-27 14:59:57.873874+01	\N
+plek	spot	n/a	https://forvo.com/word/plek/#nl	f	t	845	\N	2023-09-27 14:59:57.873874+01	\N
+meten	measure	n/a	https://forvo.com/word/meten/#nl	f	t	324	\N	2023-09-27 14:59:57.873874+01	\N
+de keuken	the kitchen	\N	https://forvo.com/word/keuken/#nl	f	t	1417	household	2023-09-27 14:59:57.873874+01	\N
+maandag	Monday	\N	https://forvo.com/word/maandag/#nl	f	t	1304	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+yard	yard	n/a	https://forvo.com/word/yard/#nl	f	t	623	household	2023-09-27 14:59:57.873874+01	\N
+gehoord	heard	n/a	https://forvo.com/word/gehoord/#nl	f	t	452	\N	2023-09-27 14:59:57.873874+01	\N
+vullen	to fill	n/a	https://forvo.com/word/vullen/#nl	f	f	397	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+de lamp	the lamp	\N	https://forvo.com/word/lamp/#nl	f	f	1413	household	2023-09-27 14:59:57.873874+01	\N
+hockeyen	to play hockey	\N	https://forvo.com/word/hockeyen/#nl	f	f	1369	hobbies	2023-09-27 14:59:57.873874+01	\N
+divisie	division	n/a	https://forvo.com/word/divisie/#nl	f	f	856	\N	2023-09-27 14:59:57.873874+01	\N
+vrouw	wife, woman	n/a	https://forvo.com/word/vrouw/#nl	f	f	965	family	2023-09-27 14:59:57.873874+01	\N
+daarom	that’s why	\N	https://forvo.com/word/daarom/#nl	f	f	1192	question words	2023-09-27 14:59:57.873874+01	\N
+vestigen	settle	n/a	https://forvo.com/word/vestigen/#nl	f	f	524	\N	2023-09-27 14:59:57.873874+01	\N
+buurman	neighbor	n/a	https://forvo.com/word/buurman/#nl	f	f	807	\N	2023-09-27 14:59:57.873874+01	\N
+controle	control	n/a	https://forvo.com/word/controle/#nl	f	f	650	\N	2023-09-27 14:59:57.873874+01	\N
+de rust	half time	\N	https://forvo.com/word/rust/#nl	f	f	1611	football	2023-09-27 14:59:57.873874+01	\N
+de hoer	the prostitute	\N	https://forvo.com/word/hoer/#nl	f	f	1404	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+ding	thing	n/a	https://forvo.com/word/ding/#nl	f	f	171	\N	2023-09-27 14:59:57.873874+01	\N
+de griep	the flu	\N	https://forvo.com/word/griep/#nl	f	f	1713	doctor	2023-09-27 14:59:57.873874+01	\N
+het fietspad	the bicycle track	\N	https://forvo.com/word/fietspad/#nl	f	f	1396	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+wedstrijd	match	n/a	https://forvo.com/word/wedstrijd/#nl	f	f	914	\N	2023-09-27 14:59:57.873874+01	\N
+de verkering	the relationship (love)	\N	https://forvo.com/word/verkering/#nl	f	f	1561	family	2023-09-27 14:59:57.873874+01	\N
+de bij	the bee	\N	https://forvo.com/word/bij/#nl	f	f	1592	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de vlinder	the butterfly	\N	https://forvo.com/word/vlinder/#nl	f	f	1593	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de spin	the spider	\N	https://forvo.com/word/spin/#nl	f	f	1594	animals (1)	2023-09-27 14:59:57.873874+01	\N
+koord	string	n/a	https://forvo.com/word/koord/#nl	f	f	815	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de voetbal	the football	\N	https://forvo.com/word/voetbal/#nl	f	f	1595	football	2023-09-27 14:59:57.873874+01	\N
+vertrouwen	to trust	\N	https://forvo.com/word/vertrouwen/#nl	f	f	1900	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de maaltijd	the meal	\N	https://forvo.com/word/maaltijd/#nl	f	f	1820	cooking	2023-09-27 14:59:57.873874+01	\N
+elementaire	basic	n/a	https://forvo.com/word/elementaire/#nl	f	f	945	\N	2023-09-27 14:59:57.873874+01	\N
+of	or/whether	\N	https://forvo.com/word/of/#nl	f	f	1116	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+het grachtenpand	the canal house	\N	https://forvo.com/word/grachtenpand/#nl	f	f	1385	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+drinken	to drink	\N	https://forvo.com/word/drinken/#nl	f	f	1256	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+horen	to hear	\N	https://forvo.com/word/horen/#nl	f	f	1259	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de vriendin	the (girl) friend	\N	https://forvo.com/word/vriendin/#nl	f	f	1557	family	2023-09-27 14:59:57.873874+01	\N
+de klasgenoot	the classmate	\N	https://forvo.com/word/klasgenoot/#nl	f	f	1560	family	2023-09-27 14:59:57.873874+01	\N
+plat, flat	flat	\N	https://forvo.com/word/plat/#nl	f	f	1984	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+ruiken	to smell	\N	https://forvo.com/word/ruiken/#nl	f	f	2100	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+kwart voor zeven ‘s ochtends	quarter to seven am		#	f	f	1074	time	2023-09-27 14:59:57.873874+01	\N
+de strafschop	the penalty	\N	https://forvo.com/word/strafschop/#nl	f	f	1621	football	2023-09-27 14:59:57.873874+01	\N
+decimaal	decimal	n/a	https://forvo.com/word/decimaal/#nl	f	f	651	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de broer	the brother	\N	https://forvo.com/word/broer/#nl	f	f	1546	family	2023-09-27 14:59:57.873874+01	\N
+de streek	the region	\N	https://forvo.com/word/streek/#nl	f	f	1742	geography	2023-09-27 14:59:57.873874+01	\N
+winkel	store/shop	n/a	https://forvo.com/word/winkel/#nl	f	f	557	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+stappen	to go out (and drink)	\N	https://forvo.com/word/stappen/#nl	f	f	1373	hobbies	2023-09-27 14:59:57.873874+01	\N
+rechtstreeks	direct	n/a	https://forvo.com/word/rechtstreeks/#nl	f	f	320	\N	2023-09-27 14:59:57.873874+01	\N
+win	win	n/a	https://forvo.com/word/win/#nl	f	f	938	\N	2023-09-27 14:59:57.873874+01	\N
+ijzer	iron	n/a	https://forvo.com/word/ijzer/#nl	f	f	692	tools/materials	2023-09-27 14:59:57.873874+01	\N
+huid	skin	n/a	https://forvo.com/word/huid/#nl	f	f	697	body	2023-09-27 14:59:57.873874+01	\N
+resultaat	result	n/a	https://forvo.com/word/resultaat/#nl	f	f	723	\N	2023-09-27 14:59:57.873874+01	\N
+de vertegenwoordiger	the representative	\N	https://forvo.com/word/vertegenwoordiger/#nl	f	f	1147	professions	2023-09-27 14:59:57.873874+01	\N
+het (onder)hemd	the undershirt	\N	https://forvo.com/word/onderhemd/#nl	f	f	1475	clothes	2023-09-27 14:59:57.873874+01	\N
+vereisen	require	n/a	https://forvo.com/word/vereisen/#nl	f	f	993	\N	2023-09-27 14:59:57.873874+01	\N
+dame	lady	n/a	https://forvo.com/word/dame/#nl	f	f	622	\N	2023-09-27 14:59:57.873874+01	\N
+passeren	pass	n/a	https://forvo.com/word/passeren/#nl	f	f	346	\N	2023-09-27 14:59:57.873874+01	\N
+de mug	the mosquito	\N	https://forvo.com/word/mug/#nl	f	f	2036	animals (2)	2023-09-27 14:59:57.873874+01	\N
+meester	master	n/a	https://forvo.com/word/meester/#nl	f	f	852	\N	2023-09-27 14:59:57.873874+01	\N
+fractie	fraction	n/a	https://forvo.com/word/fractie/#nl	f	f	552	\N	2023-09-27 14:59:57.873874+01	\N
+deze	these, this	\N	https://forvo.com/word/deze/#nl	f	f	1179	question words	2023-09-27 14:59:57.873874+01	\N
+kolonie	colony	n/a	https://forvo.com/word/kolonie/#nl	f	f	831	\N	2023-09-27 14:59:57.873874+01	\N
+dak	the roof	\N	https://forvo.com/word/dak/#nl	f	f	2102	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+werken	to work/operate	\N	https://forvo.com/word/werken/#nl	f	f	1272	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de friet	the French fries	\N	https://forvo.com/word/friet/#nl	t	f	1166	food/drink	2023-09-27 14:59:57.873874+01	\N
+hoe	how	\N	https://forvo.com/word/hoe/#nl	f	t	1188	question words	2023-09-27 14:59:57.873874+01	\N
+papa/dad	dad	\N	https://forvo.com/word/papa/#nl	t	f	1543	family	2023-09-27 14:59:57.873874+01	\N
+gehouden	kept/held	n/a	https://forvo.com/word/gehouden/#nl	t	f	577	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de brief	the letter	\N	https://forvo.com/word/brief/#nl	f	t	1520	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+het vlees	the meat	\N	https://forvo.com/word/vlees/#nl	f	t	1164	food/drink	2023-09-27 14:59:57.873874+01	\N
+gaan	to go	\N	https://forvo.com/word/gaan/#nl	f	t	1250	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de stad	the city	\N	https://forvo.com/word/stad/#nl	f	t	1743	geography	2023-09-27 14:59:57.873874+01	\N
+glas	glass	n/a	https://forvo.com/word/glas/#nl	f	t	578	tools/materials	2023-09-27 14:59:57.873874+01	\N
+waarom	why	\N	https://forvo.com/word/waarom/#nl	f	t	1191	question words	2023-09-27 14:59:57.873874+01	\N
+laag	low	\N	https://forvo.com/word/laag/#nl	t	t	1299	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+oranje	orange	\N	https://forvo.com/word/oranje/#nl	f	t	1977	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+boven	above, top, up, upstairs	\N	https://forvo.com/word/boven/#nl	f	t	1337	prepositions	2023-09-27 14:59:57.873874+01	\N
+de fiets	the bicycle	\N	https://forvo.com/word/fiets/#nl	f	t	1300	dutch symbols	2023-09-27 14:59:57.873874+01	\N
+vragen	to ask	\N	https://forvo.com/word/vragen/#nl	f	t	1251	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+zwaar	heavy	\N	https://forvo.com/word/zwaar/#nl	f	t	1288	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+praten	to talk	\N	https://forvo.com/word/praten/#nl	f	t	1269	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+lente/voorjaar	spring	UvA A2 Course	https://forvo.com/word/lente/#nl	f	f	1326	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+vieren	to celebrate	\N	https://forvo.com/word/vieren/#nl	f	t	1998	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+waaien	to blow	\N	https://forvo.com/word/waaien/#nl	f	f	1674	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+de halte	the stopping place	\N	https://forvo.com/word/halte/#nl	f	f	1204	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+menigte	crowd	n/a	https://forvo.com/word/menigte/#nl	f	f	811	\N	2023-09-27 14:59:57.873874+01	\N
+haten	to hate	\N	https://forvo.com/word/haten/#nl	f	f	1885	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+delen	to share	\N	https://forvo.com/word/delen/#nl	f	f	1886	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+natuurlijk	of course	\N	https://forvo.com/word/natuurlijk/#nl	f	f	1942	adverbs	2023-09-27 14:59:57.873874+01	\N
+specerij	spice	\N	https://forvo.com/word/specerij/#nl	f	f	2152	food/drink	2023-09-27 14:59:57.873874+01	\N
+naar beneden	down	n/a	https://forvo.com/word/beneden/#nl	f	f	197	\N	2023-09-27 14:59:57.873874+01	\N
+toelaten	allow	n/a	https://forvo.com/word/toelaten/#nl	f	f	842	\N	2023-09-27 14:59:57.873874+01	\N
+gooien	throw	n/a	https://forvo.com/word/gooien/#nl	f	f	984	\N	2023-09-27 14:59:57.873874+01	\N
+wat voor weer wordt het?	what will be the weather?	\N	#	f	f	1656	weather	2023-09-27 14:59:57.873874+01	\N
+staan	to stand	\N	https://forvo.com/word/staan/#nl	f	f	1644	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+de graad	the degree	\N	https://forvo.com/word/graad/#nl	f	f	1666	weather	2023-09-27 14:59:57.873874+01	\N
+de stof	the material	\N	https://forvo.com/word/stof/#nl	f	f	1936	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de aarde	the earth	\N	https://forvo.com/word/aarde/#nl	f	f	1937	tools/materials	2023-09-27 14:59:57.873874+01	\N
+iets	something	\N	https://forvo.com/word/iets/#nl	f	f	1938	adverbs	2023-09-27 14:59:57.873874+01	\N
+groep	group	n/a	https://forvo.com/word/groep/#nl	f	f	287	\N	2023-09-27 14:59:57.873874+01	\N
+ei	egg	n/a	https://forvo.com/word/ei/#nl	f	f	507	food/drink	2023-09-27 14:59:57.873874+01	\N
+ontslaan	to fire	\N	https://forvo.com/word/ontslaan/#nl	f	f	1541	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+stroom	stream	n/a	https://forvo.com/word/stroom/#nl	f	f	823	\N	2023-09-27 14:59:57.873874+01	\N
+oost(en)	east	\N	https://forvo.com/word/oost/#nl	f	f	2077	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+de stropdas	the tie	\N	https://forvo.com/word/stropdas/#nl	f	f	1480	clothes	2023-09-27 14:59:57.873874+01	\N
+oever	shore	n/a	https://forvo.com/word/oever/#nl	f	f	855	nature	2023-09-27 14:59:57.873874+01	\N
+stof	dust/substance	noun	https://forvo.com/word/stof/#nl	f	f	1009	household	2023-09-27 14:59:57.873874+01	\N
+wit	white	\N	https://forvo.com/word/wit/#nl	f	f	1978	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+elk	each	\N	https://forvo.com/word/elk/#nl	f	f	1991	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+beroemd	famous	\N	https://forvo.com/word/beroemd/#nl	f	f	2065	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+kamperen	to camp out	\N	https://forvo.com/word/kamperen/#nl	f	f	1358	hobbies	2023-09-27 14:59:57.873874+01	\N
+het strand	the beach	\N	https://forvo.com/word/strand/#nl	f	f	1359	hobbies	2023-09-27 14:59:57.873874+01	\N
+de snelweg	the highway	\N	https://forvo.com/word/snelweg/#nl	f	f	1199	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+hardlopen	to run	\N	https://forvo.com/word/hardlopen/#nl	f	f	1366	hobbies	2023-09-27 14:59:57.873874+01	\N
+missen	to miss	n/a	https://forvo.com/word/miss/#nl	f	f	389	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+volgen	to follow	\N	https://forvo.com/word/volgen/#nl	f	f	1500	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+gebruikelijk/gemeenschappelijke	common	\N	https://forvo.com/word/gebruikelijk/#nl	f	f	2059	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+geen	no / none	\N	https://forvo.com/word/geen/#nl	f	f	2121	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het verschil	the difference	\N	https://forvo.com/word/verschil/#nl	f	f	2124	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+bedoelen	to mean	\N	https://forvo.com/word/bedoelen/#nl	f	f	1631	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+nemen	to take	\N	https://forvo.com/word/nemen/#nl	f	f	1633	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+auto	car	n/a	https://forvo.com/word/auto/#nl	f	f	298	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+stok	stick	n/a	https://forvo.com/word/stok/#nl	f	f	694	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+weg	road	n/a	https://forvo.com/word/weg/#nl	f	f	493	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+warmte	heat	n/a	https://forvo.com/word/warmte/#nl	f	f	391	\N	2023-09-27 14:59:57.873874+01	\N
+ijs	ice	n/a	https://forvo.com/word/ijs/#nl	f	f	528	nature	2023-09-27 14:59:57.873874+01	\N
+broer	brother	n/a	https://forvo.com/word/broer/#nl	f	f	506	family	2023-09-27 14:59:57.873874+01	\N
+lol	fun	n/a	https://forvo.com/word/lol/#nl	f	f	587	\N	2023-09-27 14:59:57.873874+01	\N
+vijg	fig	n/a	https://forvo.com/word/vijg/#nl	f	f	917	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+bedden	bed	n/a	https://forvo.com/word/bedden/#nl	f	f	505	household	2023-09-27 14:59:57.873874+01	\N
+geld	money	n/a	https://forvo.com/word/geld/#nl	f	f	490	\N	2023-09-27 14:59:57.873874+01	\N
+seconde	second	noun	https://forvo.com/word/seconde/#nl	f	f	1044	time	2023-09-27 14:59:57.873874+01	\N
+het pak	the suit	\N	https://forvo.com/word/pak/#nl	f	f	1478	clothes	2023-09-27 14:59:57.873874+01	\N
+leren	to learn, to teach	\N	https://forvo.com/word/leren/#nl	f	f	1264	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+Pasen	Easter	\N	https://forvo.com/word/Pasen/#nl	f	f	2012	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+zus	sister	n/a	https://forvo.com/word/zus/#nl	f	f	920	family	2023-09-27 14:59:57.873874+01	\N
+sense	sense	n/a	https://forvo.com/word/sense/#nl	t	f	751	\N	2023-09-27 14:59:57.873874+01	\N
+kind	child	n/a	https://forvo.com/word/kind/#nl	f	t	666	family	2023-09-27 14:59:57.873874+01	\N
+genieten (van)	to enjoy	\N	https://forvo.com/word/genieten/#nl	f	f	1891	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+driehoek	triangle	n/a	https://forvo.com/word/driehoek/#nl	f	t	827	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+cirkel	circle	n/a	https://forvo.com/word/cirkel/#nl	f	t	530	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+de donder	the thunder	\N	https://forvo.com/word/donder/#nl	f	t	1678	weather	2023-09-27 14:59:57.873874+01	\N
+kreeg	got	n/a	https://forvo.com/word/kreeg/#nl	t	f	282	\N	2023-09-27 14:59:57.873874+01	\N
+vol/volledige	full	\N	https://forvo.com/word/vol/#nl	f	t	1697	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+de kop	the head	\N	https://forvo.com/word/kop/#nl	t	f	1435	body	2023-09-27 14:59:57.873874+01	\N
+het stof	the dust	\N	https://forvo.com/word/stof/#nl	f	t	1935	tools/materials	2023-09-27 14:59:57.873874+01	\N
+vijf voor half zeven	twenty five past six		#	f	t	1059	time	2023-09-27 14:59:57.873874+01	\N
+gebeuren	to happen	UvA A2 Course	https://forvo.com/word/gebeuren/#nl	f	f	1501	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de maand	the month	\N	https://forvo.com/word/maand/#nl	f	t	1311	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+hebben	to have	\N	https://forvo.com/word/hebben/#nl	f	t	1248	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de student	the student	\N	https://forvo.com/word/student/#nl	f	t	1131	professions	2023-09-27 14:59:57.873874+01	\N
+herinneren	to remember	UvA A2 Course	https://forvo.com/word/herinneren/#nl	f	t	1651	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+glad	slippery	UvA A2 Course	https://forvo.com/word/glad/#nl	f	f	2064	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+systeem	system	n/a	https://forvo.com/word/systeem/#nl	f	t	368	\N	2023-09-27 14:59:57.873874+01	\N
+melk	milk	n/a	https://forvo.com/word/melk/#nl	f	t	671	food/drink	2023-09-27 14:59:57.873874+01	\N
+de wolk	the cloud	\N	https://forvo.com/word/wolk/#nl	f	t	1679	weather	2023-09-27 14:59:57.873874+01	\N
+planeet	planet	n/a	https://forvo.com/word/planeet/#nl	f	f	828	nature	2023-09-27 14:59:57.873874+01	\N
+de kast	the closet	\N	https://forvo.com/word/kast/#nl	f	f	1415	household	2023-09-27 14:59:57.873874+01	\N
+anamnese	medical history	\N	https://forvo.com/word/anamnese/#nl	f	f	2145	doctor	2023-09-27 14:59:57.873874+01	\N
+lief	lovely, sweet	\N	https://forvo.com/word/lief/#nl	f	f	1292	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+immigreren	to immigrate	\N	https://forvo.com/word/immigreren/#nl	f	f	1766	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+de kerstman	Santa Claus	\N	https://forvo.com/word/kerstman/#nl	f	f	2007	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+paar	pair	n/a	https://forvo.com/word/paar/#nl	f	f	531	\N	2023-09-27 14:59:57.873874+01	\N
+zwak	weak	\N	https://forvo.com/word/zwak/#nl	f	f	2071	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+het spreekuur	the consultation hours	\N	https://forvo.com/word/spreekuur/#nl	f	f	1725	doctor	2023-09-27 14:59:57.873874+01	\N
+de eekhoorn	the squirrel	\N	https://forvo.com/word/eekhoorn/#nl	f	f	2039	animals (1)	2023-09-27 14:59:57.873874+01	\N
+het schot	the shot	\N	https://forvo.com/word/schot/#nl	f	f	1614	football	2023-09-27 14:59:57.873874+01	\N
+de redding	the save	\N	https://forvo.com/word/redding/#nl	f	f	1615	football	2023-09-27 14:59:57.873874+01	\N
+redden	to save	\N	https://forvo.com/word/redden/#nl	f	f	1616	football	2023-09-27 14:59:57.873874+01	\N
+de voorzet	the assist	\N	https://forvo.com/word/voorzet/#nl	f	f	1617	football	2023-09-27 14:59:57.873874+01	\N
+echt	real	\N	https://forvo.com/word/echt/#nl	f	f	1696	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+lettergreep	syllable	n/a	https://forvo.com/word/lettergreep/#nl	f	f	534	grammar	2023-09-27 14:59:57.873874+01	\N
+persoon	person	n/a	https://forvo.com/word/persoon/#nl	f	f	489	\N	2023-09-27 14:59:57.873874+01	\N
+huis	house	n/a	https://forvo.com/word/huis/#nl	f	f	88	household	2023-09-27 14:59:57.873874+01	\N
+duw	push	n/a	https://forvo.com/word/duw/#nl	f	f	712	\N	2023-09-27 14:59:57.873874+01	\N
+de nicht	the cousin, the niece	\N	https://forvo.com/word/nicht/#nl	f	f	1553	family	2023-09-27 14:59:57.873874+01	\N
+frietje met	French fries with mayonnaise	\N	https://forvo.com/word/frietje/#nl	f	f	1167	food/drink	2023-09-27 14:59:57.873874+01	\N
+de frikandel	Dutch meat sausage	\N	https://forvo.com/word/frikandel/#nl	f	f	1168	food/drink	2023-09-27 14:59:57.873874+01	\N
+de leeuw	the lion	\N	https://forvo.com/word/leeuw/#nl	f	f	2054	animals (2)	2023-09-27 14:59:57.873874+01	\N
+gezond	healthy	\N	https://forvo.com/word/gezond/#nl	f	f	1710	doctor	2023-09-27 14:59:57.873874+01	\N
+de opleiding	the education	\N	https://forvo.com/word/opleiding/#nl	f	f	1523	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de ervaring	the experience	\N	https://forvo.com/word/ervaring/#nl	f	f	1524	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de aanval	the attack	\N	https://forvo.com/word/aanval/#nl	f	f	2085	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de wortel	the carrot	\N	https://forvo.com/word/wortel/#nl	f	f	1851	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+veilig	safe	\N	https://forvo.com/word/veilig/#nl	f	f	2080	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+gevaarlijk	dangerous	\N	https://forvo.com/word/gevaarlijk/#nl	f	f	2081	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de supporter	the fan	\N	https://forvo.com/word/supporter/#nl	f	f	1608	football	2023-09-27 14:59:57.873874+01	\N
+de steen	the stone	\N	https://forvo.com/word/steen/#nl	f	f	1934	tools/materials	2023-09-27 14:59:57.873874+01	\N
+zaterdag	Saturday	\N	https://forvo.com/word/zaterdag/#nl	f	f	1309	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de rekenmachine	the calculator	\N	https://forvo.com/word/rekenmachine/#nl	f	f	1915	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de peer	the pear	\N	https://forvo.com/word/peer/#nl	f	f	1869	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de banaan	the banana	\N	https://forvo.com/word/banaan/#nl	f	f	1870	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+vrije tijd	leisure time	\N	#	f	f	1354	hobbies	2023-09-27 14:59:57.873874+01	\N
+dichtbij	nearby	\N	https://forvo.com/word/dichtbij/#nl	f	f	2129	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het eiland	the island	\N	https://forvo.com/word/eiland/#nl	f	f	1398	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+het gesprek	the conversation, the interview	\N	https://forvo.com/word/gesprek/#nl	f	f	1525	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+om tien uur	at ten o’clock		#	f	f	1051	time	2023-09-27 14:59:57.873874+01	\N
+links	left	\N	https://forvo.com/word/links/#nl	f	f	1114	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+een	a/an/any	\N	https://forvo.com/word/een/#nl	f	f	1081	introductory	2023-09-27 14:59:57.873874+01	\N
+het nieuws	the news	\N	https://forvo.com/word/nieuws/#nl	f	f	2088	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de krant	the newspaper	\N	https://forvo.com/word/krant/#nl	f	f	2089	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+nacht	night	n/a	https://forvo.com/word/nacht/#nl	f	f	247	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+origineel	original	n/a	https://forvo.com/word/origineel/#nl	f	f	866	\N	2023-09-27 14:59:57.873874+01	\N
+kwart voor zeven	quarter to seven		#	f	f	1056	time	2023-09-27 14:59:57.873874+01	\N
+de ochtend, de morgen	the morning		https://forvo.com/word/ochtend/#nl	f	f	1068	time	2023-09-27 14:59:57.873874+01	\N
+de beer	the bear	\N	https://forvo.com/word/beer/#nl	f	f	2047	animals (2)	2023-09-27 14:59:57.873874+01	\N
+ik	I	\N	https://forvo.com/word/ik/#nl	f	f	1078	introductory	2023-09-27 14:59:57.873874+01	\N
+ik ben	I am	\N	https://forvo.com/word/ben/#nl	f	f	1080	introductory	2023-09-27 14:59:57.873874+01	\N
+twintig voor vijf	twenty to five		#	f	f	1062	time	2023-09-27 14:59:57.873874+01	\N
+toekomst	the future	\N	https://forvo.com/word/toekomst/#nl	f	f	2091	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+Oudjaar	New year’s eve	\N	https://forvo.com/word/Oudjaar/#nl	f	f	2008	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+van twee uur tot vijf uur	from two till five o’clock		#	f	f	1065	time	2023-09-27 14:59:57.873874+01	\N
+voeren	enter	n/a	https://forvo.com/word/voeren/#nl	f	f	835	\N	2023-09-27 14:59:57.873874+01	\N
+minder	less	\N	https://forvo.com/word/minder/#nl	f	f	1964	adverbs	2023-09-27 14:59:57.873874+01	\N
+sectie	section	n/a	https://forvo.com/word/sectie/#nl	t	f	677	grammar	2023-09-27 14:59:57.873874+01	\N
+de olifant	the elephant	\N	https://forvo.com/word/olifant/#nl	f	t	2046	animals (2)	2023-09-27 14:59:57.873874+01	\N
+ik heet	my name is	\N	https://forvo.com/word/heet/#nl	f	t	1079	introductory	2023-09-27 14:59:57.873874+01	\N
+de verkoper/verkoopster	the salesman/saleswoman	\N	https://forvo.com/word/verkoper/#nl	f	f	1146	professions	2023-09-27 14:59:57.873874+01	\N
+stout	naughty	\N	https://forvo.com/word/stout/#nl	t	f	1293	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+samen	together	\N	https://forvo.com/word/samen/#nl	f	t	2128	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+niveau	level	n/a	https://forvo.com/word/niveau/#nl	t	f	979	\N	2023-09-27 14:59:57.873874+01	\N
+muur	wall	n/a	https://forvo.com/word/muur/#nl	f	t	565	household	2023-09-27 14:59:57.873874+01	\N
+de bank	the couch	\N	https://forvo.com/word/bank/#nl	f	t	1422	household	2023-09-27 14:59:57.873874+01	\N
+tanden	teeth	n/a	https://forvo.com/word/tanden/#nl	f	t	899	body	2023-09-27 14:59:57.873874+01	\N
+de vlag	the flag	\N	https://forvo.com/word/vlag/#nl	f	t	2090	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+gras	grass	n/a	https://forvo.com/word/gras/#nl	f	t	579	nature	2023-09-27 14:59:57.873874+01	\N
+iedereen	everybody	\N	https://forvo.com/word/iedereen/#nl	f	t	2127	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+bloed	blood	n/a	https://forvo.com/word/bloed/#nl	f	t	628	body	2023-09-27 14:59:57.873874+01	\N
+zuid(en)	south	\N	https://forvo.com/word/zuid/#nl	t	t	2078	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+land	land/country	n/a	https://forvo.com/word/land/#nl	f	t	71	geography	2023-09-27 14:59:57.873874+01	\N
+vriend	friend	n/a	https://forvo.com/word/vriend/#nl	f	f	258	\N	2023-09-27 14:59:57.873874+01	\N
+de jongen	the boy	\N	https://forvo.com/word/jongen/#nl	f	t	1086	introductory	2023-09-27 14:59:57.873874+01	\N
+als	if, as	\N	https://forvo.com/word/als/#nl	f	t	2123	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de moeder	the mother	\N	https://forvo.com/word/moeder/#nl	t	f	1544	family	2023-09-27 14:59:57.873874+01	\N
+de machine	the machine	\N	https://forvo.com/word/machine/#nl	f	f	1914	tools/materials	2023-09-27 14:59:57.873874+01	\N
+laten	to leave, let	\N	https://forvo.com/word/laten/#nl	f	f	1509	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+misverstand	misunderstanding	noun	https://forvo.com/word/misverstand/#nl	f	f	1028	\N	2023-09-27 14:59:57.873874+01	\N
+zinsnede	phrase	n/a	https://forvo.com/word/zinsnede/#nl	f	f	735	grammar	2023-09-27 14:59:57.873874+01	\N
+de bijkeuken	the scullery	\N	https://forvo.com/word/bijkeuken/#nl	f	f	1428	household	2023-09-27 14:59:57.873874+01	\N
+gedragen	to behave	\N	https://forvo.com/word/gedragen/#nl	f	f	1884	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+kalm	calm	\N	https://forvo.com/word/kalm/#nl	f	f	2143	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+aardrijkskunde	geography	\N	https://forvo.com/word/aardrijkskunde/#nl	f	f	1739	geography	2023-09-27 14:59:57.873874+01	\N
+de minuut	the minute		https://forvo.com/word/minuut/#nl	f	f	1057	time	2023-09-27 14:59:57.873874+01	\N
+het varken	the pig	\N	https://forvo.com/word/varken/#nl	f	f	1577	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de reiskostenvergoeding	the compensation for travel expenses	\N	https://forvo.com/word/reiskostenvergoeding/#nl	f	f	1538	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de hobby	the hobby	\N	https://forvo.com/word/hobby/#nl	f	f	1355	hobbies	2023-09-27 14:59:57.873874+01	\N
+de vakantie	the holiday	\N	https://forvo.com/word/vakantie/#nl	f	f	1357	hobbies	2023-09-27 14:59:57.873874+01	\N
+artikel	product	n/a	https://forvo.com/word/artikel/#nl	f	f	326	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+gesneden	cut	n/a	https://forvo.com/word/gesneden/#nl	f	f	268	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+het ijs	the ice	\N	https://forvo.com/word/ijs/#nl	f	f	1682	weather	2023-09-27 14:59:57.873874+01	\N
+niet	not, don't	\N	https://forvo.com/word/niet/#nl	f	f	1110	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+verslaan	beat	n/a	https://forvo.com/word/verslaan/#nl	f	f	747	\N	2023-09-27 14:59:57.873874+01	\N
+vilt	felt	n/a	https://forvo.com/word/vilt/#nl	f	f	535	\N	2023-09-27 14:59:57.873874+01	\N
+dikke	thick	n/a	https://forvo.com/word/dikke/#nl	f	f	758	\N	2023-09-27 14:59:57.873874+01	\N
+eiland	island	n/a	https://forvo.com/word/eiland/#nl	f	f	366	nature	2023-09-27 14:59:57.873874+01	\N
+voet	foot	n/a	https://forvo.com/word/voet/#nl	f	f	367	body	2023-09-27 14:59:57.873874+01	\N
+belangrijk	important	\N	https://forvo.com/word/belangrijk/#nl	f	f	1686	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+beter	better	\N	https://forvo.com/word/beter/#nl	f	f	1687	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+de nacht	the night		https://forvo.com/word/nacht/#nl	f	f	1066	time	2023-09-27 14:59:57.873874+01	\N
+heeft	has	n/a	https://forvo.com/word/heeft/#nl	f	f	175	\N	2023-09-27 14:59:57.873874+01	\N
+deel	part	n/a	https://forvo.com/word/deel/#nl	f	f	105	\N	2023-09-27 14:59:57.873874+01	\N
+grootte	size	n/a	https://forvo.com/word/grootte/#nl	f	f	522	\N	2023-09-27 14:59:57.873874+01	\N
+zei	said	n/a	https://forvo.com/word/zei/#nl	f	f	48	\N	2023-09-27 14:59:57.873874+01	\N
+de man	the man	\N	https://forvo.com/word/man/#nl	f	f	1084	introductory	2023-09-27 14:59:57.873874+01	\N
+het meisje	the girl	\N	https://forvo.com/word/meisje/#nl	f	f	1087	introductory	2023-09-27 14:59:57.873874+01	\N
+variëren	vary	n/a	https://forvo.com/word/variëren/#nl	f	f	523	\N	2023-09-27 14:59:57.873874+01	\N
+aftrekken	subtract	n/a	https://forvo.com/word/aftrekken/#nl	f	f	958	\N	2023-09-27 14:59:57.873874+01	\N
+streken	pranks	noun	https://forvo.com/word/streken/#nl	f	f	1026	\N	2023-09-27 14:59:57.873874+01	\N
+hard	hard, fast	\N	https://forvo.com/word/hard/#nl	f	f	1289	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+de strik	the bow	\N	https://forvo.com/word/strik/#nl	f	f	1481	clothes	2023-09-27 14:59:57.873874+01	\N
+de krokodil	the crocodile	\N	https://forvo.com/word/krokodil/#nl	f	f	2051	animals (2)	2023-09-27 14:59:57.873874+01	\N
+het oor	the ear	\N	https://forvo.com/word/oor/#nl	f	f	1438	body	2023-09-27 14:59:57.873874+01	\N
+reusachtig	huge	n/a	https://forvo.com/word/reusachtig/#nl	f	f	919	\N	2023-09-27 14:59:57.873874+01	\N
+bar	bar	n/a	https://forvo.com/word/bar/#nl	f	f	873	\N	2023-09-27 14:59:57.873874+01	\N
+afvragen	wonder	n/a	https://forvo.com/word/afvragen/#nl	f	f	379	\N	2023-09-27 14:59:57.873874+01	\N
+gelijk	equal/equate	\N	https://forvo.com/word/gelijk/#nl	f	f	1992	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+het onweer	the thunderstorm	\N	https://forvo.com/word/onweer/#nl	f	f	1676	weather	2023-09-27 14:59:57.873874+01	\N
+tegen	against	\N	https://forvo.com/word/tegen/#nl	f	f	1347	prepositions	2023-09-27 14:59:57.873874+01	\N
+geschiedenis	history	n/a	https://forvo.com/word/geschiedenis/#nl	f	f	789	\N	2023-09-27 14:59:57.873874+01	\N
+makkelijk	easy	\N	https://forvo.com/word/makkelijk/#nl	f	f	1995	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+ruimte	space	n/a	https://forvo.com/word/ruimte/#nl	f	f	451	\N	2023-09-27 14:59:57.873874+01	\N
+man	man/husband	n/a	https://forvo.com/word/man/#nl	f	f	117	\N	2023-09-27 14:59:57.873874+01	\N
+de vrouw	the woman	\N	https://forvo.com/word/vrouw/#nl	f	t	1085	introductory	2023-09-27 14:59:57.873874+01	\N
+de storm	the storm	\N	https://forvo.com/word/storm/#nl	f	t	1675	weather	2023-09-27 14:59:57.873874+01	\N
+de framboos	the raspberry	\N	https://forvo.com/word/framboos/#nl	f	t	1878	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het woord	the word	\N	https://forvo.com/word/woord/#nl	f	t	2139	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+pand	property	n/a	https://forvo.com/word/pand/#nl	t	f	986	household	2023-09-27 14:59:57.873874+01	\N
+welke	which	\N	https://forvo.com/word/welke/#nl	f	t	1178	question words	2023-09-27 14:59:57.873874+01	\N
+de doelverdediger	the goalkeeper	\N	https://forvo.com/word/doelverdediger/#nl	t	f	1606	football	2023-09-27 14:59:57.873874+01	\N
+de makelaar	the real estate agent	\N	https://forvo.com/word/makelaar/#nl	f	t	1771	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+vet	fat/greasy	n/a	https://forvo.com/word/vet/#nl	f	t	864	\N	2023-09-27 14:59:57.873874+01	\N
+in verwachting	expecting (a baby)	\N	https://forvo.com/word/verwachting/#nl	t	f	1902	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+werkwoord	verb	n/a	https://forvo.com/word/werkwoord/#nl	f	t	469	grammar	2023-09-27 14:59:57.873874+01	\N
+natuurlijke	natural	n/a	https://forvo.com/word/natuurlijke/#nl	t	t	749	nature	2023-09-27 14:59:57.873874+01	\N
+wassen	to wash	\N	https://forvo.com/word/wassen/#nl	f	t	1883	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de middag	the afternoon		https://forvo.com/word/middag/#nl	t	t	1070	time	2023-09-27 14:59:57.873874+01	\N
+dertien	thirteen	\N	https://forvo.com/word/dertien/#nl	f	t	1235	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+ontwerp	design	n/a	https://forvo.com/word/ontwerp/#nl	f	t	686	\N	2023-09-27 14:59:57.873874+01	\N
+meisje	girl	n/a	https://forvo.com/word/meisje/#nl	f	t	304	\N	2023-09-27 14:59:57.873874+01	\N
+zwanger	pregnant	\N	https://forvo.com/word/zwanger/#nl	f	t	1903	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+boot	boat	n/a	https://forvo.com/word/boot/#nl	f	t	372	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+bepaalde	certain	UvA A2 Course	https://forvo.com/word/bepaalde/#nl	f	f	406	\N	2023-09-27 14:59:57.873874+01	\N
+procent	cent	n/a	https://forvo.com/word/procent/#nl	f	t	631	\N	2023-09-27 14:59:57.873874+01	\N
+maar	but	\N	https://forvo.com/word/maar/#nl	f	t	1195	question words	2023-09-27 14:59:57.873874+01	\N
+medeklinker	consonant	n/a	https://forvo.com/word/medeklinker/#nl	f	f	668	grammar	2023-09-27 14:59:57.873874+01	\N
+rest	rest	n/a	https://forvo.com/word/rest/#nl	f	f	421	\N	2023-09-27 14:59:57.873874+01	\N
+moeder	mother	n/a	https://forvo.com/word/moeder/#nl	f	f	95	family	2023-09-27 14:59:57.873874+01	\N
+begon	began	n/a	https://forvo.com/word/begon/#nl	f	f	259	\N	2023-09-27 14:59:57.873874+01	\N
+gewoon	usual, just	\N	https://forvo.com/word/gewoon/#nl	f	f	2122	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+vinger	finger	n/a	https://forvo.com/word/vinger/#nl	f	f	742	body	2023-09-27 14:59:57.873874+01	\N
+de naturalisatie	the naturalisation	\N	https://forvo.com/word/naturalisatie/#nl	f	f	1790	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+bedrijf	company	n/a	https://forvo.com/word/bedrijf/#nl	f	f	957	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+gaf	gave	n/a	https://forvo.com/word/gaf/#nl	f	f	434	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+bot	bone	n/a	https://forvo.com/word/bot/#nl	f	f	793	body	2023-09-27 14:59:57.873874+01	\N
+onrustig	restless	\N	https://forvo.com/word/onrustig/#nl	f	f	1803	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+gevonden	found	n/a	https://forvo.com/word/gevonden/#nl	f	f	208	\N	2023-09-27 14:59:57.873874+01	\N
+houden	to hold, to keep	\N	https://forvo.com/word/houden/#nl	f	f	1504	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+aannemen	to hire	\N	https://forvo.com/word/aannemen/#nl	f	f	1540	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de fles	the bottle	\N	https://forvo.com/word/fles/#nl	f	f	1847	cooking	2023-09-27 14:59:57.873874+01	\N
+edge	edge	n/a	https://forvo.com/word/edge/#nl	f	f	582	\N	2023-09-27 14:59:57.873874+01	\N
+hun	their	\N	https://forvo.com/word/hun/#nl	f	f	2120	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+hoek	corner	n/a	https://forvo.com/word/hoek/#nl	f	f	774	\N	2023-09-27 14:59:57.873874+01	\N
+methode	method	n/a	https://forvo.com/word/methode/#nl	f	f	673	\N	2023-09-27 14:59:57.873874+01	\N
+regeren	govern	n/a	https://forvo.com/word/regeren/#nl	f	f	497	\N	2023-09-27 14:59:57.873874+01	\N
+kennisgeving	notice	n/a	https://forvo.com/word/kennisgeving/#nl	f	f	500	\N	2023-09-27 14:59:57.873874+01	\N
+hunt	hunt	n/a	https://forvo.com/word/hunt/#nl	f	f	503	\N	2023-09-27 14:59:57.873874+01	\N
+zout	salt	n/a	https://forvo.com/word/zout/#nl	f	f	996	food/drink	2023-09-27 14:59:57.873874+01	\N
+de tante	the aunt	\N	https://forvo.com/word/tante/#nl	f	f	1550	family	2023-09-27 14:59:57.873874+01	\N
+grond	ground	n/a	https://forvo.com/word/grond/#nl	f	f	465	nature	2023-09-27 14:59:57.873874+01	\N
+voorzichtig	careful	\N	https://forvo.com/word/voorzichtig/#nl	f	f	2069	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+aandeel	share	n/a	https://forvo.com/word/aandeel/#nl	f	f	867	\N	2023-09-27 14:59:57.873874+01	\N
+millennium	millennium	noun	https://forvo.com/word/millennium/#nl	f	f	1043	time	2023-09-27 14:59:57.873874+01	\N
+voorzijde	front	n/a	https://forvo.com/word/voorzijde/#nl	f	f	430	\N	2023-09-27 14:59:57.873874+01	\N
+ochtend	morning	n/a	https://forvo.com/word/ochtend/#nl	f	f	476	time	2023-09-27 14:59:57.873874+01	\N
+slecht weer	bad weather	\N	#	f	f	1668	weather	2023-09-27 14:59:57.873874+01	\N
+vijf voor acht	five to eight		#	f	f	1060	time	2023-09-27 14:59:57.873874+01	\N
+het huis	the house	\N	https://forvo.com/word/huis/#nl	f	f	1088	introductory	2023-09-27 14:59:57.873874+01	\N
+hallo	hello	\N	https://forvo.com/word/hallo/#nl	f	f	1089	introductory	2023-09-27 14:59:57.873874+01	\N
+hoi	hi	\N	https://forvo.com/word/hoi/#nl	f	f	1090	introductory	2023-09-27 14:59:57.873874+01	\N
+de wolf	the wolf	\N	https://forvo.com/word/wolf/#nl	f	f	2048	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de giraffe	the giraffe	\N	https://forvo.com/word/giraffe/#nl	f	f	2049	animals (2)	2023-09-27 14:59:57.873874+01	\N
+goedemorgen	good morning	\N	https://forvo.com/word/goedemorgen/#nl	f	f	1095	introductory	2023-09-27 14:59:57.873874+01	\N
+slip	slip	n/a	https://forvo.com/word/slip/#nl	f	f	937	\N	2023-09-27 14:59:57.873874+01	\N
+helpen	to help	\N	https://forvo.com/word/helpen/#nl	f	f	1503	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+zaad	seed	n/a	https://forvo.com/word/zaad/#nl	f	f	616	nature	2023-09-27 14:59:57.873874+01	\N
+dit	this	\N	https://forvo.com/word/dit/#nl	f	f	1177	question words	2023-09-27 14:59:57.873874+01	\N
+kapitein	captain	n/a	https://forvo.com/word/kapitein/#nl	f	f	801	\N	2023-09-27 14:59:57.873874+01	\N
+vervelen	to annoy	\N	https://forvo.com/word/vervelen/#nl	f	f	1798	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+de wallen	the red light district	\N	https://forvo.com/word/wallen/#nl	f	f	1403	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+apparaat	machine	n/a	https://forvo.com/word/apparaat/#nl	f	f	412	\N	2023-09-27 14:59:57.873874+01	\N
+de dagen van de week	the days of the week	\N	#	f	f	1302	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+denk	guess	n/a	https://forvo.com/word/denk/#nl	f	f	802	\N	2023-09-27 14:59:57.873874+01	\N
+instemmen	agree	n/a	https://forvo.com/word/instemmen/#nl	f	f	797	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+reisleider	guide		https://forvo.com/word/reisleider/#nl	f	f	1004	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het elftal	the football team	\N	https://forvo.com/word/elftal/#nl	f	f	1599	football	2023-09-27 14:59:57.873874+01	\N
+bitter	bitter	\N	https://forvo.com/word/bitter/#nl	f	f	1834	cooking	2023-09-27 14:59:57.873874+01	\N
+schouder	shoulder	n/a	https://forvo.com/word/schouder/#nl	f	f	967	body	2023-09-27 14:59:57.873874+01	\N
+de allochtoon	the immigrant	\N	https://forvo.com/word/allochtoon/#nl	f	f	1768	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+hemel	sky	n/a	https://forvo.com/word/hemel/#nl	f	f	569	nature	2023-09-27 14:59:57.873874+01	\N
+maïs	corn	n/a	https://forvo.com/word/maïs/#nl	t	f	812	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de televisie	the television	\N	https://forvo.com/word/televisie/#nl	f	t	1414	household	2023-09-27 14:59:57.873874+01	\N
+aan	to	n/a	https://forvo.com/word/aan/#nl	f	f	32	prepositions	2023-09-27 14:59:57.873874+01	\N
+moeilijk	difficult	\N	https://forvo.com/word/moeilijk/#nl	f	t	1996	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+minste	least	n/a	https://forvo.com/word/minste/#nl	t	f	611	\N	2023-09-27 14:59:57.873874+01	\N
+het cv (curriculum vitae)	the resume	\N	#	f	t	1522	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+post	post	n/a	https://forvo.com/word/post/#nl	f	t	861	\N	2023-09-27 14:59:57.873874+01	\N
+act	act	n/a	https://forvo.com/word/act/#nl	t	f	78	\N	2023-09-27 14:59:57.873874+01	\N
+zand	sand	n/a	https://forvo.com/word/zand/#nl	f	t	738	nature	2023-09-27 14:59:57.873874+01	\N
+sneeuw	snow	n/a	https://forvo.com/word/sneeuw/#nl	f	t	392	nature	2023-09-27 14:59:57.873874+01	\N
+mijl	mile	n/a	https://forvo.com/word/mijl/#nl	t	f	296	\N	2023-09-27 14:59:57.873874+01	\N
+kennen	to know (familiarity)	\N	https://forvo.com/word/kennen/#nl	f	t	1507	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+succes	success	n/a	https://forvo.com/word/succes/#nl	f	t	956	\N	2023-09-27 14:59:57.873874+01	\N
+duur	expensive	\N	https://forvo.com/word/duur/#nl	t	t	1296	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+het instrument	the tool, the (musical) instrument	\N	https://forvo.com/word/instrument/#nl	f	t	1910	tools/materials	2023-09-27 14:59:57.873874+01	\N
+het meer	the lake	\N	https://forvo.com/word/meer/#nl	f	t	1755	geography	2023-09-27 14:59:57.873874+01	\N
+slecht	bad	\N	https://forvo.com/word/slecht/#nl	f	t	1092	introductory	2023-09-27 14:59:57.873874+01	\N
+oversteken	to cross over	UvA A2 Course	https://forvo.com/word/oversteken/#nl	f	f	230	\N	2023-09-27 14:59:57.873874+01	\N
+de tweede helft	the second half	\N	#	f	t	1612	football	2023-09-27 14:59:57.873874+01	\N
+het weer	the weather	\N	https://forvo.com/word/weer/#nl	f	t	1655	weather	2023-09-27 14:59:57.873874+01	\N
+eenmaal	once, just/simply	n/a	https://forvo.com/word/eenmaal/#nl	f	f	264	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+hoewel	though	n/a	https://forvo.com/word/hoewel/#nl	f	f	312	\N	2023-09-27 14:59:57.873874+01	\N
+goed	good/well	\N	https://forvo.com/word/goed/#nl	f	f	1091	introductory	2023-09-27 14:59:57.873874+01	\N
+haar	her/hair	\N	https://forvo.com/word/haar/#nl	f	f	2115	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+vooruit	forward	n/a	https://forvo.com/word/vooruit/#nl	f	f	923	adverbs	2023-09-27 14:59:57.873874+01	\N
+verrassen	to surprise	\N	https://forvo.com/word/verrassen/#nl	f	f	2025	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+onmiddellijke	instant	n/a	https://forvo.com/word/onmiddellijke/#nl	f	f	878	\N	2023-09-27 14:59:57.873874+01	\N
+hen	them	n/a	https://forvo.com/word/hen/#nl	f	f	162	\N	2023-09-27 14:59:57.873874+01	\N
+geleden	ago	n/a	https://forvo.com/word/geleden/#nl	f	f	382	time	2023-09-27 14:59:57.873874+01	\N
+even	just (as)	\N	https://forvo.com/word/even/#nl	f	f	1949	adverbs	2023-09-27 14:59:57.873874+01	\N
+mannen	men	n/a	https://forvo.com/word/mannen/#nl	f	f	81	\N	2023-09-27 14:59:57.873874+01	\N
+spelen	to play	\N	https://forvo.com/word/spelen/#nl	f	f	1642	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+voorwaarde	condition	n/a	https://forvo.com/word/voorwaarde/#nl	f	f	941	\N	2023-09-27 14:59:57.873874+01	\N
+voer	feed	n/a	https://forvo.com/word/voer/#nl	f	f	942	\N	2023-09-27 14:59:57.873874+01	\N
+familie	family	n/a	https://forvo.com/word/familie/#nl	f	f	319	family	2023-09-27 14:59:57.873874+01	\N
+kopie	copy	n/a	https://forvo.com/word/kopie/#nl	f	f	734	\N	2023-09-27 14:59:57.873874+01	\N
+de hei	the moor	\N	https://forvo.com/word/hei/#nl	f	f	1765	geography	2023-09-27 14:59:57.873874+01	\N
+vaak	often	\N	https://forvo.com/word/vaak/#nl	f	f	2130	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de grap	the joke	\N	https://forvo.com/word/grap/#nl	f	f	2131	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+laatst	last	\N	https://forvo.com/word/laatst/#nl	f	f	2107	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het wereldkampioenschap (wk)	the world cup	\N	https://forvo.com/word/wereldkampioenschap/#nl	f	f	1628	football	2023-09-27 14:59:57.873874+01	\N
+geur	smell	n/a	https://forvo.com/word/geur/#nl	f	f	946	\N	2023-09-27 14:59:57.873874+01	\N
+vers	fresh	\N	https://forvo.com/word/vers/#nl	f	f	1850	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+pittig	spicy	\N	https://forvo.com/word/pittig/#nl	f	f	1835	cooking	2023-09-27 14:59:57.873874+01	\N
+wij/we	we	\N	https://forvo.com/word/we/#nl	f	f	1124	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+cel	cell	n/a	https://forvo.com/word/cel/#nl	f	f	509	\N	2023-09-27 14:59:57.873874+01	\N
+solliciteren	to apply for	\N	https://forvo.com/word/solliciteren/#nl	f	f	1513	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de sollicitatie	the application	\N	https://forvo.com/word/sollicitatie/#nl	f	f	1514	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de vacature	the vacancy	\N	https://forvo.com/word/vacature/#nl	f	f	1515	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de advertentie	the advertisement	\N	https://forvo.com/word/advertentie/#nl	f	f	1516	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+het werk	the work	\N	https://forvo.com/word/werk/#nl	f	f	1517	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de baan	the job	\N	https://forvo.com/word/baan/#nl	f	f	1518	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+lezen	to read	\N	https://forvo.com/word/lezen/#nl	f	f	1266	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+schrijven	to write	\N	https://forvo.com/word/schrijven/#nl	f	f	1267	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+enige	only	\N	https://forvo.com/word/enige/#nl	f	f	1689	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+de jurk	the dress	\N	https://forvo.com/word/jurk/#nl	f	f	1468	clothes	2023-09-27 14:59:57.873874+01	\N
+veertig	forty	\N	https://forvo.com/word/veertig/#nl	f	f	1241	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de aap	the monkey	\N	https://forvo.com/word/aap/#nl	f	f	2045	animals (2)	2023-09-27 14:59:57.873874+01	\N
+veertien	fourteen	\N	https://forvo.com/word/veertien/#nl	f	f	1236	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+pas	only	\N	https://forvo.com/word/pas/#nl	f	f	1946	adverbs	2023-09-27 14:59:57.873874+01	\N
+aanwezig	present	n/a	https://forvo.com/word/aanwezig/#nl	f	f	543	\N	2023-09-27 14:59:57.873874+01	\N
+de rijst	the rice	\N	https://forvo.com/word/rijst/#nl	f	f	1864	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het zout	the salt	\N	https://forvo.com/word/zout/#nl	f	f	1866	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+vermenigvuldigen	multiply	n/a	https://forvo.com/word/vermenigvuldigen/#nl	f	f	353	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+aanmelden	log	n/a	https://forvo.com/word/aanmelden/#nl	f	f	896	\N	2023-09-27 14:59:57.873874+01	\N
+juli	July	\N	https://forvo.com/word/juli/#nl	f	f	1319	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de bruiloft	the wedding	\N	https://forvo.com/word/bruiloft/#nl	f	f	2021	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+het bezoek	the visit/visitors	\N	https://forvo.com/word/bezoek/#nl	f	f	2017	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+de erwt	the pea	\N	https://forvo.com/word/erwt/#nl	f	f	1853	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de spinazie	the spinach	\N	https://forvo.com/word/spinazie/#nl	f	f	1854	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de boerenkool	the kale	\N	https://forvo.com/word/boerenkool/#nl	f	f	1855	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+oppervlak	surface	n/a	https://forvo.com/word/oppervlak/#nl	f	f	363	\N	2023-09-27 14:59:57.873874+01	\N
+bezoek	visit	n/a	https://forvo.com/word/bezoek/#nl	f	f	584	\N	2023-09-27 14:59:57.873874+01	\N
+vloer	floor	n/a	https://forvo.com/word/vloer/#nl	f	f	721	\N	2023-09-27 14:59:57.873874+01	\N
+zon	sun	n/a	https://forvo.com/word/zon/#nl	f	f	218	nature	2023-09-27 14:59:57.873874+01	\N
+stond	stood	n/a	https://forvo.com/word/stond/#nl	f	f	428	\N	2023-09-27 14:59:57.873874+01	\N
+betekende	meant	n/a	https://forvo.com/word/betekende/#nl	f	f	897	\N	2023-09-27 14:59:57.873874+01	\N
+de tulp	the tulip	\N	https://forvo.com/word/tulp/#nl	f	f	1280	dutch symbols	2023-09-27 14:59:57.873874+01	\N
+melodie	melody	n/a	https://forvo.com/word/melodie/#nl	f	f	602	\N	2023-09-27 14:59:57.873874+01	\N
+meer dan	over	n/a	#	f	f	189	prepositions	2023-09-27 14:59:57.873874+01	\N
+chief	chief	n/a	https://forvo.com/word/chief/#nl	f	f	830	\N	2023-09-27 14:59:57.873874+01	\N
+woordenboek	dictionary	n/a	https://forvo.com/word/woordenboek/#nl	f	f	670	grammar	2023-09-27 14:59:57.873874+01	\N
+dertig	thirty	\N	https://forvo.com/word/dertig/#nl	f	t	1240	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de peper	the pepper	\N	https://forvo.com/word/peper/#nl	f	t	1865	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+brood	bread	n/a	https://forvo.com/word/brood/#nl	f	t	870	food/drink	2023-09-27 14:59:57.873874+01	\N
+vraag	question	n/a	https://forvo.com/word/vraag/#nl	f	t	332	\N	2023-09-27 14:59:57.873874+01	\N
+mooi	beautiful	\N	https://forvo.com/word/mooi/#nl	f	t	1279	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+het ziekenhuis	the hospital	\N	https://forvo.com/word/ziekenhuis/#nl	f	t	1214	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+lelijk	ugly	\N	https://forvo.com/word/lelijk/#nl	f	t	1281	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+vijf over half vier	twenty five to four		#	f	t	1061	time	2023-09-27 14:59:57.873874+01	\N
+gebruiken	to use	\N	https://forvo.com/word/gebruiken/#nl	f	t	1636	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+boek	book	n/a	https://forvo.com/word/boek/#nl	f	t	252	\N	2023-09-27 14:59:57.873874+01	\N
+zilver	silver	n/a	https://forvo.com/word/zilver/#nl	f	t	911	tools/materials	2023-09-27 14:59:57.873874+01	\N
+iemand	somebody	\N	https://forvo.com/word/iemand/#nl	f	t	2126	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+erg	very, bad/awful	\N	https://forvo.com/word/erg/#nl	f	f	1948	adverbs	2023-09-27 14:59:57.873874+01	\N
+aardig	friendly	\N	https://forvo.com/word/aardig/#nl	f	f	1816	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+de slak	the snail	\N	https://forvo.com/word/slak/#nl	f	f	2038	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de dolfijn	the dolphin	\N	https://forvo.com/word/dolfijn/#nl	f	f	2040	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de zeehond	the seal	\N	https://forvo.com/word/zeehond/#nl	f	f	2041	animals (2)	2023-09-27 14:59:57.873874+01	\N
+wandelen	to go for a walk	\N	https://forvo.com/word/wandelen/#nl	f	f	1367	hobbies	2023-09-27 14:59:57.873874+01	\N
+centrum	center	n/a	https://forvo.com/word/centrum/#nl	f	f	487	\N	2023-09-27 14:59:57.873874+01	\N
+betekenen	mean	n/a	https://forvo.com/word/betekenen/#nl	f	f	143	\N	2023-09-27 14:59:57.873874+01	\N
+afvalzak	sick bag	noun	https://forvo.com/word/afvalzak/#nl	f	f	1025	\N	2023-09-27 14:59:57.873874+01	\N
+wild	wild	\N	https://forvo.com/word/wild/#nl	f	f	2034	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de brandstof	the fuel	\N	https://forvo.com/word/brandstof/#nl	f	f	1926	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de voet	the foot	\N	https://forvo.com/word/voet/#nl	f	f	1450	body	2023-09-27 14:59:57.873874+01	\N
+de tijger	the tiger	\N	https://forvo.com/word/tijger/#nl	f	f	2053	animals (2)	2023-09-27 14:59:57.873874+01	\N
+apart	separate	n/a	https://forvo.com/word/apart/#nl	f	f	763	\N	2023-09-27 14:59:57.873874+01	\N
+doei	bye	\N	https://forvo.com/word/doei/#nl	f	f	1102	introductory	2023-09-27 14:59:57.873874+01	\N
+klaar	ready	\N	https://forvo.com/word/klaar/#nl	f	f	1708	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+het vliegveld	the airport	\N	https://forvo.com/word/vliegveld/#nl	f	f	1208	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+jaar	year	n/a	https://forvo.com/word/jaar/#nl	f	f	118	time	2023-09-27 14:59:57.873874+01	\N
+bevolken	populate	n/a	https://forvo.com/word/bevolken/#nl	f	f	881	\N	2023-09-27 14:59:57.873874+01	\N
+bell	bell	n/a	https://forvo.com/word/bell/#nl	f	f	816	tools/materials	2023-09-27 14:59:57.873874+01	\N
+slaaf	slave	n/a	https://forvo.com/word/slaaf/#nl	f	f	876	\N	2023-09-27 14:59:57.873874+01	\N
+vriezen	to freeze	\N	https://forvo.com/word/vriezen/#nl	f	f	1681	weather	2023-09-27 14:59:57.873874+01	\N
+sleutel	key	n/a	https://forvo.com/word/sleutel/#nl	f	f	691	\N	2023-09-27 14:59:57.873874+01	\N
+reis	trip	n/a	https://forvo.com/word/reis/#nl	f	f	603	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de rok	the skirt	\N	https://forvo.com/word/rok/#nl	f	f	1467	clothes	2023-09-27 14:59:57.873874+01	\N
+de avond	the evening		https://forvo.com/word/avond/#nl	f	f	1072	time	2023-09-27 14:59:57.873874+01	\N
+spreken	to speak	\N	https://forvo.com/word/spreken/#nl	f	f	1268	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+minuut	minute	n/a	https://forvo.com/word/minuut/#nl	f	f	442	time	2023-09-27 14:59:57.873874+01	\N
+waar	where	\N	https://forvo.com/word/waar/#nl	f	f	1181	question words	2023-09-27 14:59:57.873874+01	\N
+geopend	open	n/a	https://forvo.com/word/geopend/#nl	f	f	275	\N	2023-09-27 14:59:57.873874+01	\N
+de mier	the ant	\N	https://forvo.com/word/mier/#nl	f	f	2035	animals (2)	2023-09-27 14:59:57.873874+01	\N
+zingen	to sing	\N	https://forvo.com/word/zingen/#nl	f	f	1380	hobbies	2023-09-27 14:59:57.873874+01	\N
+het nummer	the number / the song	\N	https://forvo.com/word/nummer/#nl	f	f	2135	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+tuin	garden	n/a	https://forvo.com/word/tuin/#nl	f	f	639	household	2023-09-27 14:59:57.873874+01	\N
+meervoud	plural	n/a	https://forvo.com/word/meervoud/#nl	f	f	998	grammar	2023-09-27 14:59:57.873874+01	\N
+het museum	the museum	\N	https://forvo.com/word/museum/#nl	f	f	1391	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+grand	grand	n/a	https://forvo.com/word/grand/#nl	f	f	536	\N	2023-09-27 14:59:57.873874+01	\N
+onderstrepen	to underline	verb	https://forvo.com/word/onderstrepen/#nl	f	f	1014	grammar	2023-09-27 14:59:57.873874+01	\N
+woord	word	n/a	https://forvo.com/word/woord/#nl	f	f	21	\N	2023-09-27 14:59:57.873874+01	\N
+afdrukken	print	n/a	https://forvo.com/word/afdrukken/#nl	f	f	843	\N	2023-09-27 14:59:57.873874+01	\N
+zonder	without	\N	https://forvo.com/word/zonder/#nl	f	f	1350	prepositions	2023-09-27 14:59:57.873874+01	\N
+kopen	to buy	\N	https://forvo.com/word/kopen/#nl	f	f	1253	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de gracht	the canal	\N	https://forvo.com/word/gracht/#nl	f	f	1384	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+de auto van de zaak	the company car	\N	#	f	f	1534	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+weer	again	n/a	https://forvo.com/word/weer/#nl	f	f	92	adverbs	2023-09-27 14:59:57.873874+01	\N
+bal	ball	n/a	https://forvo.com/word/bal/#nl	f	f	537	football	2023-09-27 14:59:57.873874+01	\N
+doden	kill	n/a	https://forvo.com/word/doden/#nl	f	f	658	\N	2023-09-27 14:59:57.873874+01	\N
+geluidsoverlast	noise	n/a	https://forvo.com/word/geluidsoverlast/#nl	f	f	978	\N	2023-09-27 14:59:57.873874+01	\N
+aantal	number	n/a	https://forvo.com/word/aantal/#nl	f	f	183	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+de wijn	the wine	\N	https://forvo.com/word/wijn/#nl	f	f	1162	food/drink	2023-09-27 14:59:57.873874+01	\N
+honger hebben	to be hungry	\N	https://forvo.com/word/honger/#nl	f	f	1828	cooking	2023-09-27 14:59:57.873874+01	\N
+winkelen	to go shopping	\N	https://forvo.com/word/winkelen/#nl	f	f	1382	hobbies	2023-09-27 14:59:57.873874+01	\N
+zitje	seat	n/a	https://forvo.com/word/zitje/#nl	f	f	950	\N	2023-09-27 14:59:57.873874+01	\N
+de vergoeding	the compensation	\N	https://forvo.com/word/vergoeding/#nl	f	f	1537	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de riem	the belt	\N	https://forvo.com/word/riem/#nl	f	f	1473	clothes	2023-09-27 14:59:57.873874+01	\N
+de spits	the striker	\N	https://forvo.com/word/spits/#nl	f	f	1602	football	2023-09-27 14:59:57.873874+01	\N
+de verdediger	the defender	\N	https://forvo.com/word/verdediger/#nl	f	f	1604	football	2023-09-27 14:59:57.873874+01	\N
+zee	sea	n/a	https://forvo.com/word/zee/#nl	f	t	238	nature	2023-09-27 14:59:57.873874+01	\N
+huilen	to cry	\N	https://forvo.com/word/huilen/#nl	t	f	1892	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+wist	knew	n/a	https://forvo.com/word/wist/#nl	t	f	345	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+toon	tone	n/a	https://forvo.com/word/toon/#nl	t	f	617	\N	2023-09-27 14:59:57.873874+01	\N
+de haven	the port	\N	https://forvo.com/word/haven/#nl	f	t	1209	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de middenvelder	the midfielder	\N	https://forvo.com/word/middenvelder/#nl	t	f	1603	football	2023-09-27 14:59:57.873874+01	\N
+woensdag	Wednesday	\N	https://forvo.com/word/woensdag/#nl	f	t	1306	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+lezing	lecture	noun	https://forvo.com/word/lezing/#nl	t	f	1010	\N	2023-09-27 14:59:57.873874+01	\N
+‘s ochtends / ‘s morgens	in the morning		#	f	t	1069	time	2023-09-27 14:59:57.873874+01	\N
+middernacht	midnight		https://forvo.com/word/middernacht/#nl	t	f	1075	time	2023-09-27 14:59:57.873874+01	\N
+slaap	sleep	n/a	https://forvo.com/word/slaap/#nl	f	t	560	\N	2023-09-27 14:59:57.873874+01	\N
+de gezondheid	the health	\N	https://forvo.com/word/gezondheid/#nl	f	t	1709	doctor	2023-09-27 14:59:57.873874+01	\N
+pistool	gun	n/a	https://forvo.com/word/pistool/#nl	f	t	841	\N	2023-09-27 14:59:57.873874+01	\N
+Sinterklaas	(Sinterklaas)	\N	https://forvo.com/word/Sinterklaas/#nl	f	t	2002	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+paars	purple	\N	https://forvo.com/word/paars/#nl	f	t	1976	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+blokkeren	block	n/a	https://forvo.com/word/blokkeren/#nl	f	t	952	\N	2023-09-27 14:59:57.873874+01	\N
+de keeper	the goalkeeper	\N	https://forvo.com/word/keeper/#nl	f	t	1605	football	2023-09-27 14:59:57.873874+01	\N
+de muziek	the music	\N	https://forvo.com/word/muziek/#nl	f	t	2134	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+nodig hebben	to need	\N	https://forvo.com/word/nodig/#nl	f	t	1629	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+dinsdag	Tuesday	\N	https://forvo.com/word/dinsdag/#nl	f	t	1305	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+kleding	dress	n/a	https://forvo.com/word/kleding/#nl	f	f	678	clothes	2023-09-27 14:59:57.873874+01	\N
+de haas	the hare	\N	https://forvo.com/word/haas/#nl	f	f	1573	animals (1)	2023-09-27 14:59:57.873874+01	\N
+emigreren	to emigrate	\N	https://forvo.com/word/emigreren/#nl	f	f	1767	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+komen	to come	\N	https://forvo.com/word/komen/#nl	f	f	1634	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+zoon	son	n/a	https://forvo.com/word/zoon/#nl	f	f	659	family	2023-09-27 14:59:57.873874+01	\N
+betalen	to pay	\N	https://forvo.com/word/betalen/#nl	f	f	1645	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+rijden	to drive	\N	https://forvo.com/word/rijden/#nl	f	f	1257	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+opnemen	record	n/a	https://forvo.com/word/opnemen/#nl	f	f	371	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+uur	hour	n/a	https://forvo.com/word/uur/#nl	f	f	454	time	2023-09-27 14:59:57.873874+01	\N
+verhuizing	move	n/a	https://forvo.com/word/verhuizing/#nl	f	f	145	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+schreef	wrote	n/a	https://forvo.com/word/schreef/#nl	f	f	615	\N	2023-09-27 14:59:57.873874+01	\N
+het overhemd	the shirt	\N	https://forvo.com/word/overhemd/#nl	f	f	1476	clothes	2023-09-27 14:59:57.873874+01	\N
+de naam	the name	\N	https://forvo.com/word/naam/#nl	f	f	2136	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+het boek	the book	\N	https://forvo.com/word/boek/#nl	f	f	2137	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de sporthal	the sports hall	\N	https://forvo.com/word/sporthal/#nl	f	f	1217	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+plotseling	sudden	n/a	https://forvo.com/word/plotseling/#nl	f	f	513	\N	2023-09-27 14:59:57.873874+01	\N
+de geit	the goat	noun	https://forvo.com/word/geit/#nl	f	f	1012	animals (2)	2023-09-27 14:59:57.873874+01	\N
+king	king	n/a	https://forvo.com/word/king/#nl	f	f	350	\N	2023-09-27 14:59:57.873874+01	\N
+het hoofdkantoor	the head office	\N	https://forvo.com/word/hoofdkantoor/#nl	f	f	1402	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+de slager	the butcher	\N	https://forvo.com/word/slager/#nl	f	f	1135	professions	2023-09-27 14:59:57.873874+01	\N
+spreiding	spread	n/a	https://forvo.com/word/spreiding/#nl	f	f	968	\N	2023-09-27 14:59:57.873874+01	\N
+dergelijke	such	n/a	https://forvo.com/word/dergelijke/#nl	f	f	76	\N	2023-09-27 14:59:57.873874+01	\N
+lenen	to borrow	\N	https://forvo.com/word/lenen/#nl	f	f	1492	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+het gebouw	the building	\N	https://forvo.com/word/gebouw/#nl	f	f	1393	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+het kind	the child	\N	https://forvo.com/word/kind/#nl	f	f	1554	family	2023-09-27 14:59:57.873874+01	\N
+de patiënt	the patient	\N	https://forvo.com/word/patiënt/#nl	f	f	1724	doctor	2023-09-27 14:59:57.873874+01	\N
+pad	path	n/a	https://forvo.com/word/pad/#nl	f	f	894	\N	2023-09-27 14:59:57.873874+01	\N
+boos	angry	\N	https://forvo.com/word/boos/#nl	f	f	1800	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+wrijven	rub	n/a	https://forvo.com/word/wrijven/#nl	f	f	819	\N	2023-09-27 14:59:57.873874+01	\N
+geboren	born	n/a	https://forvo.com/word/geboren/#nl	f	f	973	\N	2023-09-27 14:59:57.873874+01	\N
+de schaar	the scissors	\N	https://forvo.com/word/schaar/#nl	f	f	1911	tools/materials	2023-09-27 14:59:57.873874+01	\N
+knippen	to cut (with scissors)	\N	https://forvo.com/word/knippen/#nl	f	f	1912	tools/materials	2023-09-27 14:59:57.873874+01	\N
+gedicht	poem	n/a	https://forvo.com/word/gedicht/#nl	f	f	814	\N	2023-09-27 14:59:57.873874+01	\N
+een verjaardag vieren	to celebrate a birthday	\N	#	f	f	1378	hobbies	2023-09-27 14:59:57.873874+01	\N
+onderzijde	bottom	n/a	https://forvo.com/word/onderzijde/#nl	f	f	690	\N	2023-09-27 14:59:57.873874+01	\N
+proces	process	n/a	https://forvo.com/word/proces/#nl	f	f	760	\N	2023-09-27 14:59:57.873874+01	\N
+waarde	value	n/a	https://forvo.com/word/waarde/#nl	f	f	744	\N	2023-09-27 14:59:57.873874+01	\N
+zal	shall/will	n/a	https://forvo.com/word/zal/#nl	f	f	716	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+arm, slechte	poor	\N	https://forvo.com/word/arm/#nl	f	f	1284	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+weten	to know (factually)	\N	https://forvo.com/word/weten/#nl	f	f	1263	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+afdekking	cover	n/a	https://forvo.com/word/afdekking/#nl	f	f	216	\N	2023-09-27 14:59:57.873874+01	\N
+de zwaan	the swan	\N	https://forvo.com/word/zwaan/#nl	f	f	1583	animals (1)	2023-09-27 14:59:57.873874+01	\N
+dromen	to dream	\N	https://forvo.com/word/dromen/#nl	f	f	1890	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+naam	name	n/a	https://forvo.com/word/naam/#nl	f	f	127	\N	2023-09-27 14:59:57.873874+01	\N
+trek	pull	n/a	https://forvo.com/word/trek/#nl	f	f	498	\N	2023-09-27 14:59:57.873874+01	\N
+om	at	\N	https://forvo.com/word/om/#nl	f	f	1353	prepositions	2023-09-27 14:59:57.873874+01	\N
+de sollicitatiebrief	the application letter	\N	https://forvo.com/word/sollicitatiebrief/#nl	f	f	1521	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+mond	mouth	n/a	https://forvo.com/word/mond/#nl	f	f	607	body	2023-09-27 14:59:57.873874+01	\N
+omdat	because	\N	https://forvo.com/word/omdat/#nl	f	f	1194	question words	2023-09-27 14:59:57.873874+01	\N
+behalve	except	\N	https://forvo.com/word/behalve/#nl	f	f	1196	question words	2023-09-27 14:59:57.873874+01	\N
+smal	narrow	\N	https://forvo.com/word/smal/#nl	f	f	1988	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+beide	both	\N	https://forvo.com/word/beide/#nl	f	f	1989	common adjectives (3)	2023-09-27 14:59:57.873874+01	\N
+boom	tree	n/a	https://forvo.com/word/boom/#nl	f	f	229	nature	2023-09-27 14:59:57.873874+01	\N
+portemonnee	wallet	\N	https://forvo.com/word/portemonnee/#nl	f	f	2153	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+vleugel	wing	n/a	https://forvo.com/word/vleugel/#nl	f	f	805	\N	2023-09-27 14:59:57.873874+01	\N
+de VVE-bijdrage	communal costs	\N	#	f	f	1775	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+ster	the star	\N	https://forvo.com/word/ster/#nl	f	f	2094	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+rekenen	charge	n/a	https://forvo.com/word/rekenen/#nl	t	f	871	\N	2023-09-27 14:59:57.873874+01	\N
+oktober	October	\N	https://forvo.com/word/oktober/#nl	t	f	1322	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+ben	am	n/a	https://forvo.com/word/ben/#nl	f	t	542	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+produceren	produce	n/a	https://forvo.com/word/produceren/#nl	f	t	449	\N	2023-09-27 14:59:57.873874+01	\N
+tweede	second	n/a	https://forvo.com/word/tweede/#nl	f	t	301	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+uitleggen	to explain	verb	https://forvo.com/word/uitleggen/#nl	t	f	1016	\N	2023-09-27 14:59:57.873874+01	\N
+klinken	sound	n/a	https://forvo.com/word/klinken/#nl	t	f	184	\N	2023-09-27 14:59:57.873874+01	\N
+september	September	\N	https://forvo.com/word/september/#nl	f	t	1321	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de gans	the goose	\N	https://forvo.com/word/gans/#nl	f	t	1584	animals (1)	2023-09-27 14:59:57.873874+01	\N
+hout	wood	n/a	https://forvo.com/word/hout/#nl	t	t	273	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de thee	the tea	\N	https://forvo.com/word/thee/#nl	f	t	1158	food/drink	2023-09-27 14:59:57.873874+01	\N
+quart	quart	n/a	https://forvo.com/word/quart/#nl	f	t	975	\N	2023-09-27 14:59:57.873874+01	\N
+de zee	the sea	\N	https://forvo.com/word/zee/#nl	f	t	1754	geography	2023-09-27 14:59:57.873874+01	\N
+karakter	character	n/a	https://forvo.com/word/karakter/#nl	f	t	780	\N	2023-09-27 14:59:57.873874+01	\N
+de les	the lesson	\N	https://forvo.com/word/les/#nl	f	t	2138	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+alle	all	n/a	https://forvo.com/word/alle/#nl	f	t	152	\N	2023-09-27 14:59:57.873874+01	\N
+het gezicht	the face	\N	https://forvo.com/word/gezicht/#nl	f	t	1990	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+halen	to pick up	\N	https://forvo.com/word/halen/#nl	f	t	1491	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+het vliegtuig	the airplane	\N	https://forvo.com/word/vliegtuig/#nl	f	t	1207	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de gele kaart	the yellow card	\N	#	f	f	1618	football	2023-09-27 14:59:57.873874+01	\N
+kan	can/may	n/a	https://forvo.com/word/kan/#nl	f	t	37	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+de taart	the pie	\N	https://forvo.com/word/taart/#nl	f	t	2023	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+compleet	complete	\N	https://forvo.com/word/compleet/#nl	f	t	2073	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+grafiek	chart	n/a	https://forvo.com/word/grafiek/#nl	f	f	953	\N	2023-09-27 14:59:57.873874+01	\N
+liefde	love	n/a	https://forvo.com/word/liefde/#nl	f	f	488	\N	2023-09-27 14:59:57.873874+01	\N
+brede	broad	n/a	https://forvo.com/word/brede/#nl	f	f	994	\N	2023-09-27 14:59:57.873874+01	\N
+gereedschap	tool	n/a	https://forvo.com/word/gereedschap/#nl	f	f	943	tools/materials	2023-09-27 14:59:57.873874+01	\N
+verscheidene	several	n/a	https://forvo.com/word/verscheidene/#nl	f	f	479	\N	2023-09-27 14:59:57.873874+01	\N
+weg	gone	n/a	https://forvo.com/word/weg/#nl	f	f	600	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+kolom	column	n/a	https://forvo.com/word/column/#nl	f	f	987	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de vleermuis	the bat	n/a	https://forvo.com/word/vleermuis/#nl	f	f	809	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de perzik	the peach	\N	https://forvo.com/word/perzik/#nl	f	f	1871	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+gescheiden zijn	to be divorced	\N	https://forvo.com/word/gescheiden/#nl	f	f	1566	family	2023-09-27 14:59:57.873874+01	\N
+het dier	the animal	\N	https://forvo.com/word/dier/#nl	f	f	1567	animals (1)	2023-09-27 14:59:57.873874+01	\N
+west	west	\N	https://forvo.com/word/west/#nl	f	f	2079	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+touw	rope	n/a	https://forvo.com/word/touw/#nl	f	f	936	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de walvis	the whale	\N	https://forvo.com/word/walvis/#nl	f	f	2042	animals (2)	2023-09-27 14:59:57.873874+01	\N
+weinig	little, few	n/a	https://forvo.com/word/weinig/#nl	f	f	114	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+zakenreis	business trip	noun	https://forvo.com/word/zakenreis/#nl	f	f	1021	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+boerderij	farm	n/a	https://forvo.com/word/boerderij/#nl	f	f	231	\N	2023-09-27 14:59:57.873874+01	\N
+elf	eleven	\N	https://forvo.com/word/elf/#nl	f	f	1233	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+misschien	maybe/perhaps	\N	https://forvo.com/word/misschien/#nl	f	f	1113	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+het oog	the eye	\N	https://forvo.com/word/oog/#nl	f	f	1439	body	2023-09-27 14:59:57.873874+01	\N
+plannen	plan	n/a	https://forvo.com/word/plannen/#nl	f	f	415	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+rechts	right	\N	https://forvo.com/word/rechts/#nl	f	f	1115	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+de boon	the bean	\N	https://forvo.com/word/boon/#nl	f	f	1852	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+de telefoon	the telephone	\N	https://forvo.com/word/telefoon/#nl	f	f	1920	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de eend	the duck	\N	https://forvo.com/word/eend/#nl	f	f	1582	animals (1)	2023-09-27 14:59:57.873874+01	\N
+vertegenwoordigen	represent	n/a	https://forvo.com/word/vertegenwoordigen/#nl	f	f	518	\N	2023-09-27 14:59:57.873874+01	\N
+omhoog	up	n/a	https://forvo.com/word/omhoog/#nl	f	f	155	\N	2023-09-27 14:59:57.873874+01	\N
+beschrijven	describe	n/a	https://forvo.com/word/beschrijven/#nl	f	f	719	\N	2023-09-27 14:59:57.873874+01	\N
+het kopje	the cup	\N	https://forvo.com/word/kopje/#nl	f	f	1846	cooking	2023-09-27 14:59:57.873874+01	\N
+‘s middags	in the afternoon		#	f	f	1071	time	2023-09-27 14:59:57.873874+01	\N
+ander	other	\N	https://forvo.com/word/ander/#nl	f	f	1683	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+nek	neck	n/a	https://forvo.com/word/nek/#nl	f	f	901	body	2023-09-27 14:59:57.873874+01	\N
+stropdas	tie	n/a	https://forvo.com/word/stropdas/#nl	f	f	834	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+blijven	to stay/continue	\N	https://forvo.com/word/blijven/#nl	f	f	1654	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+menselijk	human	n/a	https://forvo.com/word/menselijk/#nl	f	f	788	\N	2023-09-27 14:59:57.873874+01	\N
+de citroen	the lemon	\N	https://forvo.com/word/citroen/#nl	f	f	1875	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+het gereedschap	the tools	\N	https://forvo.com/word/gereedschap/#nl	f	f	1909	tools/materials	2023-09-27 14:59:57.873874+01	\N
+tak	branch	n/a	https://forvo.com/word/tak/#nl	f	f	913	\N	2023-09-27 14:59:57.873874+01	\N
+lichaam	body	n/a	https://forvo.com/word/lichaam/#nl	f	f	317	body	2023-09-27 14:59:57.873874+01	\N
+inschrijven	to subscribe	\N	https://forvo.com/word/inschrijven/#nl	f	f	1778	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+de winkel	the shop	\N	https://forvo.com/word/winkel/#nl	f	f	1212	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+het doel	the goal	\N	https://forvo.com/word/doel/#nl	f	f	1597	football	2023-09-27 14:59:57.873874+01	\N
+verkopen	to sell	\N	https://forvo.com/word/verkopen/#nl	f	f	1898	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+happy	happy	n/a	https://forvo.com/word/happy/#nl	f	f	595	\N	2023-09-27 14:59:57.873874+01	\N
+de woning	the house	\N	https://forvo.com/word/woning/#nl	f	f	1407	household	2023-09-27 14:59:57.873874+01	\N
+goud	gold	n/a	https://forvo.com/word/goud/#nl	f	f	374	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+reden	reason	n/a	https://forvo.com/word/reden/#nl	f	f	516	\N	2023-09-27 14:59:57.873874+01	\N
+zondag	Sunday	\N	https://forvo.com/word/zondag/#nl	f	f	1310	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+viel	fell	n/a	https://forvo.com/word/viel/#nl	f	f	643	\N	2023-09-27 14:59:57.873874+01	\N
+eenheid	unit	n/a	https://forvo.com/word/eenheid/#nl	f	f	402	\N	2023-09-27 14:59:57.873874+01	\N
+rente	interest	n/a	https://forvo.com/word/rente/#nl	f	f	466	\N	2023-09-27 14:59:57.873874+01	\N
+duizelig	dizzy	\N	https://forvo.com/word/duizelig/#nl	f	f	1718	doctor	2023-09-27 14:59:57.873874+01	\N
+de kikker	the frog	\N	https://forvo.com/word/kikker/#nl	f	t	2037	animals (2)	2023-09-27 14:59:57.873874+01	\N
+het station	the railway station	\N	https://forvo.com/word/station/#nl	t	f	1210	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+dat	that	\N	https://forvo.com/word/dat/#nl	t	f	1176	question words	2023-09-27 14:59:57.873874+01	\N
+verkeerd/mis	wrong	\N	https://forvo.com/word/verkeerd/#nl	t	f	1706	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+hagelen	to hail	\N	https://forvo.com/word/hagelen/#nl	t	f	1672	weather	2023-09-27 14:59:57.873874+01	\N
+onder	below/under, among	\N	https://forvo.com/word/onder/#nl	f	t	1338	prepositions	2023-09-27 14:59:57.873874+01	\N
+koken	to cook	\N	https://forvo.com/word/koken/#nl	f	t	1825	cooking	2023-09-27 14:59:57.873874+01	\N
+de wind	the wind	\N	https://forvo.com/word/wind/#nl	f	t	1673	weather	2023-09-27 14:59:57.873874+01	\N
+spijkerbroek	jeans	noun	https://forvo.com/word/spijkerbroek/#nl	f	t	1019	clothes	2023-09-27 14:59:57.873874+01	\N
+de woonkamer	the living room	\N	https://forvo.com/word/woonkamer/#nl	f	t	1421	household	2023-09-27 14:59:57.873874+01	\N
+mengen	to mix	n/a	https://forvo.com/word/mengen/#nl	f	t	632	\N	2023-09-27 14:59:57.873874+01	\N
+de groente	the vegetables	\N	https://forvo.com/word/groente/#nl	f	t	1149	food/drink	2023-09-27 14:59:57.873874+01	\N
+de schouder	the shoulder	\N	https://forvo.com/word/schouder/#nl	t	f	1454	body	2023-09-27 14:59:57.873874+01	\N
+de haai	the shark	\N	https://forvo.com/word/haai/#nl	f	t	2043	animals (2)	2023-09-27 14:59:57.873874+01	\N
+vaardigheid	skill	n/a	https://forvo.com/word/vaardigheid/#nl	t	t	906	\N	2023-09-27 14:59:57.873874+01	\N
+sturen	send	n/a	https://forvo.com/word/sturen/#nl	f	t	839	\N	2023-09-27 14:59:57.873874+01	\N
+alsjeblieft	here you are, please	\N	https://forvo.com/word/alsjeblieft/#nl	f	t	1103	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+niets	nothing	\N	https://forvo.com/word/niets/#nl	f	t	1939	adverbs	2023-09-27 14:59:57.873874+01	\N
+het glas	the glass	\N	https://forvo.com/word/glas/#nl	f	t	1845	cooking	2023-09-27 14:59:57.873874+01	\N
+laat	late	\N	https://forvo.com/word/laat/#nl	f	t	1693	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+vlakte	plain	n/a	https://forvo.com/word/vlakte/#nl	f	f	303	\N	2023-09-27 14:59:57.873874+01	\N
+onduidelijk	unclear	\N	https://forvo.com/word/onduidelijk/#nl	f	f	1701	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+stil	quiet/silent	\N	https://forvo.com/word/stil/#nl	f	f	2067	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+de meloen	the melon	\N	https://forvo.com/word/meloen/#nl	f	f	1877	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+op	at, on top	\N	https://forvo.com/word/op/#nl	f	f	1339	prepositions	2023-09-27 14:59:57.873874+01	\N
+die	that, those, which, who	\N	https://forvo.com/word/die/#nl	f	f	1180	question words	2023-09-27 14:59:57.873874+01	\N
+nog	still/yet	\N	https://forvo.com/word/nog/#nl	f	f	1947	adverbs	2023-09-27 14:59:57.873874+01	\N
+elektrische	electric	n/a	https://forvo.com/word/elektrische/#nl	f	f	791	nature	2023-09-27 14:59:57.873874+01	\N
+zaag	saw	n/a	https://forvo.com/word/zaag/#nl	f	f	236	\N	2023-09-27 14:59:57.873874+01	\N
+de kat	the cat	\N	https://forvo.com/word/kat/#nl	f	f	1570	animals (1)	2023-09-27 14:59:57.873874+01	\N
+bijna	almost	\N	https://forvo.com/word/bijna/#nl	f	f	1955	adverbs	2023-09-27 14:59:57.873874+01	\N
+zuur	acid	\N	https://forvo.com/word/zuur/#nl	f	f	1833	cooking	2023-09-27 14:59:57.873874+01	\N
+de computer	the computer	\N	https://forvo.com/word/computer/#nl	f	f	1916	tools/materials	2023-09-27 14:59:57.873874+01	\N
+(enkel)voudige	single	\N	https://forvo.com/word/enkel/#nl	f	f	1690	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+het voetbal	football (soccer)	\N	https://forvo.com/word/voetbal/#nl	f	f	1596	football	2023-09-27 14:59:57.873874+01	\N
+weer	weather	n/a	https://forvo.com/word/weer/#nl	f	f	590	weather	2023-09-27 14:59:57.873874+01	\N
+noot	note	n/a	https://forvo.com/word/noot/#nl	f	f	413	\N	2023-09-27 14:59:57.873874+01	\N
+rots	rock	n/a	https://forvo.com/word/rots/#nl	f	f	338	tools/materials	2023-09-27 14:59:57.873874+01	\N
+vijf	five	\N	https://forvo.com/word/vijf/#nl	f	f	1227	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+deed	did	n/a	https://forvo.com/word/deed/#nl	f	f	182	\N	2023-09-27 14:59:57.873874+01	\N
+periode	period	n/a	https://forvo.com/word/periode/#nl	f	f	783	time	2023-09-27 14:59:57.873874+01	\N
+de deur	the door	\N	https://forvo.com/word/deur/#nl	f	f	1408	household	2023-09-27 14:59:57.873874+01	\N
+de kroket	Dutch fried ragout bar	\N	https://forvo.com/word/kroket/#nl	f	f	1169	food/drink	2023-09-27 14:59:57.873874+01	\N
+helft	half	n/a	https://forvo.com/word/helft/#nl	f	f	337	\N	2023-09-27 14:59:57.873874+01	\N
+het fruit	the fruits	\N	https://forvo.com/word/fruit/#nl	f	f	1150	food/drink	2023-09-27 14:59:57.873874+01	\N
+eeuw	century	n/a	https://forvo.com/word/eeuw/#nl	f	f	728	time	2023-09-27 14:59:57.873874+01	\N
+vloeistof	liquid	n/a	https://forvo.com/word/vloeistof/#nl	f	f	895	tools/materials	2023-09-27 14:59:57.873874+01	\N
+besparen	save	n/a	https://forvo.com/word/besparen/#nl	f	f	649	\N	2023-09-27 14:59:57.873874+01	\N
+de aardbei	the strawberry	\N	https://forvo.com/word/aardbei/#nl	f	f	1881	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+lachen	to laugh	\N	https://forvo.com/word/lachen/#nl	f	f	1882	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+suggereren	suggest	n/a	https://forvo.com/word/suggereren/#nl	f	f	619	\N	2023-09-27 14:59:57.873874+01	\N
+regelen	arrange	n/a	https://forvo.com/word/regelen/#nl	f	f	969	\N	2023-09-27 14:59:57.873874+01	\N
+bloem	flower	n/a	https://forvo.com/word/bloem/#nl	f	f	597	nature	2023-09-27 14:59:57.873874+01	\N
+sluiten	to close	\N	https://forvo.com/word/sluiten/#nl	f	f	1495	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+ruziemaken	to argue	verb	https://forvo.com/word/ruziemaken/#nl	f	f	1030	\N	2023-09-27 14:59:57.873874+01	\N
+steen	stone	n/a	https://forvo.com/word/steen/#nl	f	f	682	\N	2023-09-27 14:59:57.873874+01	\N
+de rug	the spine	\N	https://forvo.com/word/rug/#nl	f	f	1452	body	2023-09-27 14:59:57.873874+01	\N
+vergeten	to forget	\N	https://forvo.com/word/vergeten/#nl	f	f	1258	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+stuk	piece	n/a	https://forvo.com/word/stuk/#nl	f	f	343	\N	2023-09-27 14:59:57.873874+01	\N
+ware	TRUE	n/a	https://forvo.com/word/ware/#nl	f	f	456	\N	2023-09-27 14:59:57.873874+01	\N
+massa	mass	n/a	https://forvo.com/word/massa/#nl	f	f	933	\N	2023-09-27 14:59:57.873874+01	\N
+stop	stop	n/a	https://forvo.com/word/stop/#nl	f	f	263	\N	2023-09-27 14:59:57.873874+01	\N
+de bibliotheek	the library	\N	https://forvo.com/word/bibliotheek/#nl	f	f	1219	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+de school	the school	\N	https://forvo.com/word/school/#nl	f	f	1220	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+temperatuur	temperature	n/a	https://forvo.com/word/temperatuur/#nl	f	f	741	weather	2023-09-27 14:59:57.873874+01	\N
+ras	race	n/a	https://forvo.com/word/ras/#nl	f	f	555	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de inburgering	the assimilation (formal)	\N	https://forvo.com/word/inburgering/#nl	f	f	1787	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+ofwel	either	n/a	https://forvo.com/word/ofwel/#nl	f	f	722	\N	2023-09-27 14:59:57.873874+01	\N
+zitten	to sit	\N	https://forvo.com/word/zitten/#nl	f	t	1643	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+kunnen	to can	\N	https://forvo.com/word/kunnen/#nl	t	f	1494	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de buik	the belly, the stomach	\N	https://forvo.com/word/buik/#nl	t	f	1453	body	2023-09-27 14:59:57.873874+01	\N
+de kerstboom	the Christmas tree	\N	https://forvo.com/word/kerstboom/#nl	t	f	2006	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+de bliksem	lightning	noun	https://forvo.com/word/bliksem/#nl	f	f	1011	nature	2023-09-27 14:59:57.873874+01	\N
+zetten	to put	\N	https://forvo.com/word/zetten/#nl	f	t	2097	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+gas	gas	n/a	https://forvo.com/word/gas/#nl	f	t	589	nature	2023-09-27 14:59:57.873874+01	\N
+dorst hebben	to be thirsty	\N	https://forvo.com/word/dorst/#nl	f	t	1829	cooking	2023-09-27 14:59:57.873874+01	\N
+blij	happy/glad	\N	https://forvo.com/word/blij/#nl	f	t	1806	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+de cirkel/kring	the circle	\N	https://forvo.com/word/cirkel/#nl	f	f	1970	colors/shapes	2023-09-27 14:59:57.873874+01	\N
+de hoekschop	the corner kick	\N	https://forvo.com/word/hoekschop/#nl	t	f	1622	football	2023-09-27 14:59:57.873874+01	\N
+zwemmen	swim	n/a	https://forvo.com/word/zwemmen/#nl	f	t	962	\N	2023-09-27 14:59:57.873874+01	\N
+een taal leren	to learn a language	\N	#	f	t	1364	hobbies	2023-09-27 14:59:57.873874+01	\N
+zeven	seven	\N	https://forvo.com/word/zeven/#nl	f	t	1229	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+mama	mom	\N	https://forvo.com/word/mama/#nl	f	t	1545	family	2023-09-27 14:59:57.873874+01	\N
+rivier	river	n/a	https://forvo.com/word/rivier/#nl	f	t	297	nature	2023-09-27 14:59:57.873874+01	\N
+zoet	sweet	\N	https://forvo.com/word/zoet/#nl	f	t	1831	cooking	2023-09-27 14:59:57.873874+01	\N
+de pijn	the ache	\N	https://forvo.com/word/pijn/#nl	f	t	1720	doctor	2023-09-27 14:59:57.873874+01	\N
+het bedrijf	the company	\N	https://forvo.com/word/bedrijf/#nl	f	t	1527	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+de kers	the cherry	\N	https://forvo.com/word/kers/#nl	f	t	1880	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+evenement	event	n/a	https://forvo.com/word/evenement/#nl	f	t	959	\N	2023-09-27 14:59:57.873874+01	\N
+de praktijk	the practice	UvA A2 Course	https://forvo.com/word/praktijk/#nl	f	f	762	\N	2023-09-27 14:59:57.873874+01	\N
+de oorlog	the war	\N	https://forvo.com/word/oorlog/#nl	f	t	2084	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+de dijk	the dike	\N	https://forvo.com/word/dijk/#nl	f	t	1760	geography	2023-09-27 14:59:57.873874+01	\N
+oefening	exercise	n/a	https://forvo.com/word/oefening/#nl	f	t	564	\N	2023-09-27 14:59:57.873874+01	\N
+ontdekken	to discover	\N	https://forvo.com/word/ontdekken/#nl	f	t	1893	UvA B1A Course CH4	2023-09-27 14:59:57.873874+01	\N
+de maan	the moon	\N	https://forvo.com/word/maan/#nl	f	f	1312	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de boekhouder	the accountant	\N	https://forvo.com/word/boekhouder/#nl	f	f	1145	professions	2023-09-27 14:59:57.873874+01	\N
+de mus	the sparrow	\N	https://forvo.com/word/mus/#nl	f	f	1586	animals (1)	2023-09-27 14:59:57.873874+01	\N
+zich legitimeren	to identify oneself	\N	https://forvo.com/word/legitimeren/#nl	f	f	1781	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+alles	everything	\N	https://forvo.com/word/alles/#nl	f	f	1940	adverbs	2023-09-27 14:59:57.873874+01	\N
+februari	February	\N	https://forvo.com/word/februari/#nl	f	f	1314	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+de vergiftiging	the poisoning	\N	https://forvo.com/word/vergiftiging/#nl	f	f	1719	doctor	2023-09-27 14:59:57.873874+01	\N
+de goudvis	the goldfish	\N	https://forvo.com/word/goudvis/#nl	f	f	2030	animals (2)	2023-09-27 14:59:57.873874+01	\N
+bieden	provide	n/a	https://forvo.com/word/bieden/#nl	f	f	796	\N	2023-09-27 14:59:57.873874+01	\N
+lui	lazy	\N	https://forvo.com/word/lui/#nl	f	f	2066	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+lekker	tasty	\N	https://forvo.com/word/lekker/#nl	f	f	1276	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+zo	like this	\N	https://forvo.com/word/zo/#nl	f	f	1189	question words	2023-09-27 14:59:57.873874+01	\N
+patroon	pattern	n/a	https://forvo.com/word/patroon/#nl	f	f	485	\N	2023-09-27 14:59:57.873874+01	\N
+de bus	the bus	\N	https://forvo.com/word/bus/#nl	f	f	1201	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+eigen	own	\N	https://forvo.com/word/eigen/#nl	f	f	2112	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+mijn	my	\N	https://forvo.com/word/mijn/#nl	f	f	2113	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+de dierentuin	the zoo	\N	https://forvo.com/word/dierentuin/#nl	f	f	2044	animals (2)	2023-09-27 14:59:57.873874+01	\N
+de woonboot	the house boat	\N	https://forvo.com/word/woonboot/#nl	f	f	1386	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+schommelstoel	rocking chair	noun	https://forvo.com/word/schommelstoel/#nl	f	f	1018	household	2023-09-27 14:59:57.873874+01	\N
+partituur	score	n/a	https://forvo.com/word/partituur/#nl	f	f	927	\N	2023-09-27 14:59:57.873874+01	\N
+wimper	eyelash	\N	https://forvo.com/word/wimper/#nl	f	f	2140	body	2023-09-27 14:59:57.873874+01	\N
+aansluiten	connect	n/a	https://forvo.com/word/aansluiten/#nl	f	f	860	\N	2023-09-27 14:59:57.873874+01	\N
+Nieuwjaar	New year	\N	https://forvo.com/word/Nieuwjaar/#nl	f	f	2010	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+leerling	student	n/a	https://forvo.com/word/leerling/#nl	f	f	773	\N	2023-09-27 14:59:57.873874+01	\N
+wolk	cloud	n/a	https://forvo.com/word/wolk/#nl	f	f	679	nature	2023-09-27 14:59:57.873874+01	\N
+wind	wind	n/a	https://forvo.com/word/wind/#nl	f	f	331	nature	2023-09-27 14:59:57.873874+01	\N
+want	because	\N	https://forvo.com/word/want/#nl	f	f	1193	question words	2023-09-27 14:59:57.873874+01	\N
+de zus	the sister	\N	https://forvo.com/word/zus/#nl	f	f	1547	family	2023-09-27 14:59:57.873874+01	\N
+punt	point	n/a	https://forvo.com/word/punt/#nl	f	f	94	\N	2023-09-27 14:59:57.873874+01	\N
+controleren	check	n/a	https://forvo.com/word/controleren/#nl	f	f	384	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+de berg	the mountain	\N	https://forvo.com/word/berg/#nl	f	f	1763	geography	2023-09-27 14:59:57.873874+01	\N
+object	object	n/a	https://forvo.com/word/object/#nl	f	f	361	\N	2023-09-27 14:59:57.873874+01	\N
+het avondeten	the dinner	\N	https://forvo.com/word/avondeten/#nl	f	f	1824	cooking	2023-09-27 14:59:57.873874+01	\N
+de trui	the sweater	\N	https://forvo.com/word/trui/#nl	f	f	1465	clothes	2023-09-27 14:59:57.873874+01	\N
+tien over zes	ten past six		#	f	f	1058	time	2023-09-27 14:59:57.873874+01	\N
+brengen	to bring	\N	https://forvo.com/word/brengen/#nl	f	f	1490	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+geest	mind	n/a	https://forvo.com/word/geest/#nl	f	f	445	\N	2023-09-27 14:59:57.873874+01	\N
+herhaal	repeat	n/a	https://forvo.com/word/herhaal/#nl	f	f	992	\N	2023-09-27 14:59:57.873874+01	\N
+sterven	die	n/a	https://forvo.com/word/sterven/#nl	f	f	610	\N	2023-09-27 14:59:57.873874+01	\N
+wet	law	n/a	https://forvo.com/word/wet/#nl	f	f	731	\N	2023-09-27 14:59:57.873874+01	\N
+kledinghanger	coat hanger	noun	https://forvo.com/word/kledinghanger/#nl	f	f	1015	household	2023-09-27 14:59:57.873874+01	\N
+gewas	crop	n/a	https://forvo.com/word/gewas/#nl	f	f	769	nature	2023-09-27 14:59:57.873874+01	\N
+stijgen	rise	n/a	https://forvo.com/word/stijgen/#nl	f	f	624	\N	2023-09-27 14:59:57.873874+01	\N
+de mijne	mine	n/a	#	f	f	833	professions	2023-09-27 14:59:57.873874+01	\N
+symbool	symbol	n/a	https://forvo.com/word/symbool/#nl	f	f	609	dutch symbols	2023-09-27 14:59:57.873874+01	\N
+kleden	clothe	n/a	https://forvo.com/word/kleden/#nl	f	f	598	clothes	2023-09-27 14:59:57.873874+01	\N
+scheiden	to divorce	\N	https://forvo.com/word/scheiden/#nl	f	f	1565	family	2023-09-27 14:59:57.873874+01	\N
+tien	ten	\N	https://forvo.com/word/tien/#nl	f	f	1232	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+grote	major/big/great/large	n/a	https://forvo.com/word/grote/#nl	f	f	836	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+beetje	bit	n/a	https://forvo.com/word/beetje/#nl	f	f	732	\N	2023-09-27 14:59:57.873874+01	\N
+de kapper	the hairdresser	\N	https://forvo.com/word/kapper/#nl	f	f	1143	professions	2023-09-27 14:59:57.873874+01	\N
+dicht	close	n/a	https://forvo.com/word/dicht/#nl	f	f	246	\N	2023-09-27 14:59:57.873874+01	\N
+de muis	the mouse	\N	https://forvo.com/word/muis/#nl	f	f	1571	animals (1)	2023-09-27 14:59:57.873874+01	\N
+het konijn	the rabbit	\N	https://forvo.com/word/konijn/#nl	f	f	1572	animals (1)	2023-09-27 14:59:57.873874+01	\N
+kamp	camp	n/a	https://forvo.com/word/kamp/#nl	f	f	970	\N	2023-09-27 14:59:57.873874+01	\N
+regenen	to rain	\N	https://forvo.com/word/regenen/#nl	f	f	1670	weather	2023-09-27 14:59:57.873874+01	\N
+roken	to smoke	\N	https://forvo.com/word/roken/#nl	f	f	1111	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+bracht	brought	n/a	https://forvo.com/word/bracht/#nl	f	f	390	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+anders	else	n/a	https://forvo.com/word/anders/#nl	t	f	653	\N	2023-09-27 14:59:57.873874+01	\N
+de weg	the road	\N	https://forvo.com/word/weg/#nl	f	t	1198	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+het lichaam, het lijf	the body	\N	https://forvo.com/word/lichaam/#nl	t	f	1432	body	2023-09-27 14:59:57.873874+01	\N
+klein	small	\N	https://forvo.com/word/klein/#nl	f	t	1275	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+stad	town/city	n/a	https://forvo.com/word/stad/#nl	t	f	404	geography	2023-09-27 14:59:57.873874+01	\N
+de tandarts	the dentist	\N	https://forvo.com/word/tandarts/#nl	f	t	1734	doctor	2023-09-27 14:59:57.873874+01	\N
+negen	nine	\N	https://forvo.com/word/negen/#nl	f	t	1231	numbers/counting	2023-09-27 14:59:57.873874+01	\N
+groot	big	\N	https://forvo.com/word/groot/#nl	f	t	1274	common adjectives (1)	2023-09-27 14:59:57.873874+01	\N
+het legitimatiebewijs	the id	\N	https://forvo.com/word/legitimatiebewijs/#nl	t	f	1780	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+base	base	n/a	https://forvo.com/word/base/#nl	f	t	265	\N	2023-09-27 14:59:57.873874+01	\N
+de slaapkamer	the sleeping room	\N	https://forvo.com/word/slaapkamer/#nl	f	t	1423	household	2023-09-27 14:59:57.873874+01	\N
+kaart	card, map	n/a	https://forvo.com/word/kaart/#nl	f	t	934	geography	2023-09-27 14:59:57.873874+01	\N
+‘s nachts	at night		#	f	t	1067	time	2023-09-27 14:59:57.873874+01	\N
+de vrije dag	the day off	\N	#	f	t	2000	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+de spijkerbroek	the jeans	\N	https://forvo.com/word/spijkerbroek/#nl	f	t	1464	clothes	2023-09-27 14:59:57.873874+01	\N
+olie	oil	n/a	https://forvo.com/word/olie/#nl	f	t	627	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de baas	the boss	\N	https://forvo.com/word/baas/#nl	t	t	1133	professions	2023-09-27 14:59:57.873874+01	\N
+poort	port	n/a	https://forvo.com/word/poort/#nl	t	t	66	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+sporten	to exercise	\N	https://forvo.com/word/sporten/#nl	f	f	1365	hobbies	2023-09-27 14:59:57.873874+01	\N
+de heuvel	the hill	\N	https://forvo.com/word/heuvel/#nl	f	f	1764	geography	2023-09-27 14:59:57.873874+01	\N
+akkoord	chord	n/a	https://forvo.com/word/akkoord/#nl	f	f	863	\N	2023-09-27 14:59:57.873874+01	\N
+geluk	the happiness	\N	https://forvo.com/word/geluk/#nl	f	f	2106	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+teken	sign	n/a	https://forvo.com/word/teken/#nl	f	f	583	\N	2023-09-27 14:59:57.873874+01	\N
+de neus	the nose	\N	https://forvo.com/word/neus/#nl	f	f	1442	body	2023-09-27 14:59:57.873874+01	\N
+kindje	baby	n/a	https://forvo.com/word/kindje/#nl	f	f	702	family	2023-09-27 14:59:57.873874+01	\N
+het kuiken	the chick	n/a	https://forvo.com/word/kuiken/#nl	f	f	882	animals (2)	2023-09-27 14:59:57.873874+01	\N
+hem	him	n/a	https://forvo.com/word/hem/#nl	f	f	173	\N	2023-09-27 14:59:57.873874+01	\N
+verzamelen	to collect/gather	n/a	https://forvo.com/word/verzamelen/#nl	f	f	648	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de pen	the pen	\N	https://forvo.com/word/pen/#nl	f	f	1922	tools/materials	2023-09-27 14:59:57.873874+01	\N
+gevangen	caught	n/a	https://forvo.com/word/gevangen/#nl	f	f	782	\N	2023-09-27 14:59:57.873874+01	\N
+kracht	force/power	n/a	https://forvo.com/word/kracht/#nl	f	f	359	misc. words (1)	2023-09-27 14:59:57.873874+01	\N
+ziek	ill	\N	https://forvo.com/word/ziek/#nl	f	f	1711	doctor	2023-09-27 14:59:57.873874+01	\N
+raamstoel	window seat	\N	https://forvo.com/word/raamstoel/#nl	f	f	2147	household	2023-09-27 14:59:57.873874+01	\N
+overwegen	to consider	\N	https://forvo.com/word/overwegen/#nl	f	f	1652	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+creëren	create	n/a	https://forvo.com/word/creëren/#nl	f	f	806	\N	2023-09-27 14:59:57.873874+01	\N
+de mandarijn	the mandarin	\N	https://forvo.com/word/mandarijn/#nl	f	f	1874	fruits/veggies	2023-09-27 14:59:57.873874+01	\N
+vrouwen	women	n/a	https://forvo.com/word/vrouwen/#nl	f	f	907	family	2023-09-27 14:59:57.873874+01	\N
+voor	for/before/in front of	\N	https://forvo.com/word/voor/#nl	f	f	1333	prepositions	2023-09-27 14:59:57.873874+01	\N
+verhaal	story	n/a	https://forvo.com/word/verhaal/#nl	f	f	235	\N	2023-09-27 14:59:57.873874+01	\N
+de pannenkoek	the pancake	\N	https://forvo.com/word/pannenkoek/#nl	f	f	1170	food/drink	2023-09-27 14:59:57.873874+01	\N
+vreemd	strange	n/a	https://forvo.com/word/vreemd/#nl	f	f	599	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+eenzaam	lonely	\N	https://forvo.com/word/eenzaam/#nl	f	f	2072	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+bewijzen	prove	n/a	https://forvo.com/word/bewijzen/#nl	f	f	561	\N	2023-09-27 14:59:57.873874+01	\N
+gat	hole	n/a	https://forvo.com/word/gat/#nl	f	f	700	\N	2023-09-27 14:59:57.873874+01	\N
+gewicht	weight	n/a	https://forvo.com/word/gewicht/#nl	f	f	526	\N	2023-09-27 14:59:57.873874+01	\N
+dorp	village	n/a	https://forvo.com/word/dorp/#nl	f	f	704	geography	2023-09-27 14:59:57.873874+01	\N
+woestijn	desert	n/a	https://forvo.com/word/woestijn/#nl	f	f	846	nature	2023-09-27 14:59:57.873874+01	\N
+het brood	the bread	\N	https://forvo.com/word/brood/#nl	f	f	1151	food/drink	2023-09-27 14:59:57.873874+01	\N
+spell	spell	n/a	https://forvo.com/word/spell/#nl	f	f	68	\N	2023-09-27 14:59:57.873874+01	\N
+vrachtwagen	truck	n/a	https://forvo.com/word/vrachtwagen/#nl	f	f	977	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+oh	oh	n/a	https://forvo.com/word/oh/#nl	f	f	436	\N	2023-09-27 14:59:57.873874+01	\N
+de ontsteking	the inflammation	\N	https://forvo.com/word/ontsteking/#nl	f	f	1716	doctor	2023-09-27 14:59:57.873874+01	\N
+misselijk	nauseous	\N	https://forvo.com/word/misselijk/#nl	f	f	1717	doctor	2023-09-27 14:59:57.873874+01	\N
+het plein	the square	\N	https://forvo.com/word/plein/#nl	f	f	1395	Amsterdam	2023-09-27 14:59:57.873874+01	\N
+leuk vinden	to like	\N	#	f	f	1508	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+de vlieg	the fly	\N	https://forvo.com/word/vlieg/#nl	f	f	1591	animals (1)	2023-09-27 14:59:57.873874+01	\N
+het vuur	the fire	\N	https://forvo.com/word/vuur/#nl	f	f	1838	cooking	2023-09-27 14:59:57.873874+01	\N
+de jas	the coat	\N	https://forvo.com/word/jas/#nl	f	f	1466	clothes	2023-09-27 14:59:57.873874+01	\N
+leeftijd	age	n/a	https://forvo.com/word/leeftijd/#nl	f	f	676	time	2023-09-27 14:59:57.873874+01	\N
+lokaliseren	locate	n/a	https://forvo.com/word/lokaliseren/#nl	f	f	778	common verbs (4)	2023-09-27 14:59:57.873874+01	\N
+aankomen	arrive	n/a	https://forvo.com/word/aankomen/#nl	f	f	851	\N	2023-09-27 14:59:57.873874+01	\N
+begeleiden	guide	n/a	https://forvo.com/word/begeleiden/#nl	f	f	925	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+heerlijk	delicious	adjective	https://forvo.com/word/heerlijk/#nl	f	f	1007	food/drink	2023-09-27 14:59:57.873874+01	\N
+gemak	ease	n/a	https://forvo.com/word/gemak/#nl	f	f	285	\N	2023-09-27 14:59:57.873874+01	\N
+de eerste helft	the first half	\N	#	t	f	1610	football	2023-09-27 14:59:57.873874+01	\N
+brand	fire	n/a	https://forvo.com/word/brand/#nl	f	t	340	\N	2023-09-27 14:59:57.873874+01	\N
+de koe	the cow	\N	https://forvo.com/word/koe/#nl	f	f	1575	animals (1)	2023-09-27 14:59:57.873874+01	\N
+denken	to think	\N	https://forvo.com/word/denken/#nl	t	f	1271	common verbs (1)	2023-09-27 14:59:57.873874+01	\N
+het potlood	the pencil	\N	https://forvo.com/word/potlood/#nl	f	t	1921	tools/materials	2023-09-27 14:59:57.873874+01	\N
+het adres	the address	\N	https://forvo.com/word/adres/#nl	f	t	1776	moving/immigration	2023-09-27 14:59:57.873874+01	\N
+staart	tail	n/a	https://forvo.com/word/staart/#nl	f	t	448	\N	2023-09-27 14:59:57.873874+01	\N
+drop	liquorice	\N	https://forvo.com/word/drop/#nl	f	t	1172	food/drink	2023-09-27 14:59:57.873874+01	\N
+mogelijk	possible	\N	https://forvo.com/word/mogelijk/#nl	f	t	1704	common adjectives (2)	2023-09-27 14:59:57.873874+01	\N
+ons	us	n/a	https://forvo.com/word/ons/#nl	f	t	91	\N	2023-09-27 14:59:57.873874+01	\N
+excite	excite	n/a	https://forvo.com/word/excite/#nl	f	t	748	\N	2023-09-27 14:59:57.873874+01	\N
+de kaas	the cheese	\N	https://forvo.com/word/kaas/#nl	f	t	1153	food/drink	2023-09-27 14:59:57.873874+01	\N
+de olie	the oil	\N	https://forvo.com/word/olie/#nl	f	t	1924	tools/materials	2023-09-27 14:59:57.873874+01	\N
+eenvoudig	simple/easy	UvA A2 Course	https://forvo.com/word/eenvoudig/#nl	f	f	478	\N	2023-09-27 14:59:57.873874+01	\N
+de boerderij	the farm	\N	https://forvo.com/word/boerderij/#nl	f	t	1574	animals (1)	2023-09-27 14:59:57.873874+01	\N
+bouwen	to build	\N	https://forvo.com/word/bouwen/#nl	f	t	1653	common verbs (3)	2023-09-27 14:59:57.873874+01	\N
+klap	blow	n/a	https://forvo.com/word/klap/#nl	f	f	626	\N	2023-09-27 14:59:57.873874+01	\N
+de teen	the toe	\N	https://forvo.com/word/teen/#nl	f	f	1451	body	2023-09-27 14:59:57.873874+01	\N
+probleem	problem	n/a	https://forvo.com/word/probleem/#nl	f	t	342	\N	2023-09-27 14:59:57.873874+01	\N
+algemeen	general	\N	https://forvo.com/word/algemeen/#nl	t	f	2057	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+leggen	lay	n/a	https://forvo.com/word/leggen/#nl	t	f	483	\N	2023-09-27 14:59:57.873874+01	\N
+dom	stupid	\N	https://forvo.com/word/dom/#nl	f	t	2060	common adjectives (4)	2023-09-27 14:59:57.873874+01	\N
+energie	energy	n/a	https://forvo.com/word/energie/#nl	f	t	502	nature	2023-09-27 14:59:57.873874+01	\N
+hoe laat is het?	what time is it?	question	#	f	t	1047	time	2023-09-27 14:59:57.873874+01	\N
+de vos	the fox	\N	https://forvo.com/word/vos/#nl	f	f	2033	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de sleutel	the key	\N	https://forvo.com/word/sleutel/#nl	f	f	1918	tools/materials	2023-09-27 14:59:57.873874+01	\N
+de premier	the prime minister	\N	https://forvo.com/word/premier/#nl	f	f	1130	professions	2023-09-27 14:59:57.873874+01	\N
+de vriend	the (boy) friend	\N	https://forvo.com/word/vriend/#nl	f	f	1556	family	2023-09-27 14:59:57.873874+01	\N
+een beetje	a bit	\N	https://forvo.com/word/beetje/#nl	f	f	1941	adverbs	2023-09-27 14:59:57.873874+01	\N
+altijd	always	\N	https://forvo.com/word/altijd/#nl	f	t	1951	adverbs	2023-09-27 14:59:57.873874+01	\N
+is	is	n/a	https://forvo.com/word/is/#nl	f	f	25	\N	2023-09-27 14:59:57.873874+01	\N
+het zilver	the silver	\N	https://forvo.com/word/zilver/#nl	f	f	1928	tools/materials	2023-09-27 14:59:57.873874+01	\N
+pond	pound	n/a	https://forvo.com/word/pond/#nl	f	f	424	\N	2023-09-27 14:59:57.873874+01	\N
+a.u.b.	please	\N	https://forvo.com/word/a.u.b./#nl	f	f	1106	pronouns/thanking	2023-09-27 14:59:57.873874+01	\N
+klimmen	climb	n/a	https://forvo.com/word/klimmen/#nl	f	f	684	\N	2023-09-27 14:59:57.873874+01	\N
+de rook	the smoke	\N	https://forvo.com/word/rook/#nl	t	f	1839	cooking	2023-09-27 14:59:57.873874+01	\N
+moe	tired	\N	https://forvo.com/word/moe/#nl	f	f	1795	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+gevaar	danger	n/a	https://forvo.com/word/gevaar/#nl	f	f	755	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+Koningsdag	King’s Day	\N	https://forvo.com/word/Koningsdag/#nl	f	f	2001	celebrations/holidays	2023-09-27 14:59:57.873874+01	\N
+tijdperk	era	noun	https://forvo.com/word/tijdperk/#nl	t	f	1045	time	2023-09-27 14:59:57.873874+01	\N
+brief	letter	n/a	https://forvo.com/word/brief/#nl	f	t	294	\N	2023-09-27 14:59:57.873874+01	\N
+atoom	atom	n/a	https://forvo.com/word/atoom/#nl	f	f	787	nature	2023-09-27 14:59:57.873874+01	\N
+vreugde	joy	n/a	https://forvo.com/word/vreugde/#nl	f	f	571	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+ondersteuning	support	n/a	https://forvo.com/word/ondersteuning/#nl	f	f	888	\N	2023-09-27 14:59:57.873874+01	\N
+pyjama	pajamas	\N	https://forvo.com/word/pyjama/#nl	f	t	2150	clothes	2023-09-27 14:59:57.873874+01	\N
+instrument	instrument	n/a	https://forvo.com/word/instrument/#nl	f	f	576	tools/materials	2023-09-27 14:59:57.873874+01	\N
+bellen	to call	\N	https://forvo.com/word/bellen/#nl	f	f	1493	common verbs (2)	2023-09-27 14:59:57.873874+01	\N
+water	water	n/a	https://forvo.com/word/water/#nl	f	f	191	nature	2023-09-27 14:59:57.873874+01	\N
+openen	to open	\N	https://forvo.com/word/openen/#nl	f	f	1919	tools/materials	2023-09-27 14:59:57.873874+01	\N
+antwoord	answer	n/a	https://forvo.com/word/antwoord/#nl	f	f	209	\N	2023-09-27 14:59:57.873874+01	\N
+koele	cool	n/a	https://forvo.com/word/koele/#nl	f	f	685	\N	2023-09-27 14:59:57.873874+01	\N
+de auto	the car	\N	https://forvo.com/word/auto/#nl	t	f	1200	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+thuis	home	\N	https://forvo.com/word/thuis/#nl	f	t	2109	misc. words (2)	2023-09-27 14:59:57.873874+01	\N
+juni	June	\N	https://forvo.com/word/juni/#nl	f	f	1318	weekdays/months/seasons	2023-09-27 14:59:57.873874+01	\N
+borrelen	to have a drink	\N	https://forvo.com/word/borrelen/#nl	f	f	1370	hobbies	2023-09-27 14:59:57.873874+01	\N
+scherpe	sharp	n/a	https://forvo.com/word/scherpe/#nl	f	f	804	\N	2023-09-27 14:59:57.873874+01	\N
+chagrijnig	grumpy	\N	https://forvo.com/word/chagrijnig/#nl	f	f	1794	moods/emotions	2023-09-27 14:59:57.873874+01	\N
+handel	trade	n/a	https://forvo.com/word/handel/#nl	f	f	601	job hunting/business	2023-09-27 14:59:57.873874+01	\N
+lift	lift	n/a	https://forvo.com/word/lift/#nl	f	f	849	\N	2023-09-27 14:59:57.873874+01	\N
+buitenspel	offside	\N	https://forvo.com/word/buitenspel/#nl	f	f	1623	football	2023-09-27 14:59:57.873874+01	\N
+de directeur	the (company) director	\N	https://forvo.com/word/directeur/#nl	f	f	1144	professions	2023-09-27 14:59:57.873874+01	\N
+het bier	the beer	\N	https://forvo.com/word/bier/#nl	f	f	1161	food/drink	2023-09-27 14:59:57.873874+01	\N
+puistje	pimple	noun	https://forvo.com/word/puistje/#nl	f	f	1024	body	2023-09-27 14:59:57.873874+01	\N
+de schildpad	the turtle	\N	https://forvo.com/word/schildpad/#nl	f	f	2028	animals (1)	2023-09-27 14:59:57.873874+01	\N
+de straat	the street	\N	https://forvo.com/word/straat/#nl	f	f	1197	traffic/buildings	2023-09-27 14:59:57.873874+01	\N
+\.
+
+
+--
+-- Name: category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.category_id_seq', 45, true);
 
 
 --
@@ -1983,7 +2344,7 @@ SELECT pg_catalog.setval('public.lesson_id_seq', 4, true);
 -- Name: vocabulary_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('public.vocabulary_id_seq', 2207, true);
+SELECT pg_catalog.setval('public.vocabulary_id_seq', 2540, true);
 
 
 --
@@ -1991,7 +2352,7 @@ SELECT pg_catalog.setval('public.vocabulary_id_seq', 2207, true);
 --
 
 ALTER TABLE ONLY public.category
-    ADD CONSTRAINT category_pkey PRIMARY KEY (name);
+    ADD CONSTRAINT category_pkey PRIMARY KEY (id);
 
 
 --
