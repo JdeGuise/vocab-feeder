@@ -5,7 +5,7 @@
   "main": "server/src/index.ts",
   "scripts": {
     "start": "NODE_PATH='./node_modules' NODE_ENV='production' npm-run-all clean build --parallel watch:build watch:server --print-label",
-    "build": "tsc; cp ./server/.env ./dist/server",
+    "build": "tsc; cp .env ./dist/server",
     "build-project": "concurrently 'npm start' 'cd client; npm start'",
     "clean": "rimraf ./dist/server",
     "test": "echo \"Error: no test specified\" && exit 1",
