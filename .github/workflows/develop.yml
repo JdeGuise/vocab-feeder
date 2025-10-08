@@ -16,7 +16,7 @@ jobs:
           node-version: '18'
       - name: 🏗️ Build backend
         run: |
-          npm ci
+          npm install
           npm run build:server
       - name: 🏗️ Build frontend
         run: |
