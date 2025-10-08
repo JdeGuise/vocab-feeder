@@ -38,7 +38,7 @@ jobs:
           # Copy server
           cp -r dist/server deploy/
           # Copy client build
-          cp -r client/build deploy/client
+          cp -r dist/client deploy/client
           # Copy package.json and production dependencies
           cp package.json deploy/
           cd deploy
