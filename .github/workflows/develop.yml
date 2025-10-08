@@ -2,39 +2,43 @@ on:
   push:
     branches:
       - develop
-name: 🚀 Deploy website on push
+name: 🚀 Build & Deploy Vocab Feeder (Develop)
 jobs:
   web-deploy:
-    name: 🎉 Build & Deploy
+    name: 🎉 Build & Deploy to Namecheap
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
       - name: 🔧 Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-      - name: 📦 Install backend dependencies
-        run: npm install
       - name: 🏗️ Build backend
         run: |
-          npm run clean
+          npm ci
           npm run build:server
       - name: 🏗️ Build frontend
         run: |
           cd client
-          npm install
+          npm ci
           npm run build
           cd ..
-      - name: 📂 Prepare deployment folder
+      - name: 📁 Prepare deploy package
         run: |
           mkdir -p deploy
-          cp -r dist/server deploy/
-          cp -r dist/client deploy/client
-      - name: 🚀 Deploy to Namecheap
+          cp -r dist deploy/dist
+          cp -r client/build deploy/client
+          cp package.json deploy/
+      - name: 🚀 FTP Deploy to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: vocabfeeder-dev.johndeguise.com
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           server-dir: /vocabfeeder-dev.johndeguise.com/
+          exclude: |
+            **/node_modules/**
+            **/.git*/**
+            **/src/**
+            **/client/src/**
