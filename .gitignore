@@ -13,7 +13,6 @@ localStorage/
 
 # app builds
 build/
-dist/
 
 # sample data
 *.sql
