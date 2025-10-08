@@ -2,7 +2,7 @@ on:
   push:
     branches:
       - master
-name: 🚀 Build & Deploy Vocab Feeder (Staging)
+name: 🚀 Build & Deploy Vocab Feeder (Production)
 jobs:
   web-deploy:
     name: 🎉 Build & Deploy to Namecheap
