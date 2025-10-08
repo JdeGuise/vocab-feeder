@@ -72,7 +72,7 @@ const Toast = ({ message, type, id }) => {
     return () => {
       clearTimeout(timerID.current);
     };
-  }, [handleDismiss]);
+  });
 
   return (
     <div
