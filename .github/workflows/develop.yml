@@ -29,7 +29,7 @@ jobs:
       - name: 📂 Prepare deployment folder
         run: |
           mkdir -p deploy
-          cp -r server/dist deploy/
+          cp -r dist/server deploy/
           cp -r client/build deploy/client
       - name: 🚀 Deploy to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
