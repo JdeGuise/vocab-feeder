@@ -33,7 +33,7 @@ const toastTypes = {
 };
 
 const Toast = ({ message, type, id }) => {
-  const { toastClass, icon, iconClass, progressBarClass } = toastTypes[type];
+  const { icon, iconClass, progressBarClass } = toastTypes[type];
   const toast = useToast(); // call useToast
   const timerID = useRef(null); // create a Reference
   const progressRef = useRef(null);
@@ -72,7 +72,7 @@ const Toast = ({ message, type, id }) => {
     return () => {
       clearTimeout(timerID.current);
     };
-  }, []);
+  }, [handleDismiss]);
 
   return (
     <div
