@@ -8,9 +8,7 @@
     "build:server": "tsc",
     "build": "npm run clean && npm run build:server",
     "start": "node ./server/dist/index.js",
-    "dev": "NODE_ENV=development npx nodemon server/src/index.ts",
-    "lint": "eslint . --ext .js,.ts,.tsx",
-    "lint-fix": "eslint --fix . --ext .js,.ts,.tsx"
+    "dev": "NODE_ENV=development npx nodemon server/src/index.ts"
   },
   "repository": {
     "type": "git",

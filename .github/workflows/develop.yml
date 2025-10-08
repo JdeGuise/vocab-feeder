@@ -17,7 +17,9 @@ jobs:
       - name: 📦 Install backend dependencies
         run: npm install
       - name: 🏗️ Build backend
-        run: npm run clean && npm run build:server
+        run: |
+          npm run clean
+          npm run build:server
       - name: 🏗️ Build frontend
         run: |
           cd client
