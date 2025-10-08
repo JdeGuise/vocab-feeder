@@ -5,16 +5,36 @@ on:
 name: 🚀 Deploy website on push
 jobs:
   web-deploy:
-    name: 🎉 Deploy
+    name: 🎉 Build & Deploy
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v4
-    
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-      with:
-        server: vocabfeeder-stg.johndeguise.com
-        username: ${{ secrets.ftp_username }}
-        password: ${{ secrets.ftp_password }}
-        server-dir: /vocabfeeder-stg.johndeguise.com/
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v4
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: 📦 Install backend dependencies
+        run: npm install
+      - name: 🏗️ Build backend
+        run: |
+          npm run clean
+          npm run build:server
+      - name: 🏗️ Build frontend
+        run: |
+          cd client
+          npm install
+          npm run build
+          cd ..
+      - name: 📂 Prepare deployment folder
+        run: |
+          mkdir -p deploy
+          cp -r dist/server deploy/
+          cp -r dist/client deploy/client
+      - name: 🚀 Deploy to Namecheap
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: vocabfeeder-stg.johndeguise.com
+          username: ${{ secrets.ftp_username }}
+          password: ${{ secrets.ftp_password }}
+          server-dir: /vocabfeeder-stg.johndeguise.com/
