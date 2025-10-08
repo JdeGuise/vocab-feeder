@@ -1,35 +1,50 @@
+name: 🚀 Build & Deploy Vocab Feeder (Develop)
+
 on:
   push:
     branches:
       - develop
-name: 🚀 Build & Deploy Vocab Feeder (Develop)
+
 jobs:
   web-deploy:
     name: 🎉 Build & Deploy to Namecheap
     runs-on: ubuntu-latest
+
     steps:
-      - name: 🚚 Get latest code
+      - name: 🚚 Checkout latest code
         uses: actions/checkout@v4
+
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+
       - name: 🏗️ Build backend
         run: |
-          npm install
+          npm install --omit=dev
           npm run build:server
+
       - name: 🏗️ Build frontend
         run: |
           cd client
-          npm install
+          npm install --omit=dev
           npm run build
           cd ..
+
       - name: 📁 Prepare deploy package
         run: |
+          rm -rf deploy
           mkdir -p deploy
+          # Copy server
           cp -r dist/server deploy/
+          # Copy client build
           cp -r dist/client deploy/client
+          # Copy package.json and production dependencies
           cp package.json deploy/
+          cd deploy
+          npm install --omit=dev
+          cd ..
+
       - name: 🚀 FTP Deploy to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
