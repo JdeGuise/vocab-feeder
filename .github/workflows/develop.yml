@@ -27,8 +27,8 @@ jobs:
       - name: 📁 Prepare deploy package
         run: |
           mkdir -p deploy
-          cp -r dist deploy/dist
-          cp -r client/build deploy/client
+          cp -r dist/server deploy/
+          cp -r dist/client deploy/client
           cp package.json deploy/
       - name: 🚀 FTP Deploy to Namecheap
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
