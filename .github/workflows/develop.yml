@@ -21,7 +21,7 @@ jobs:
       - name: 🏗️ Build frontend
         run: |
           cd client
-          npm ci
+          npm install
           npm run build
           cd ..
       - name: 📁 Prepare deploy package
